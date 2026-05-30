@@ -1,6 +1,6 @@
 <nav class="bg-white shadow-md sticky top-0 z-50">
     <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-        <a href="{{ route('home') }}" class="text-3xl font-extrabold text-primary-600">Cartzen</a>
+        <a href="{{ route('home') }}" class="text-3xl font-extrabold text-primary-600"><img class="h-[90px]" src="frontend/images/cartzen_logo.png " alt=""></a>
         <div class="hidden md:flex space-x-6 items-center">
             <a href="{{ route('home') }}" class="hover:text-primary-600 transition">Home</a>
             <a href="{{ route('shop') }}" class="hover:text-primary-600 transition">Shop</a>
