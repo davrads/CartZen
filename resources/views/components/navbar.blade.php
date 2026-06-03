@@ -3,7 +3,7 @@
         <a href="{{ route('home') }}" class="text-3xl font-extrabold text-primary-600"><img class="h-[90px]" src="frontend/images/cartzen_logo.png " alt=""></a>
         <div class="hidden md:flex space-x-6 items-center">
             <a href="{{ route('home') }}" class="hover:text-primary-600 transition">Home</a>
-            <a href="{{ route('shop') }}" class="hover:text-primary-600 transition">Shop</a>
+            <a href="{{ route('shop', ['slug' => 'mobiles-tablets']) }}" class="hover:text-primary-600 transition">Shop</a>
             <a href="{{ route('cart.index') }}" class="hover:text-primary-600 transition">Cart</a>
             @auth
                 @if(auth()->user()->role == 'vendor')
