@@ -2,51 +2,76 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cart;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class CartController extends Controller
 {
+    private function getSessionId()
+    {
+        if (!session()->has('cart_session')) {
+            session()->put('cart_session', Str::random(40));
+        }
+        return session()->get('cart_session');
+    }
+
     public function index()
     {
-        $cart = session()->get('cart', []);
-        return view('frontend.cart', compact('cart'));
+        $cartItems = $this->getCartItems();
+        $subtotal = $cartItems->sum(fn($item) => $item->product->price * $item->quantity);
+        return view('cart.index', compact('cartItems', 'subtotal'));
     }
 
-    public function add(Request $request, $id)
+    public function add(Request $request, Product $product)
     {
-        $product = Product::findOrFail($id);
-        $cart = session()->get('cart', []);
+        $request->validate(['quantity' => 'integer|min:1']);
 
-        if (isset($cart[$id])) {
-            $cart[$id]['quantity']++;
+        $cart = Cart::where(function ($q) {
+            if (Auth::check()) {
+                $q->where('user_id', Auth::id());
+            } else {
+                $q->where('session_id', $this->getSessionId());
+            }
+        })->where('product_id', $product->id)->first();
+
+        if ($cart) {
+            $cart->increment('quantity', $request->quantity);
         } else {
-            $cart[$id] = [
-                'name' => $product->name,
-                'price' => $product->price,
-                'quantity' => 1,
-                'image' => $product->image,
-            ];
+            Cart::create([
+                'user_id' => Auth::id(),
+                'session_id' => !Auth::check() ? $this->getSessionId() : null,
+                'product_id' => $product->id,
+                'quantity' => $request->quantity,
+            ]);
         }
-        session()->put('cart', $cart);
-        return redirect()->back()->with('success', 'Product added to cart!');
+
+        return redirect()->route('cart.index')->with('success', 'Product added to cart!');
     }
 
-    public function remove($id)
+    public function update(Request $request, Cart $cart)
     {
-        $cart = session()->get('cart');
-        if (isset($cart[$id])) {
-            unset($cart[$id]);
-            session()->put('cart', $cart);
-        }
-        return redirect()->back();
+        $cart->update(['quantity' => $request->quantity]);
+        return redirect()->route('cart.index')->with('success', 'Cart updated');
     }
 
-    public function update(Request $request, $id)
+    public function destroy(Cart $cart)
     {
-        $cart = session()->get('cart');
-        $cart[$id]['quantity'] = $request->quantity;
-        session()->put('cart', $cart);
-        return redirect()->back();
+        $cart->delete();
+        return redirect()->route('cart.index')->with('success', 'Item removed');
+    }
+
+    private function getCartItems()
+    {
+        return Cart::with('product')
+            ->where(function ($q) {
+                if (Auth::check()) {
+                    $q->where('user_id', Auth::id());
+                } else {
+                    $q->where('session_id', $this->getSessionId());
+                }
+            })->get();
     }
 }

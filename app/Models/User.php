@@ -2,43 +2,19 @@
 
 namespace App\Models;
 
-use Filament\Models\Contracts\FilamentUser;
-use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    public function vendorProfile()
-    {
-        return $this->hasOne(VendorProfile::class);
-    }
-
-    public function customerProfile()
-    {
-        return $this->hasOne(CustomerProfile::class);
-    }
-
-    public function addresses()
-    {
-        return $this->hasMany(Address::class);
-    }
-
     protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'role',
-        'phone',
+        'name', 'email', 'password', 'phone', 'address', 'role',
     ];
 
-    protected $hidden = [
-        'password',
-        'remember_token'
-    ];
+    protected $hidden = ['password', 'remember_token'];
 
     protected function casts(): array
     {
@@ -48,19 +24,18 @@ class User extends Authenticatable implements FilamentUser
         ];
     }
 
-
-
-
-    public function products()
+    public function vendor()
     {
-        return $this->hasMany(Product::class, 'vendor_id');
+        return $this->hasOne(Vendor::class);
     }
-    public function canAccessPanel(Panel $panel): bool
+
+    public function isAdmin()
     {
-        return match ($panel->getId()) {
-            'admin' => $this->role === 'admin',
-            'vendor' => $this->role === 'vendor',
-            default => false,
-        };
+        return $this->role === 'admin';
+    }
+
+    public function isVendor()
+    {
+        return $this->role === 'vendor';
     }
 }

@@ -13,14 +13,20 @@ class DatabaseSeeder extends Seeder
     /**
      * Seed the application's database.
      */
-    public function run(): void
-    {
-        $this->call(UserSeeder::class);
-        $this->call(VendorProfileSeeder::class);
-        $this->call(CategorySeeder::class);
-        $this->call(ProductSeeder::class);
-        $this->call(ProductVariantSeeder::class);
-        $this->call(ProductImageSeeder::class);
 
-    }
+    public function run()
+{
+    \App\Models\User::factory(10)->create(); // only if you have factories
+    // or manually:
+    \App\Models\Category::create(['name' => 'Electronics', 'slug' => 'electronics']);
+}
+    // public function run(): void
+    // {
+    //     // User::factory(10)->create();
+
+    //     User::factory()->create([
+    //         'name' => 'Test User',
+    //         'email' => 'test@example.com',
+    //     ]);
+    // }
 }

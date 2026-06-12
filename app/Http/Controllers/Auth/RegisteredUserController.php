@@ -12,8 +12,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
-use App\Models\Vendor;
-
 
 class RegisteredUserController extends Controller
 {
@@ -44,25 +42,10 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        // inside store() after creating user:
-        if ($request->role === 'vendor') {
-            $request->validate([
-        'shop_name' => 'required|string|max:255',
-        'shop_phone' => 'nullable|string',
-    ]);
-            Vendor::create([
-            'user_id' => $user->id,
-            'shop_name' => $request->shop_name,
-            'phone' => $request->shop_phone,
-            'description' => $request->shop_description,
-    ]);
-// original code below
         event(new Registered($user));
 
         Auth::login($user);
 
         return redirect(route('dashboard', absolute: false));
     }
-    return redirect()->route('dashboard');
-}
 }
