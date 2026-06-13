@@ -35,6 +35,16 @@
                 >
                     Cart
                 </a>
+
+                 <a
+                    href="{{'frontend.category'}}"
+                    class="text-gray-700 hover:text-purple-600 font-medium transition duration-200"
+                >
+                    Category
+                </a>
+
+
+
             </div>
 
             <!-- Right Section -->
@@ -73,7 +83,7 @@
                         Register
                     </a>
                 @endauth --}}
-                
+
             </div>
 
         </div>

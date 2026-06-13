@@ -35,6 +35,7 @@ Route::middleware('guest')->group(function () {
     Route::get('/auth/google/login', [CustomerAuthController::class, 'googleLogin'])
         ->name('google.login');
 
+<<<<<<< Updated upstream
     Route::get('/auth/google/register', [CustomerAuthController::class, 'googleRegister'])
         ->name('google.register');
 
@@ -47,5 +48,11 @@ Route::post('/logout', [CustomerAuthController::class, 'logout'])
     ->name('logout');
 
   Route::get('/category/', function(){
+=======
+// require __DIR__.'/auth.php';
+
+
+Route::get('/category/', function(){
+>>>>>>> Stashed changes
     return view('/frontend.category');
 });

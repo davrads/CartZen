@@ -266,17 +266,17 @@
                 <h1 class="text-5xl lg:text-6xl font-bold leading-tight tracking-tight">
                     Big Deals for a<br>Better Life
                 </h1>
-                
+
                 <p class="text-2xl text-purple-100 font-light">
                     Up to <span class="font-bold text-white">60% OFF</span> on Premium Products
                 </p>
 
                 <div class="flex items-center gap-4">
-                    <a href="{{ route('shop') }}" 
+                    <a href="{{ route('shop') }}"
                        class="inline-block bg-white text-purple-700 hover:bg-purple-50 px-10 py-4 rounded-2xl font-semibold text-lg transition-all duration-300 hover:scale-105 shadow-xl">
                         Shop Now
                     </a>
-                    <a href="#" 
+                    <a href="#"
                        class="inline-block border border-white/50 hover:border-white/80 px-8 py-4 rounded-2xl font-medium transition-all">
                         Browse Categories
                     </a>
@@ -299,7 +299,7 @@
             </div>
 
             <div class="flex justify-center lg:justify-end">
-                <img src="https://via.placeholder.com/620x520/4F46E5/FFFFFF?text=Premium+Collection" 
+                <img src="https://via.placeholder.com/620x520/4F46E5/FFFFFF?text=Premium+Collection"
                      class="rounded-3xl shadow-2xl w-full max-w-lg lg:max-w-none object-cover"
                      alt="Premium Products">
             </div>
@@ -316,10 +316,10 @@
                 <span class="text-4xl">⚡</span>
                 <h2 class="text-4xl font-bold tracking-tight">Flash Deals</h2>
             </div>
-            
+
             <div class="flex items-center gap-3">
                 <span class="text-sm font-medium text-gray-500 uppercase tracking-widest">Ends in</span>
-                <div id="timer" 
+                <div id="timer"
                      class="bg-red-600 text-white px-7 py-3 rounded-2xl font-mono text-2xl font-bold shadow-lg">
                     02:45:18
                 </div>
@@ -334,7 +334,7 @@
 
         <div class="text-center mt-10">
             <a href="#" class="text-purple-600 hover:text-purple-700 font-semibold flex items-center justify-center gap-2">
-                View All Flash Deals 
+                View All Flash Deals
                 <span class="text-xl">→</span>
             </a>
         </div>
@@ -344,10 +344,10 @@
     <section class="bg-gray-50 py-16">
         <div class="max-w-7xl mx-auto px-6">
             <h2 class="text-3xl font-bold text-center mb-12">Shop by Category</h2>
-            
+
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-6">
                 @foreach($categories ?? [] as $category)
-                    <a href="{{ route('category.show', $category->slug) }}" 
+                    <a href="{{ route('category.show', $category->slug) }}"
                        class="group bg-white rounded-3xl p-6 text-center shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                         <div class="text-5xl mb-4 transition-transform group-hover:scale-110">
                             {{ $category->emoji ?? '🛍️' }}
@@ -377,7 +377,7 @@
     <section class="bg-gray-900 text-white py-16">
         <div class="max-w-7xl mx-auto px-6">
             <h2 class="text-3xl font-bold text-center mb-12">Trusted Vendors</h2>
-            
+
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach($vendors ?? [] as $vendor)
                     <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-8 hover:bg-white/10 transition-all group">
@@ -390,7 +390,7 @@
                                 <p class="text-purple-300 text-sm">Verified Seller</p>
                             </div>
                         </div>
-                        <a href="{{ route('vendor.store', $vendor->id) }}" 
+                        <a href="{{ route('vendor.store', $vendor->id) }}"
                            class="block text-center border border-white/30 hover:border-white py-3 rounded-2xl font-medium transition-colors">
                             Visit Store →
                         </a>
@@ -411,11 +411,11 @@
 
     setInterval(() => {
         if (timeLeft <= 0) return;
-        
+
         timeLeft--;
         const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
         const seconds = (timeLeft % 60).toString().padStart(2, '0');
-        
+
         timerEl.textContent = `${minutes}:${seconds}`;
     }, 1000);
 </script>
@@ -448,16 +448,16 @@
         </h2>
         <span class="bg-red-100 text-red-600 px-6 py-2 rounded-xl font-semibold" id="timer">02:45:18</span>
     </div>
-    
+
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         <x-product-card :discount="true" />
-        <x-product-card :discount="true" 
+        <x-product-card :discount="true"
                         name="boAt Rockers 450 Headphones"
                         price="2,399"
                         original_price="3,499" />
-        <x-product-card name="Xiaomi Redmi Note 13" 
+        <x-product-card name="Xiaomi Redmi Note 13"
                         price="23,999" />
-        <x-product-card :discount="true" 
+        <x-product-card :discount="true"
                         name="Realme C67 5G"
                         price="17,999"
                         original_price="21,999" />
