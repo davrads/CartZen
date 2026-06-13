@@ -109,11 +109,8 @@
                 Help
             </a>
 
-            <a href="#" class="hover:text-purple-600 transition">
-                Register
-            </a>
-
-            <a href="#"
+        
+            <a href="/login"
                 class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition">
                 Login
             </a>

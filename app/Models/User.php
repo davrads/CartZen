@@ -33,6 +33,7 @@ class User extends Authenticatable implements FilamentUser
         'password',
         'role',
         'phone',
+        'google_id',
     ];
 
     protected $hidden = [
