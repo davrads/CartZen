@@ -45,3 +45,7 @@ Route::middleware('guest')->group(function () {
 Route::post('/logout', [CustomerAuthController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
+
+  Route::get('/category/', function(){
+    return view('/frontend.category');
+});
