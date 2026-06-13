@@ -1,59 +1,128 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# CartZen Project Overview
+## Project Title
+CartZen - Multi-Vendor E-Commerce Platform
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
 
-## About Laravel
+## Project Description
+CartZen is a web-based multi-vendor e-commerce platform   that enables multiple vendors to sell products through a centralized marketplace. The platform provides separate dashboards and functionalities for administrators, vendors, and customers.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Administrators can manage vendors, customers, categories, and products. Vendors can manage their own products, product variants, and product images. Customers can browse products, add items to their cart, place orders, and track purchases.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+The project is being developed as a team-based Laravel application following the MVC architecture and RESTful API principles.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Project Objectives
+- Build a scalable multi-vendor marketplace.
+- Provide a centralized platform for vendors and customers.
+- Implement role-based access control for Admin, Vendor, and Customer users.
+- Develop a responsive and user-friendly shopping experience.
+- Create an efficient product and inventory management system.
+- Enable secure order and checkout processes.
+- Provide an administrative dashboard for platform management.
 
-## Learning Laravel
+## Core Features
+### Authentication & User Management
+- User Registration & Login using Google  
+- Role-Based Access Control
+- Admin Dashboard
+- Vendor Profiles
+- Customer Profiles
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### Vendor Management
+- Vendor Registration
+- Vendor Approval
+- Vendor Profile Management
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Platform for-
+- Product Browsing
+- Product Search
+- Category Filtering
+- Product Details Page
 
-## Laravel Sponsors
+### Product Management
+- Category Management
+- Product Management
+- Product Image Management
+- Product Variant Management
+- Inventory Stock Tracking
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Shopping Experience
+- Shopping Cart
+- Checkout Process
+- Order Placement
+- Make Payment
+- Order Tracking
 
-### Premium Partners
+### Administration
+- Vendor Management
+- Customer Management
+- Product Monitoring
+- Dashboard Analytics
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## User Roles
+### Administrator
+- Manage Vendors
+- Manage Customers
+- Manage Categories
+- Monitor Products
+- View Platform Analytics
 
-## Contributing
+### Vendor
+- Manage Products
+- Manage Product Images
+- Manage Product Variants
+- Manage Inventory
+- View Orders
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Customer
+- Browse Products
+- Manage Cart
+- Place Orders
+- Track Orders
+- Make Payments
 
-## Code of Conduct
+## Technology Stacks
+### Backend
+- PHP
+- Laravel Framework
+- Laravel Eloquent ORM
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Frontend
+- Laravel Blade Templates
+- HTML
+- CSS
+- JavaScript
 
-## Security Vulnerabilities
+### Database
+- MYSQL
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Backend Dashboard
+- Filament
 
-## License
+### Development Tools
+- Version Control: Git & Github
+- Backend Package Manager: Composer
+- Frontend Package Manager & Build Tool: npm
+- IDE: Visual Studio Code 
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## System Architecture
+Client Browser
+↓
+Laravel Blade Frontend
+↓
+Controllers
+↓
+Services/Logics
+↓
+Models (Eloquent ORM)
+↓
+MySQL Database
+
+## Expected Outcome 
+CartZen will provide a complete multi-vendor e-commerce solution where vendors can efficiently manage products and customers can seamlessly browse, purchase and track products through a modern web interface.
+
+## Future Additions
+- Product reviews and ratings
+- Wishlist functionality
+- Advanced analytics and reporting
+- Email and SMS notifications
+- Mobile application support
