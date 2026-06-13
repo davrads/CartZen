@@ -13,6 +13,6 @@ class VendorMiddleware
         if (Auth::check() && Auth::user()->role === 'vendor') {
             return $next($request);
         }
-        abort(403, 'Unauthorized – Vendor area only.');
+        abort(403, 'Unauthorized');
     }
 }
