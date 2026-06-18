@@ -51,3 +51,7 @@ Route::post('/logout', [CustomerAuthController::class, 'logout'])
 Route::get('/category/', function(){
     return view('/frontend.category');
 });
+
+Route::get('/user_profile', function(){
+    return view('/profile.user_profile');
+});
