@@ -37,7 +37,7 @@
                 </a>
 
                  <a
-                    href="{{'frontend.category'}}"
+                    href="/categories"
                     class="text-gray-700 hover:text-purple-600 font-medium transition duration-200"
                 >
                     Category
@@ -155,11 +155,11 @@
 
         <!-- Cart & Login -->
         <div class="flex items-center gap-6">
-            <a href="#" class="text-gray-700 hover:text-purple-500 flex items-center gap-1 text-sm">
+            <a href="/user_profile" class="text-gray-700 hover:text-purple-500 flex items-center gap-1 text-sm">
                 <i class="fas fa-user-circle text-2xl"></i>
                 <span class="hidden md:inline">Account</span>
             </a>
-            <a href="#" class="text-gray-700 hover:text-purple-500 flex items-center gap-1 text-sm relative">
+            <a href="{{route('cart.index')}}" class="text-gray-700 hover:text-purple-500 flex items-center gap-1 text-sm relative">
                 <i class="fas fa-shopping-cart text-2xl"></i>
                 <span class="absolute -top-2 -right-3 bg-purple-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
                 <span class="hidden md:inline">Cart</span>

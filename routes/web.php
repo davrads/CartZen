@@ -3,18 +3,18 @@
 use App\Http\Controllers\Auth\CustomerAuthController;
 use App\Http\Controllers\FrontendController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [FrontendController::class, 'home'])->name('home');
 Route::get('/shop', [FrontendController::class, 'shop'])->name('shop');
-Route::get('/product/{slug}', [FrontendController::class, 'productShow'])->name('product.show');
+Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
 Route::get('/vendor-store/{id}', [FrontendController::class, 'vendorStore'])->name('vendor.store');
 
 
-Route::prefix('cart')->group(function () {
-    Route::get('/', [CartController::class, 'index'])->name('cart.index');
-});
+
 
 Route::prefix('checkout')->group(function () {
     Route::get('/', [CheckoutController::class, 'index'])->name('checkout');
@@ -22,6 +22,7 @@ Route::prefix('checkout')->group(function () {
 });
 
 Route::middleware('guest')->group(function () {
+
     Route::get('/login', [CustomerAuthController::class, 'showLogin'])
         ->name('login');
 
@@ -42,16 +43,22 @@ Route::middleware('guest')->group(function () {
         ->name('google.callback');
 });
 
-Route::post('/logout', [CustomerAuthController::class, 'logout'])
-    ->middleware('auth')
+Route::middleware('auth')->group(function () {
+
+    Route::get('/user_profile', function () {
+        return view('profile.user_profile');
+    })->name('profile');
+
+    Route::prefix('cart')->group(function () {
+        Route::get('/', [CartController::class, 'index'])
+            ->name('cart.index');
+    });
+
+    Route::post('/logout', [CustomerAuthController::class, 'logout'])
     ->name('logout');
-
-
-
-Route::get('/category/', function(){
-    return view('/frontend.category');
 });
 
-Route::get('/user_profile', function(){
-    return view('/profile.user_profile');
-});
+
+
+Route::get('/categories', [CategoryController::class, 'index'])
+    ->name('categories.index');

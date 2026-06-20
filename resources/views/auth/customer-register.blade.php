@@ -55,7 +55,7 @@
                             </div>
                             <p class="mt-1 text-xs text-gray-500">Min. 8 characters</p>
                         </div>
-                        <div>
+                        <!-- <div>
                             <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirm</label>
                             <div class="mt-1 relative rounded-md shadow-sm">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -65,7 +65,7 @@
                                     class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary sm:text-sm transition"
                                     placeholder="••••••••">
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
 

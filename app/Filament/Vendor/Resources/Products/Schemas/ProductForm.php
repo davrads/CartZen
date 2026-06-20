@@ -2,6 +2,7 @@
 
 namespace App\Filament\Vendor\Resources\Products\Schemas;
 
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -43,7 +44,7 @@ class ProductForm
                 TextInput::make('stock')
                     ->required()
                     ->numeric(),
-                TextInput::make('thumbnail')
+                FileUpload::make('thumbnail')
                     ->default(null),
                 Select::make('status')
                     ->options(['available' => 'Available', 'out_of_stock' => 'Out of stock'])
