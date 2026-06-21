@@ -227,7 +227,7 @@
     <div id="sidebar-overlay" class="fixed inset-0 bg-black/30 lg:hidden" onclick="closeSidebar()"></div>
 
     <!-- Sidebar -->
-    <div class="bg-white grid grid-cols-2  ">
+    <div class="bg-white grid lg:grid-cols-[auto,1fr]  ">
         <aside id="sidebar"
             class=" left-0 h-[calc(100vh-5rem)] overflow-y-auto w-64 bg-white shadow-xl z-50 flex flex-col transition-transform duration-300 -translate-x-full lg:translate-x-0 lg:shadow-none lg:border-r lg:border-gray-100">
 
