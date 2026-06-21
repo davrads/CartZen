@@ -11,8 +11,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [FrontendController::class, 'home'])->name('home');
 Route::get('/shop', [FrontendController::class, 'shop'])->name('shop');
 Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
-Route::get('/vendor-store/{id}', [FrontendController::class, 'vendorStore'])->name('vendor.store');
-
+Route::get('/vendor-store', function(){
+    return view('frontend.vendor-store');
+});
+Route::get('/categories', [CategoryController::class, 'index'])
+    ->name('categories.index');
 
 
 
@@ -36,10 +39,7 @@ Route::middleware('guest')->group(function () {
     Route::get('/auth/google/login', [CustomerAuthController::class, 'googleLogin'])
         ->name('google.login');
 
-<<<<<<< Updated upstream
-=======
 
->>>>>>> Stashed changes
     Route::get('/auth/google/register', [CustomerAuthController::class, 'googleRegister'])
         ->name('google.register');
 
@@ -60,25 +60,17 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/logout', [CustomerAuthController::class, 'logout'])
     ->name('logout');
-<<<<<<< Updated upstream
 });
 
 
 
-Route::get('/categories', [CategoryController::class, 'index'])
-    ->name('categories.index');
-=======
 
 
 
 
-Route::get('/category/', function(){
-    return view('/frontend.category');
-});
-
-Route::get('/vendor-store', function(){
-    return view('frontend.vendor-store');
-});
 
 
->>>>>>> Stashed changes
+
+
+
+
