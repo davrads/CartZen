@@ -19,8 +19,8 @@ return new class extends Migration
             $table->string('province');
             $table->string('district');
             $table->string('city');
+            $table->string('address_line');
             $table->string('postal_code');
-            $table->string('address');
             $table->boolean('is_default')->default(false);
             $table->timestamps();
         });

@@ -3,7 +3,6 @@
 @section('title', 'My Profile')
 
 @section('content')
-<!-- Custom Styles for Dashboard Components -->
 <style>
     body {
         font-family: 'DM Sans', sans-serif;
@@ -190,13 +189,11 @@
     }
 </style>
 
-<!-- Fonts (Note: Ideally place these inside layouts.app if possible) -->
 <link
     href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap"
     rel="stylesheet" />
 
 <div class="bg-gray-50 min-h-screen text-gray-800">
-    <!-- Mobile Topbar -->
     <header
         class="lg:hidden fixed top-0 left-0 right-0 z-30 bg-white shadow-sm flex items-center justify-between px-4 py-3">
         <div class="flex items-center gap-2">
@@ -209,7 +206,6 @@
                     <line x1="3" y1="18" x2="21" y2="18" />
                 </svg>
             </button>
-
         </div>
         <div class="relative">
             <input type="text" placeholder="Search…"
@@ -223,21 +219,20 @@
         </div>
     </header>
 
-    <!-- Sidebar Overlay -->
     <div id="sidebar-overlay" class="fixed inset-0 bg-black/30 lg:hidden" onclick="closeSidebar()"></div>
 
-    <!-- Sidebar -->
-    <div class="bg-white grid lg:grid-cols-[auto,1fr]  ">
+    <div class="bg-white grid lg:grid-cols-[auto,1fr]">
         <aside id="sidebar"
             class=" left-0 h-[calc(100vh-5rem)] overflow-y-auto w-64 bg-white shadow-xl z-50 flex flex-col transition-transform duration-300 -translate-x-full lg:translate-x-0 lg:shadow-none lg:border-r lg:border-gray-100">
 
             <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-100 shrink-0">
                 <div
                     class="w-11 h-11 rounded-full bg-violet-600 flex items-center justify-center text-white font-bold text-lg shrink-0">
-                    A</div>
+                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                </div>
                 <div class="min-w-0">
-                    <p class="font-semibold text-gray-900 text-sm truncate">Aaryan Shrestha</p>
-                    <p class="text-xs text-gray-400 truncate">aaryan@example.com</p>
+                    <p class="font-semibold text-gray-900 text-sm truncate">{{ auth()->user()->name }}</p>
+                    <p class="text-xs text-gray-400 truncate">{{ auth()->user()->email }}</p>
                 </div>
             </div>
 
@@ -310,250 +305,245 @@
                 </button>
             </nav>
 
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class=" flex items-center gap-3 px-3 py-2.5 rounded-xl  text-sm hover:bg-red-50 hover:text-red-600 transition">
-                        Logout
-                    </button>
-                </form>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="w-full text-left flex items-center gap-3 px-6 py-2.5 rounded-xl text-sm hover:bg-red-50 hover:text-red-600 transition">
+                    Logout
+                </button>
+            </form>
         </aside>
 
-        <!-- Main Content Dashboard Wrapper -->
         <div class="lg:ml--60 min-h-screen flex flex-col">
             <main class="flex-1 px-0 sm:px-6 lg:px-8 py-6 mt-14 lg:mt-0">
 
-                <!-- ===== MY PROFILE PAGE ===== -->
                 <div id="page-profile" class="page">
                     <h1 class="text-xl font-bold text-gray-900 mb-6">My Profile</h1>
                     <div class="max-w-2xl">
+                        @if(session('success'))
+                            <div class="mb-4 p-4 text-sm text-green-700 bg-green-100 rounded-xl">{{ session('success') }}</div>
+                        @endif
+                        @if($errors->any())
+                            <div class="mb-4 p-4 text-sm text-red-700 bg-red-100 rounded-xl">
+                                <ul>
+                                    @foreach($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
                         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-5">
-                            <div class="flex items-center gap-4 mb-6">
-                                <div
-                                    class="w-16 h-16 rounded-full bg-violet-600 flex items-center justify-center text-white font-bold text-2xl shrink-0">
-                                    A</div>
-                                <div>
-                                    <p class="font-bold text-gray-900 text-lg">Aaryan Shrestha</p>
-                                    <p class="text-sm text-gray-400">Member since Jan 2023</p>
+                            <form method="POST" action="{{ route('profile.update') }}">
+                                @csrf
+                                @method('PUT')
+                                <div class="flex items-center gap-4 mb-6">
+                                    <div class="w-16 h-16 rounded-full bg-violet-600 flex items-center justify-center text-white font-bold text-2xl shrink-0">
+                                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-gray-900 text-lg">{{ auth()->user()->name }}</p>
+                                        <p class="text-sm text-gray-400">Member since {{ auth()->user()->created_at->format('M Y') }}</p>
+                                    </div>
+                                    <button type="button" class="ml-auto text-sm text-violet-600 font-medium hover:underline">Change Photo</button>
                                 </div>
-                                <button class="ml-auto text-sm text-violet-600 font-medium hover:underline">Change
-                                    Photo</button>
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-xs font-semibold text-gray-500 mb-1.5">First Name</label>
-                                    <input type="text" value="Aaryan"
-                                        class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition" />
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-gray-500 mb-1.5">Last Name</label>
-                                    <input type="text" value="Shrestha"
-                                        class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition" />
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-gray-500 mb-1.5">Email
-                                        Address</label>
-                                    <input type="email" value="aaryan@example.com"
-                                        class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition" />
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-gray-500 mb-1.5">Phone
-                                        Number</label>
-                                    <input type="tel" value="+977 98XXXXXXXX"
-                                        class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition" />
-                                </div>
-                                <div class="sm:col-span-2">
-                                    <label class="block text-xs font-semibold text-gray-500 mb-1.5">Date of
-                                        Birth</label>
-                                    <input type="date" value="1999-05-14"
-                                        class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition" />
-                                </div>
-                            </div>
-                            <button
-                                class="mt-5 bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition">Save
-                                Changes</button>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div class="sm:col-span-2">
+        <label class="block text-xs font-semibold text-gray-500 mb-1.5">Full Name</label>
+        <input type="text" name="name" value="{{ old('name', auth()->user()->name) }}"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition" required />
+    </div>
+    <div>
+        <label class="block text-xs font-semibold text-gray-500 mb-1.5">Email Address</label>
+        <input type="email" name="email" value="{{ old('email', auth()->user()->email) }}"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition" required />
+    </div>
+    <div>
+        <label class="block text-xs font-semibold text-gray-500 mb-1.5">Phone Number</label>
+        <input type="tel" name="phone" value="{{ old('phone', auth()->user()->phone ?? (auth()->user()->addresses->where('is_default', 1)->first()->phone ?? (auth()->user()->addresses->first()->phone ?? ''))) }}"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition" />
+    </div>
+</div>
+                                <button type="submit" class="mt-5 bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition">Save Changes</button>
+                            </form>
                         </div>
+
                         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                            <h2 class="font-bold text-gray-800 mb-4 text-base">Change Password</h2>
-                            <div class="space-y-3">
-                                <div>
-                                    <label class="block text-xs font-semibold text-gray-500 mb-1.5">Current
-                                        Password</label>
-                                    <input type="password" placeholder="••••••••"
-                                        class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition" />
+                            <form method="POST" action="{{ route('password.update') }}">
+                                @csrf
+                                @method('PUT')
+                                <h2 class="font-bold text-gray-800 mb-4 text-base">Change Password</h2>
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-gray-500 mb-1.5">Current Password</label>
+                                        <input type="password" name="current_password" placeholder="••••••••"
+                                            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition" required />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-gray-500 mb-1.5">New Password</label>
+                                        <input type="password" name="password" placeholder="••••••••"
+                                            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition" required />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-gray-500 mb-1.5">Confirm New Password</label>
+                                        <input type="password" name="password_confirmation" placeholder="••••••••"
+                                            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition" required />
+                                    </div>
                                 </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-gray-500 mb-1.5">New
-                                        Password</label>
-                                    <input type="password" placeholder="••••••••"
-                                        class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition" />
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-gray-500 mb-1.5">Confirm New
-                                        Password</label>
-                                    <input type="password" placeholder="••••••••"
-                                        class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition" />
-                                </div>
-                            </div>
-                            <button
-                                class="mt-4 bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition">Update
-                                Password</button>
+                                <button type="submit" class="mt-4 bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition">Update Password</button>
+                            </form>
                         </div>
                     </div>
                 </div>
 
-                <!-- ===== ADDRESS BOOK PAGE ===== -->
                 <div id="page-address" class="page">
-                    <h1 class="text-xl font-bold text-gray-900 mb-6">Address Book</h1>
-                    <div class="max-w-2xl">
-                        <div class="flex items-center justify-between mb-4">
-                            <p class="text-sm text-gray-500">Your saved addresses</p>
-                            <button onclick="document.getElementById('add-address-form').classList.toggle('hidden')"
-                                class="flex items-center gap-1.5 text-sm font-semibold text-violet-600 hover:text-violet-800 transition">
-                                <svg width="15" height="15" fill="none" stroke="currentColor"
-                                    stroke-width="2.2" viewBox="0 0 24 24">
-                                    <line x1="12" y1="5" x2="12" y2="19" />
-                                    <line x1="5" y1="12" x2="19" y2="12" />
-                                </svg>
-                                Add New Address
-                            </button>
+    <h1 class="text-xl font-bold text-gray-900 mb-6">Address Book</h1>
+    <div class="max-w-2xl">
+        <div class="flex items-center justify-between mb-4">
+            <p class="text-sm text-gray-500">Your saved addresses</p>
+            <button onclick="openAddressForm()"
+                class="flex items-center gap-1.5 text-sm font-semibold text-violet-600 hover:text-violet-800 transition">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                Add New Address
+            </button>
+        </div>
+
+        <div id="add-address-form" class="hidden bg-violet-50 border border-violet-200 rounded-2xl p-5 mb-4">
+            <form id="addressForm" method="POST" action="{{ route('addresses.store') }}">
+                @csrf
+                <div id="method-field"></div> <h3 id="form-title" class="font-semibold text-gray-800 text-sm mb-3">New Address</h3>
+               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div>
+        <label for="adr_full_name" class="block text-xs font-semibold text-gray-500 mb-1.5">Full Name</label>
+        <input type="text" name="full_name" id="adr_full_name" placeholder="Full Name" required
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 bg-white transition" />
+    </div>
+
+    <div>
+        <label for="adr_phone" class="block text-xs font-semibold text-gray-500 mb-1.5">Phone Number</label>
+        <input type="tel" name="phone" id="adr_phone" placeholder="Phone Number" required
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 bg-white transition" />
+    </div>
+
+    <div class="sm:col-span-2">
+        <label for="adr_province" class="block text-xs font-semibold text-gray-500 mb-1.5">Province</label>
+        <input type="text" name="province" id="adr_province" placeholder="Province" required
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 bg-white transition" />
+    </div>
+
+    <div>
+        <label for="adr_district" class="block text-xs font-semibold text-gray-500 mb-1.5">District</label>
+        <input type="text" name="district" id="adr_district" placeholder="District" required
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 bg-white transition" />
+    </div>
+
+    <div>
+        <label for="adr_city" class="block text-xs font-semibold text-gray-500 mb-1.5">City</label>
+        <input type="text" name="city" id="adr_city" placeholder="City" required
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 bg-white transition" />
+    </div>
+
+    <div>
+        <label for="adr_address_line" class="block text-xs font-semibold text-gray-500 mb-1.5">Address Line</label>
+        <input type="text" name="address_line" id="adr_address_line" placeholder="Address Line" required
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 bg-white transition" />
+    </div>
+
+    <div>
+        <label for="adr_postal_code" class="block text-xs font-semibold text-gray-500 mb-1.5">Postal Code</label>
+        <input type="text" name="postal_code" id="adr_postal_code" placeholder="Postal Code" required
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 bg-white transition" />
+    </div>
+
+    <div class="sm:col-span-2 flex items-center gap-2 mt-2">
+        <input type="checkbox" name="is_default" id="is_default" value="1" 
+            class="rounded text-violet-600 focus:ring-violet-500 w-4 h-4 cursor-pointer">
+        <label for="is_default" class="text-xs font-medium text-gray-600 cursor-pointer select-none">Set as default address</label>
+    </div>
+</div>
+                <div class="flex gap-2 mt-3">
+                    <button type="submit" class="bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold px-5 py-2 rounded-xl transition">Save</button>
+                    <button type="button" onclick="document.getElementById('add-address-form').classList.add('hidden')"
+                        class="text-sm font-medium text-gray-500 hover:text-gray-700 px-4 py-2 rounded-xl border border-gray-200 bg-white transition">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="space-y-4">
+            @forelse(auth()->user()->addresses ?? [] as $address)
+                <div class="bg-white rounded-2xl shadow-sm {{ $address->is_default ? 'border-2 border-violet-400' : 'border border-gray-100' }} p-5">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                @if($address->is_default)
+                                    <span class="tag">Default</span>
+                                @endif
+                                <span class="tag">Saved</span>
+                            </div>
+                            <p class="font-semibold text-gray-800 text-sm mt-2">{{ $address->full_name }}</p>
+                            <p class="text-sm text-gray-500 mt-0.5">{{ $address->province }}, {{ $address->district }}, {{ $address->city }}, {{ $address->address_line }}</p>
+                            <p class="text-sm text-gray-400 mt-1">{{ $address->phone }}</p>
                         </div>
-                        <div id="add-address-form"
-                            class="hidden bg-violet-50 border border-violet-200 rounded-2xl p-5 mb-4">
-                            <h3 class="font-semibold text-gray-800 text-sm mb-3">New Address</h3>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <input type="text" placeholder="Full Name"
-                                    class="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 bg-white" />
-                                <input type="tel" placeholder="Phone Number"
-                                    class="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 bg-white" />
-                                <input type="text" placeholder="Address Line 1"
-                                    class="sm:col-span-2 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 bg-white" />
-                                <input type="text" placeholder="City"
-                                    class="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 bg-white" />
-                                <input type="text" placeholder="Province"
-                                    class="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 bg-white" />
-                            </div>
-                            <div class="flex gap-2 mt-3">
-                                <button
-                                    class="bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold px-5 py-2 rounded-xl transition">Save</button>
-                                <button onclick="document.getElementById('add-address-form').classList.add('hidden')"
-                                    class="text-sm font-medium text-gray-500 hover:text-gray-700 px-4 py-2 rounded-xl border border-gray-200 bg-white transition">Cancel</button>
-                            </div>
-                        </div>
-                        <div class="space-y-4">
-                            <div class="bg-white rounded-2xl shadow-sm border-2 border-violet-400 p-5">
-                                <div class="flex items-start justify-between">
-                                    <div>
-                                        <div class="flex items-center gap-2 mb-1"><span class="tag">Default</span><span
-                                                class="tag">Home</span></div>
-                                        <p class="font-semibold text-gray-800 text-sm mt-2">Aaryan Shrestha</p>
-                                        <p class="text-sm text-gray-500 mt-0.5">Thamel, Kathmandu, Bagmati Province,
-                                            44600</p>
-                                        <p class="text-sm text-gray-500">Nepal</p>
-                                        <p class="text-sm text-gray-400 mt-1">+977 98XXXXXXXX</p>
-                                    </div>
-                                    <div class="flex gap-2 shrink-0 ml-3">
-                                        <button class="text-xs text-violet-600 hover:underline font-medium">Edit</button>
-                                        <button class="text-xs text-red-400 hover:underline font-medium">Delete</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-                                <div class="flex items-start justify-between">
-                                    <div>
-                                        <div class="flex items-center gap-2 mb-1"><span class="tag">Work</span>
-                                        </div>
-                                        <p class="font-semibold text-gray-800 text-sm mt-2">Aaryan Shrestha</p>
-                                        <p class="text-sm text-gray-500 mt-0.5">Pulchowk, Lalitpur, Bagmati Province,
-                                            44700</p>
-                                        <p class="text-sm text-gray-500">Nepal</p>
-                                        <p class="text-sm text-gray-400 mt-1">+977 98XXXXXXXX</p>
-                                    </div>
-                                    <div class="flex gap-2 shrink-0 ml-3">
-                                        <button class="text-xs text-violet-600 hover:underline font-medium">Edit</button>
-                                        <button class="text-xs text-red-400 hover:underline font-medium">Delete</button>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="flex gap-2 shrink-0 ml-3">
+                            <button onclick="editAddress({{ json_encode($address) }})" class="text-xs text-violet-600 hover:underline font-medium"><i class=" text-lg fa-solid fa-pen-to-square"></i></button>
+                            <form method="POST" action="{{ route('addresses.destroy', $address->id) }}" onsubmit="return confirm('Are you sure?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-xs text-red-400 hover:underline font-medium">Delete</button>
+                            </form>
                         </div>
                     </div>
                 </div>
-
-                <!-- ===== MY ORDERS PAGE ===== -->
+            @empty
+                <div class="text-center py-8 text-gray-400 bg-white rounded-2xl border border-gray-100">
+                    <p class="text-sm">No saved addresses found.</p>
+                </div>
+            @endforelse
+        </div>
+    </div>
+</div>
                 <div id="page-orders" class="page active">
                     <h1 class="text-xl font-bold text-gray-900 mb-4">My Orders</h1>
                     <div class="flex gap-0 border-b border-gray-200 mb-5 overflow-x-auto">
-                        <button onclick="setTab(this,'all')" data-tab="all"
-                            class="tab-active px-4 sm:px-5 py-2.5 text-sm whitespace-nowrap transition">All</button>
-                        <button onclick="setTab(this,'processing')" data-tab="processing"
-                            class="tab-inactive px-4 sm:px-5 py-2.5 text-sm whitespace-nowrap transition">Processing</button>
-                        <button onclick="setTab(this,'shipped')" data-tab="shipped"
-                            class="tab-inactive px-4 sm:px-5 py-2.5 text-sm whitespace-nowrap transition">Shipped</button>
-                        <button onclick="setTab(this,'delivered')" data-tab="delivered"
-                            class="tab-inactive px-4 sm:px-5 py-2.5 text-sm whitespace-nowrap transition">Delivered</button>
-                        <button onclick="setTab(this,'cancelled')" data-tab="cancelled"
-                            class="tab-inactive px-4 sm:px-5 py-2.5 text-sm whitespace-nowrap transition">Cancelled</button>
+                        <button onclick="setTab(this,'all')" data-tab="all" class="tab-active px-4 sm:px-5 py-2.5 text-sm whitespace-nowrap transition">All</button>
+                        <button onclick="setTab(this,'processing')" data-tab="processing" class="tab-inactive px-4 sm:px-5 py-2.5 text-sm whitespace-nowrap transition">Processing</button>
+                        <button onclick="setTab(this,'shipped')" data-tab="shipped" class="tab-inactive px-4 sm:px-5 py-2.5 text-sm whitespace-nowrap transition">Shipped</button>
+                        <button onclick="setTab(this,'delivered')" data-tab="delivered" class="tab-inactive px-4 sm:px-5 py-2.5 text-sm whitespace-nowrap transition">Delivered</button>
+                        <button onclick="setTab(this,'cancelled')" data-tab="cancelled" class="tab-inactive px-4 sm:px-5 py-2.5 text-sm whitespace-nowrap transition">Cancelled</button>
                     </div>
-                    <div id="orders-list"
-                        class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden divide-y divide-gray-100">
-                        <div class="order-row flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 sm:px-6 py-4 sm:py-5"
-                            data-status="delivered">
-                            <div>
-                                <p class="order-id font-medium text-gray-800 text-sm">Order #CZ1234567890</p>
-                                <p class="text-xs text-gray-400 mt-0.5">May 12, 2024</p>
+                    <div id="orders-list" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden divide-y divide-gray-100">
+                        @if(isset($orders) && count($orders) > 0)
+                            @foreach($orders as $order)
+                                <div class="order-row flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 sm:px-6 py-4 sm:py-5" data-status="{{ $order->status }}">
+                                    <div>
+                                        <p class="order-id font-medium text-gray-800 text-sm">Order #{{ $order->order_number }}</p>
+                                        <p class="text-xs text-gray-400 mt-0.5">{{ $order->created_at->format('M d, Y') }}</p>
+                                    </div>
+                                    <div class="flex items-center gap-3 sm:gap-5 flex-wrap">
+                                        <span class="font-semibold text-gray-800 text-sm sm:text-base">Rs. {{ number_format($order->total_amount) }}</span>
+                                        <span class="badge badge-{{ $order->status }}">{{ ucfirst($order->status) }}</span>
+                                        <a href="#" class="text-violet-600 hover:text-violet-800 text-sm font-medium hover:underline transition">View Details</a>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="order-row flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 sm:px-6 py-4 sm:py-5" data-status="delivered">
+                                <div>
+                                    <p class="order-id font-medium text-gray-800 text-sm">Order #CZ1234567890</p>
+                                    <p class="text-xs text-gray-400 mt-0.5">May 12, 2024</p>
+                                </div>
+                                <div class="flex items-center gap-3 sm:gap-5 flex-wrap">
+                                    <span class="font-semibold text-gray-800 text-sm sm:text-base">Rs. 10,999</span>
+                                    <span class="badge badge-delivered">Delivered</span>
+                                    <a href="#" class="text-violet-600 hover:text-violet-800 text-sm font-medium hover:underline transition">View Details</a>
+                                </div>
                             </div>
-                            <div class="flex items-center gap-3 sm:gap-5 flex-wrap">
-                                <span class="font-semibold text-gray-800 text-sm sm:text-base">Rs. 10,999</span>
-                                <span class="badge badge-delivered">Delivered</span>
-                                <a href="#"
-                                    class="text-violet-600 hover:text-violet-800 text-sm font-medium hover:underline transition">View
-                                    Details</a>
-                            </div>
-                        </div>
-                        <div class="order-row flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 sm:px-6 py-4 sm:py-5"
-                            data-status="shipped">
-                            <div>
-                                <p class="order-id font-medium text-gray-800 text-sm">Order #CZ1234567889</p>
-                                <p class="text-xs text-gray-400 mt-0.5">May 05, 2024</p>
-                            </div>
-                            <div class="flex items-center gap-3 sm:gap-5 flex-wrap">
-                                <span class="font-semibold text-gray-800 text-sm sm:text-base">Rs. 2,199</span>
-                                <span class="badge badge-shipped">Shipped</span>
-                                <a href="#"
-                                    class="text-violet-600 hover:text-violet-800 text-sm font-medium hover:underline transition">View
-                                    Details</a>
-                            </div>
-                        </div>
-                        <div class="order-row flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 sm:px-6 py-4 sm:py-5"
-                            data-status="processing">
-                            <div>
-                                <p class="order-id font-medium text-gray-800 text-sm">Order #CZ1234567888</p>
-                                <p class="text-xs text-gray-400 mt-0.5">Apr 28, 2024</p>
-                            </div>
-                            <div class="flex items-center gap-3 sm:gap-5 flex-wrap">
-                                <span class="font-semibold text-gray-800 text-sm sm:text-base">Rs. 1,299</span>
-                                <span class="badge badge-processing">Processing</span>
-                                <a href="#"
-                                    class="text-violet-600 hover:text-violet-800 text-sm font-medium hover:underline transition">View
-                                    Details</a>
-                            </div>
-                        </div>
-                        <div class="order-row flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 sm:px-6 py-4 sm:py-5"
-                            data-status="cancelled">
-                            <div>
-                                <p class="order-id font-medium text-gray-800 text-sm">Order #CZ1234567887</p>
-                                <p class="text-xs text-gray-400 mt-0.5">Apr 20, 2024</p>
-                            </div>
-                            <div class="flex items-center gap-3 sm:gap-5 flex-wrap">
-                                <span class="font-semibold text-gray-800 text-sm sm:text-base">Rs. 899</span>
-                                <span class="badge badge-cancelled">Cancelled</span>
-                                <a href="#"
-                                    class="text-violet-600 hover:text-violet-800 text-sm font-medium hover:underline transition">View
-                                    Details</a>
-                            </div>
-                        </div>
+                        @endif
+
                         <div id="empty-state" class="hidden py-16 text-center text-gray-400">
-                            <svg class="mx-auto mb-3 w-12 h-12 text-gray-200" fill="none" stroke="currentColor"
-                                stroke-width="1.5" viewBox="0 0 24 24">
+                            <svg class="mx-auto mb-3 w-12 h-12 text-gray-200" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                 <rect x="2" y="3" width="20" height="14" rx="2" />
                                 <line x1="8" y1="21" x2="16" y2="21" />
                                 <line x1="12" y1="17" x2="12" y2="21" />
@@ -563,23 +553,18 @@
                     </div>
                 </div>
 
-                <!-- ===== WISHLIST PAGE ===== -->
                 <div id="page-wishlist" class="page">
                     <h1 class="text-xl font-bold text-gray-900 mb-6">Wishlist</h1>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <div
-                            class="wishlist-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden group">
+                        <div class="wishlist-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden group">
                             <div class="relative bg-gray-50 h-44 flex items-center justify-center">
-                                <svg width="64" height="64" fill="none" stroke="#D1D5DB" stroke-width="1"
-                                    viewBox="0 0 24 24">
+                                <svg width="64" height="64" fill="none" stroke="#D1D5DB" stroke-width="1" viewBox="0 0 24 24">
                                     <rect x="3" y="3" width="18" height="18" rx="2" />
                                     <circle cx="8.5" cy="8.5" r="1.5" />
                                     <polyline points="21 15 16 10 5 21" />
                                 </svg>
-                                <button
-                                    class="remove-btn absolute top-2 right-2 w-7 h-7 bg-white rounded-full flex items-center justify-center shadow text-red-400 hover:text-red-600 hover:shadow-md transition">
-                                    <svg width="13" height="13" fill="none" stroke="currentColor"
-                                        stroke-width="2.5" viewBox="0 0 24 24">
+                                <button class="remove-btn absolute top-2 right-2 w-7 h-7 bg-white rounded-full flex items-center justify-center shadow text-red-400 hover:text-red-600 hover:shadow-md transition">
+                                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                         <line x1="18" y1="6" x2="6" y2="18" />
                                         <line x1="6" y1="6" x2="18" y2="18" />
                                     </svg>
@@ -590,82 +575,20 @@
                                 <p class="text-xs text-gray-400 mt-0.5">Sony</p>
                                 <div class="flex items-center justify-between mt-3">
                                     <span class="font-bold text-gray-900">Rs. 12,500</span>
-                                    <button
-                                        class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">Add
-                                        to Cart</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div
-                            class="wishlist-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden group">
-                            <div class="relative bg-gray-50 h-44 flex items-center justify-center">
-                                <svg width="64" height="64" fill="none" stroke="#D1D5DB" stroke-width="1"
-                                    viewBox="0 0 24 24">
-                                    <rect x="3" y="3" width="18" height="18" rx="2" />
-                                    <circle cx="8.5" cy="8.5" r="1.5" />
-                                    <polyline points="21 15 16 10 5 21" />
-                                </svg>
-                                <button
-                                    class="remove-btn absolute top-2 right-2 w-7 h-7 bg-white rounded-full flex items-center justify-center shadow text-red-400 hover:text-red-600 hover:shadow-md transition">
-                                    <svg width="13" height="13" fill="none" stroke="currentColor"
-                                        stroke-width="2.5" viewBox="0 0 24 24">
-                                        <line x1="18" y1="6" x2="6" y2="18" />
-                                        <line x1="6" y1="6" x2="18" y2="18" />
-                                    </svg>
-                                </button>
-                            </div>
-                            <div class="p-4">
-                                <p class="font-semibold text-gray-800 text-sm">Running Shoes Pro Max</p>
-                                <p class="text-xs text-gray-400 mt-0.5">Nike</p>
-                                <div class="flex items-center justify-between mt-3">
-                                    <span class="font-bold text-gray-900">Rs. 8,999</span>
-                                    <button
-                                        class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">Add
-                                        to Cart</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div
-                            class="wishlist-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden group">
-                            <div class="relative bg-gray-50 h-44 flex items-center justify-center">
-                                <svg width="64" height="64" fill="none" stroke="#D1D5DB" stroke-width="1"
-                                    viewBox="0 0 24 24">
-                                    <rect x="3" y="3" width="18" height="18" rx="2" />
-                                    <circle cx="8.5" cy="8.5" r="1.5" />
-                                    <polyline points="21 15 16 10 5 21" />
-                                </svg>
-                                <button
-                                    class="remove-btn absolute top-2 right-2 w-7 h-7 bg-white rounded-full flex items-center justify-center shadow text-red-400 hover:text-red-600 hover:shadow-md transition">
-                                    <svg width="13" height="13" fill="none" stroke="currentColor"
-                                        stroke-width="2.5" viewBox="0 0 24 24">
-                                        <line x1="18" y1="6" x2="6" y2="18" />
-                                        <line x1="6" y1="6" x2="18" y2="18" />
-                                    </svg>
-                                </button>
-                            </div>
-                            <div class="p-4">
-                                <p class="font-semibold text-gray-800 text-sm">Smart Watch Series 8</p>
-                                <p class="text-xs text-gray-400 mt-0.5">Samsung</p>
-                                <div class="flex items-center justify-between mt-3">
-                                    <span class="font-bold text-gray-900">Rs. 32,000</span>
-                                    <button
-                                        class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">Add
-                                        to Cart</button>
+                                    <button class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">Add to Cart</button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- ===== REVIEWS PAGE ===== -->
                 <div id="page-reviews" class="page">
                     <h1 class="text-xl font-bold text-gray-900 mb-6">Reviews</h1>
                     <div class="max-w-2xl space-y-4">
                         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
                             <div class="flex items-start gap-4">
                                 <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center shrink-0">
-                                    <svg width="24" height="24" fill="none" stroke="#9CA3AF" stroke-width="1"
-                                        viewBox="0 0 24 24">
+                                    <svg width="24" height="24" fill="none" stroke="#9CA3AF" stroke-width="1" viewBox="0 0 24 24">
                                         <rect x="3" y="3" width="18" height="18" rx="2" />
                                         <circle cx="8.5" cy="8.5" r="1.5" />
                                         <polyline points="21 15 16 10 5 21" />
@@ -677,60 +600,19 @@
                                         <span class="text-xs text-gray-400">May 15, 2024</span>
                                     </div>
                                     <div class="flex gap-0.5 mt-1 mb-2">
-                                        <span class="star text-base">★</span><span class="star text-base">★</span><span
-                                            class="star text-base">★</span><span class="star text-base">★</span><span
-                                            class="star empty text-base">★</span>
+                                        <span class="star text-base">★</span><span class="star text-base">★</span><span class="star text-base">★</span><span class="star text-base">★</span><span class="star empty text-base">★</span>
                                     </div>
-                                    <p class="text-sm text-gray-600">Really great sound quality and the noise
-                                        cancellation is top notch. Battery life could be better, but overall very happy
-                                        with the purchase.</p>
+                                    <p class="text-sm text-gray-600">Really great sound quality and the noise cancellation is top notch.</p>
                                     <div class="flex gap-3 mt-3">
                                         <button class="text-xs text-violet-600 hover:underline font-medium">Edit</button>
                                         <button class="text-xs text-red-400 hover:underline font-medium">Delete</button>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-                            <div class="flex items-start gap-4">
-                                <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center shrink-0">
-                                    <svg width="24" height="24" fill="none" stroke="#9CA3AF" stroke-width="1"
-                                        viewBox="0 0 24 24">
-                                        <rect x="3" y="3" width="18" height="18" rx="2" />
-                                        <circle cx="8.5" cy="8.5" r="1.5" />
-                                        <polyline points="21 15 16 10 5 21" />
-                                    </svg>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex items-center justify-between flex-wrap gap-2">
-                                        <p class="font-semibold text-gray-800 text-sm">Running Shoes Pro Max</p>
-                                        <span class="text-xs text-gray-400">May 7, 2024</span>
-                                    </div>
-                                    <div class="flex gap-0.5 mt-1 mb-2">
-                                        <span class="star text-base">★</span><span class="star text-base">★</span><span
-                                            class="star text-base">★</span><span class="star text-base">★</span><span
-                                            class="star text-base">★</span>
-                                    </div>
-                                    <p class="text-sm text-gray-600">Perfect fit and very comfortable for long runs.
-                                        The cushioning is excellent. Would definitely recommend to anyone looking for
-                                        quality running shoes.</p>
-                                    <div class="flex gap-3 mt-3">
-                                        <button class="text-xs text-violet-600 hover:underline font-medium">Edit</button>
-                                        <button class="text-xs text-red-400 hover:underline font-medium">Delete</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-violet-50 border border-dashed border-violet-300 rounded-2xl p-5 text-center">
-                            <p class="text-sm text-violet-500 font-medium mb-2">Have a recent purchase to review?</p>
-                            <button onclick="navigate('orders')"
-                                class="bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold px-5 py-2 rounded-xl transition">View
-                                My Orders</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- ===== NOTIFICATIONS PAGE ===== -->
                 <div id="page-notifications" class="page">
                     <h1 class="text-xl font-bold text-gray-900 mb-6">Notifications</h1>
                     <div class="max-w-2xl space-y-3">
@@ -738,31 +620,11 @@
                             <span class="notif-dot mt-1.5 shrink-0"></span>
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm font-semibold text-gray-800">Your order has been shipped!</p>
-                                <p class="text-xs text-gray-500 mt-0.5">Order #CZ1234567889 is on its way. Expected
-                                    delivery: May 10, 2024.</p>
+                                <p class="text-xs text-gray-500 mt-0.5">Order #CZ1234567889 is on its way.</p>
                                 <p class="text-xs text-violet-400 mt-1.5 font-medium">2 hours ago</p>
                             </div>
-                            <button onclick="this.parentElement.remove()"
-                                class="text-gray-400 hover:text-gray-600 transition shrink-0">
-                                <svg width="14" height="14" fill="none" stroke="currentColor"
-                                    stroke-width="2" viewBox="0 0 24 24">
-                                    <line x1="18" y1="6" x2="6" y2="18" />
-                                    <line x1="6" y1="6" x2="18" y2="18" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="bg-white border border-gray-100 rounded-2xl p-4 flex items-start gap-3">
-                            <div class="w-2 h-2 shrink-0"></div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-sm font-medium text-gray-700">Price Drop Alert</p>
-                                <p class="text-xs text-gray-400 mt-0.5">An item in your wishlist "Smart Watch Series 8"
-                                    is now 5% off!</p>
-                                <p class="text-xs text-gray-400 mt-1.5">1 day ago</p>
-                            </div>
-                            <button onclick="this.parentElement.remove()"
-                                class="text-gray-400 hover:text-gray-600 transition shrink-0">
-                                <svg width="14" height="14" fill="none" stroke="currentColor"
-                                    stroke-width="2" viewBox="0 0 24 24">
+                            <button onclick="this.parentElement.remove()" class="text-gray-400 hover:text-gray-600 transition shrink-0">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <line x1="18" y1="6" x2="6" y2="18" />
                                     <line x1="6" y1="6" x2="18" y2="18" />
                                 </svg>
@@ -771,7 +633,6 @@
                     </div>
                 </div>
 
-                <!-- ===== SETTINGS PAGE ===== -->
                 <div id="page-settings" class="page">
                     <h1 class="text-xl font-bold text-gray-900 mb-6">Settings</h1>
                     <div class="max-w-2xl bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">
@@ -781,19 +642,9 @@
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <p class="text-sm font-semibold text-gray-800">Order Updates</p>
-                                        <p class="text-xs text-gray-400">Receive emails regarding purchase confirmation
-                                            and shipping status.</p>
+                                        <p class="text-xs text-gray-400">Receive emails regarding purchase confirmation.</p>
                                     </div>
-                                    <label class="toggle"><input type="checkbox" checked><span
-                                            class="slider"></span></label>
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <p class="text-sm font-semibold text-gray-800">Promotions & News</p>
-                                        <p class="text-xs text-gray-400">Get alerts on weekly sales, coupons, and
-                                            exclusive offers.</p>
-                                    </div>
-                                    <label class="toggle"><input type="checkbox"><span class="slider"></span></label>
+                                    <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
                                 </div>
                             </div>
                         </div>
@@ -805,7 +656,6 @@
     </div>
 </div>
 
-<!-- Dashboard Interactive Controllers -->
 <script>
     function navigate(pageId) {
         document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
@@ -853,5 +703,41 @@
         document.getElementById('sidebar').classList.add('-translate-x-full');
         document.getElementById('sidebar-overlay').classList.remove('show');
     }
+    function openAddressForm() {
+    const formContainer = document.getElementById('add-address-form');
+    const form = document.getElementById('addressForm');
+    
+    document.getElementById('form-title').innerText = "New Address";
+    document.getElementById('method-field').innerHTML = "";
+    form.action = "{{ route('addresses.store') }}";
+    form.reset();
+    
+    formContainer.classList.remove('hidden');
+}
+
+function editAddress(address) {
+    const formContainer = document.getElementById('add-address-form');
+    const form = document.getElementById('addressForm');
+    
+    document.getElementById('form-title').innerText = "Edit Address";
+    // लाराभेलमा अपडेट गर्न PUT मेथड चाहिन्छ
+    document.getElementById('method-field').innerHTML = '<input type="hidden" name="_method" value="PUT">';
+    
+    // यहाँ तपाईंको वेब डट पीएचपी अनुसार यूआरएल डाइनामिक बनाउने
+    form.action = `/addresses/${address.id}`;
+    
+    // फारमका फिल्डहरूमा पुराना डाटाहरू भर्ने
+    document.getElementById('adr_full_name').value = address.full_name;
+    document.getElementById('adr_phone').value = address.phone;
+        document.getElementById('adr_province').value = address.province;
+           document.getElementById('adr_district').value = address.district;
+    document.getElementById('adr_city').value = address.city;
+    document.getElementById('adr_address_line').value = address.address_line; 
+    document.getElementById('adr_postal_code').value = address.postal_code;
+    document.getElementById('is_default').checked = address.is_default == 1;
+    
+    formContainer.classList.remove('hidden');
+    formContainer.scrollIntoView({ behavior: 'smooth' });
+}
 </script>
 @endsection

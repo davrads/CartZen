@@ -6,6 +6,8 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProfileController; 
+use App\Http\Controllers\AddressController; 
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [FrontendController::class, 'home'])->name('home');
@@ -53,6 +55,15 @@ Route::middleware('auth')->group(function () {
         return view('profile.user_profile');
     })->name('profile');
 
+    // === Profile  and password update routes===
+    Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/password/update', [ProfileController::class, 'passwordUpdate'])->name('password.update');
+    Route::put('/addresses/{address}', [AddressController::class, 'update'])->name('addresses.update');
+
+    // === Address management routes ===
+    Route::post('/addresses', [AddressController::class, 'store'])->name('addresses.store');
+    Route::delete('/addresses/{address}', [AddressController::class, 'destroy'])->name('addresses.destroy');
+
     Route::prefix('cart')->group(function () {
         Route::get('/', [CartController::class, 'index'])
             ->name('cart.index');
@@ -61,16 +72,3 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [CustomerAuthController::class, 'logout'])
     ->name('logout');
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
