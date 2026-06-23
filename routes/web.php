@@ -12,13 +12,16 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [FrontendController::class, 'home'])->name('home');
 Route::get('/shop', [FrontendController::class, 'shop'])->name('shop');
-Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
-Route::get('/vendor-store', function(){
+Route::get('/vendor-store', function () {
     return view('frontend.vendor-store');
 });
-Route::get('/categories', [CategoryController::class, 'index'])
-    ->name('categories.index');
 
+Route::prefix('categories')->group(function () {
+    Route::get('/', [CategoryController::class, 'index'])
+        ->name('categories.index');
+    Route::get('/{category}', [CategoryController::class, 'show'])
+        ->name('categories.show');
+});
 
 
 Route::prefix('checkout')->group(function () {
@@ -51,16 +54,17 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
 
+    Route::get('/products/{product}', [ProductController::class, 'show'])
+        ->name('products.show');
+
     Route::get('/user_profile', function () {
         return view('profile.user_profile');
     })->name('profile');
 
-    // === Profile  and password update routes===
     Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/password/update', [ProfileController::class, 'passwordUpdate'])->name('password.update');
     Route::put('/addresses/{address}', [AddressController::class, 'update'])->name('addresses.update');
 
-    // === Address management routes ===
     Route::post('/addresses', [AddressController::class, 'store'])->name('addresses.store');
     Route::delete('/addresses/{address}', [AddressController::class, 'destroy'])->name('addresses.destroy');
 
@@ -69,6 +73,21 @@ Route::middleware('auth')->group(function () {
             ->name('cart.index');
     });
 
+
+
     Route::post('/logout', [CustomerAuthController::class, 'logout'])
-    ->name('logout');
+        ->name('logout');
 });
+
+
+
+
+
+
+
+
+
+
+
+
+

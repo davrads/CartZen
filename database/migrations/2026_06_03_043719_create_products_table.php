@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('brand')->nullable();
             $table->string('sku')->nullable();
             $table->decimal('price', 10, 2);
-            $table->decimal('discounted_price', 10, 2);
+            $table->decimal('discounted_price', 10, 2)->nullable();
             $table->integer('stock');
             $table->string('thumbnail')->nullable();
             $table->enum('status', ['available', 'out_of_stock'])->default('available');

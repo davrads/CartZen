@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\Categories\Schemas;
 
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
@@ -13,14 +14,23 @@ class CategoryForm
         return $schema
             ->components([
                 TextInput::make('name')
-                    ->required(),
+                    ->required()
+                    ->maxLength(255),
+
                 TextInput::make('slug')
-                    ->required(),
-                TextInput::make('parent_id')
-                    ->numeric()
-                    ->default(null),
+                    ->required()
+                    ->unique(ignoreRecord: true),
+
+                Select::make('parent_id')
+                    ->label('Parent Category')
+                    ->relationship('parent', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->nullable(),
+
                 FileUpload::make('image')
-                    ->image(),
+                    ->image()
+                    ->directory('categories'),
             ]);
     }
 }

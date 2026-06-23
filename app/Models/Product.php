@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    protected $fillable=[
+    protected $fillable = [
         'vendor_id',
         'category_id',
         'name',
@@ -21,19 +21,27 @@ class Product extends Model
         'status',
         'featured'
     ];
-    public function vendor(){
+    public function vendor()
+    {
         return $this->belongsTo(User::class, 'vendor_id');
     }
 
-    public function category(){
+    public function category()
+    {
         return $this->belongsTo(Category::class);
     }
 
-    public function images(){
+    public function images()
+    {
         return $this->hasMany(ProductImage::class);
     }
 
-    public function variants(){
+    public function variants()
+    {
         return $this->hasMany(ProductVariant::class);
+    }
+    public function getRouteKeyName()
+    {
+        return 'slug';
     }
 }

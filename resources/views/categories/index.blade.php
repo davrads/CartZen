@@ -1,46 +1,48 @@
 @extends('layouts.app')
+
 @section('content')
+
+@if(isset($category))
+<div class="category-main-block-section  px-6 py-3 text-sm">
+    <a href="{{ url('/') }}" class="text-gray-500 hover:text-violet-600">Home</a>
+    <span class="mx-2">></span>
+    <a href="{{ route('categories.index') }}" class="text-gray-500 hover:text-violet-600">Categories</a>
+    <span class="mx-2">></span>
+    <span class="font-medium text-violet-600">
+        {{ $category->name }}
+    </span>
+</div>
+@endif
+
 
 <style>
     .category-main-block-section {
         width: 1240px;
-        /* Fixed typo: widows -> width */
         margin: 0 auto;
     }
 </style>
 
 <body class="bg-gray-50 min-h-screen py-4 sm:py-8 px-4">
 
-    <!-- category page block -->
     <section class="flex category-main-block category-main-block-section">
 
-        <!-- Sidebar Container -->
         <div class="w-64 flex-shrink-0">
 
-            <!-- Categories Section -->
             <div class="bg-white border-r border-gray-200 p-4">
-                <h2 class="text-lg font-bold text-gray-900 mb-4">Categories</h2>
+                <h2 class="text-lg font-bold text-gray-900 mb-4">All Categories</h2>
                 <div class="space-y-1">
-                    <!-- All Button -->
-                    <button class="w-full text-left px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-violet-600 rounded-md transition-colors flex justify-between items-center group">
-                        <span>All</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 group-hover:text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </button>
 
-                    <!-- Dynamic Category List -->
+
                     <div class="pl-4">
-                        @foreach($categories as $category)
-                        <button class="w-full text-left px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-violet-600 rounded-md transition-colors block">
-                            <span>{{ $category->name }}</span>
-                        </button>
+                        @foreach($categories as $cats)
+                        <a href="{{ route('categories.show', $cats) }}" class="w-full text-left px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-violet-600 rounded-md transition-colors block">
+                            <span>{{ $cats->name }}</span>
+                        </a>
                         @endforeach
                     </div>
                 </div>
             </div>
 
-            <!-- Brand Section -->
             <div class="bg-white border-r border-gray-200 p-4 mt-4">
                 <h2 class="text-xl font-bold mb-4">Brand</h2>
                 <div class="space-y-3 mb-6">
@@ -53,14 +55,13 @@
                 </div>
             </div>
         </div>
-        <!-- End of Sidebar -->
 
-        <!-- Main Content (Mobiles Section) -->
         <div class="flex-1">
             <div class="bg-white border-b px-6 py-5 flex justify-between items-center">
                 <div>
-                    <h1 class="text-2xl font-bold">Mobiles & Tablets</h1>
-                    <p class="text-gray-500">1200+ products</p>
+
+                    <h1 class="text-2xl font-bold">{{ $category->name }}</h1>
+                    <p class="text-sm text-gray-600">Showing {{ $products->firstItem() }} - {{ $products->lastItem() }} of {{ $products->total() }} products</p>
                 </div>
                 <div class="flex items-center gap-3">
                     <span class="text-sm text-gray-600">Sort by:</span>
@@ -74,14 +75,17 @@
 
             <div class="p-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    @foreach($products as $product)
-                    <x-product-card :product="$product" />
-                    @endforeach
-
+                    @forelse($products as $product)
+                    <x-product-card :product=$product />
+                    @empty
+                    <p>No products found.</p>
+                    @endforelse
+                </div>
+                <div class="mt-8 flex justify-center">
+                    {{ $products->links() }}
                 </div>
             </div>
         </div>
-        <!-- End of Main Content -->
 
     </section>
 </body>
