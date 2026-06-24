@@ -8,7 +8,7 @@
     
     <header class="px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-4">
       <div class="flex items-center gap-1.5 shrink-0">
-        <h1 class="text-xl font-bold text-gray-900">My Cart ({{ count($cart) }})</h1>
+        <h1 class="text-xl font-bold text-gray-900">My Cart Item ({{ count($cart) }})</h1>
       </div>
       
       <div class="relative flex-1 max-w-xs">
