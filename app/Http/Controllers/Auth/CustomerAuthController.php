@@ -24,11 +24,15 @@ class CustomerAuthController extends Controller
             'password' => 'required',
         ]);
 
-        if (Auth::attempt($credentials)) {
+        if (Auth::guard('customer')->attempt($credentials)) {
             $request->session()->regenerate();
+            dd(
+        Auth::guard('customer')->check(),
+        Auth::guard('customer')->user()
+    );
 
-            if (Auth::user()->role !== 'customer') {
-                Auth::logout();
+            if (Auth::guard('customer')->user()->role !== 'customer') {
+                Auth::guard('customer')->logout();
 
                 return back()->withErrors([
                     'email' => 'Credentials do not match our records.',
@@ -60,7 +64,7 @@ class CustomerAuthController extends Controller
             'role' => 'customer',
         ]);
 
-        Auth::login($user);
+        Auth::guard('customer')->login($user);
 
         return redirect('/');
     }
@@ -69,7 +73,7 @@ class CustomerAuthController extends Controller
 
     public function logout(Request $request)
     {
-        Auth::logout();
+        Auth::guard('customer')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect('/');
@@ -107,7 +111,7 @@ class CustomerAuthController extends Controller
                     ->with('error', 'Account not found. Please register first.');
             }
 
-            Auth::login($user);
+            Auth::guard('customer')->login($user);
 
             return redirect()->route('home');
         }
@@ -128,7 +132,7 @@ class CustomerAuthController extends Controller
                 'role' => 'customer',
             ]);
 
-            Auth::login($user);
+            Auth::guard('customer')->login($user);
 
             return redirect()->route('home');
         }

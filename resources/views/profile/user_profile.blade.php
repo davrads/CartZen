@@ -228,11 +228,11 @@
             <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-100 shrink-0">
                 <div
                     class="w-11 h-11 rounded-full bg-violet-600 flex items-center justify-center text-white font-bold text-lg shrink-0">
-                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                    {{ strtoupper(substr(Auth::guard('customer')->user()->name, 0, 1)) }}
                 </div>
                 <div class="min-w-0">
-                    <p class="font-semibold text-gray-900 text-sm truncate">{{ auth()->user()->name }}</p>
-                    <p class="text-xs text-gray-400 truncate">{{ auth()->user()->email }}</p>
+                    <p class="font-semibold text-gray-900 text-sm truncate">{{ Auth::guard('customer')->user()->name }}</p>
+                    <p class="text-xs text-gray-400 truncate">{{ Auth::guard('customer')->user()->email }}</p>
                 </div>
             </div>
 
@@ -338,28 +338,28 @@
                                 @method('PUT')
                                 <div class="flex items-center gap-4 mb-6">
                                     <div class="w-16 h-16 rounded-full bg-violet-600 flex items-center justify-center text-white font-bold text-2xl shrink-0">
-                                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                        {{ strtoupper(substr(Auth::guard('customer')->user()->name, 0, 1)) }}
                                     </div>
                                     <div>
-                                        <p class="font-bold text-gray-900 text-lg">{{ auth()->user()->name }}</p>
-                                        <p class="text-sm text-gray-400">Member since {{ auth()->user()->created_at->format('M Y') }}</p>
+                                        <p class="font-bold text-gray-900 text-lg">{{ Auth::guard('customer')->user()->name }}</p>
+                                        <p class="text-sm text-gray-400">Member since {{ Auth::guard('customer')->user()->created_at->format('M Y') }}</p>
                                     </div>
                                     <button type="button" class="ml-auto text-sm text-violet-600 font-medium hover:underline">Change Photo</button>
                                 </div>
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
     <div class="sm:col-span-2">
         <label class="block text-xs font-semibold text-gray-500 mb-1.5">Full Name</label>
-        <input type="text" name="name" value="{{ old('name', auth()->user()->name) }}"
+        <input type="text" name="name" value="{{ old('name', Auth::guard('customer')->user()->name) }}"
             class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition" required />
     </div>
     <div>
         <label class="block text-xs font-semibold text-gray-500 mb-1.5">Email Address</label>
-        <input type="email" name="email" value="{{ old('email', auth()->user()->email) }}"
+        <input type="email" name="email" value="{{ old('email', Auth::guard('customer')->user()->email) }}"
             class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition" required />
     </div>
     <div>
         <label class="block text-xs font-semibold text-gray-500 mb-1.5">Phone Number</label>
-        <input type="tel" name="phone" value="{{ old('phone', auth()->user()->phone ?? (auth()->user()->addresses->where('is_default', 1)->first()->phone ?? (auth()->user()->addresses->first()->phone ?? ''))) }}"
+        <input type="tel" name="phone" value="{{ old('phone', Auth::guard('customer')->user()->phone ?? (Auth::guard('customer')->user()->addresses->where('is_default', 1)->first()->phone ?? (Auth::guard('customer')->user()->addresses->first()->phone ?? ''))) }}"
             class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition" />
     </div>
 </div>
@@ -472,7 +472,7 @@
         </div>
 
         <div class="space-y-4">
-            @forelse(auth()->user()->addresses ?? [] as $address)
+            @forelse(Auth::guard('customer')->user()->addresses ?? [] as $address)
                 <div class="bg-white rounded-2xl shadow-sm {{ $address->is_default ? 'border-2 border-violet-400' : 'border border-gray-100' }} p-5">
                     <div class="flex items-start justify-between">
                         <div>
@@ -487,7 +487,7 @@
                             <p class="text-sm text-gray-400 mt-1">{{ $address->phone }}</p>
                         </div>
                         <div class="flex gap-2 shrink-0 ml-3">
-                            <button onclick="editAddress({{ json_encode($address) }})" class="text-xs text-violet-600 hover:underline font-medium"><i class=" text-lg fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="editAddress({{ $address->toJson() }})" class="text-xs text-violet-600 hover:underline font-medium"><i class=" text-lg fa-solid fa-pen-to-square"></i></button>
                             <form method="POST" action="{{ route('addresses.destroy', $address->id) }}" onsubmit="return confirm('Are you sure?')">
                                 @csrf
                                 @method('DELETE')

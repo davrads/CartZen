@@ -57,7 +57,7 @@ Route::middleware('guest')->group(function () {
         ->name('google.callback');
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware('customer')->group(function () {
     Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add', [App\Http\Controllers\CartController::class, 'add'])->name('cart.add');
     Route::post('/cart/update', [App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
@@ -75,13 +75,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/addresses/{address}', [AddressController::class, 'destroy'])->name('addresses.destroy');
 
     Route::prefix('cart')->group(function () {
-        Route::get('/', [CartController::class, 'index'])
-            ->name('cart.index');
-
-        Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-        Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
-        Route::get('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
-        Route::post('/cart/update', [App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
+        Route::get('/', [CartController::class, 'index'])->name('cart.index');
+        Route::post('/add', [CartController::class, 'add'])->name('cart.add');
+        Route::get('/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
+        Route::post('/update', [App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
     });
 
     Route::post('/logout', [CustomerAuthController::class, 'logout'])

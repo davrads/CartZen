@@ -15,14 +15,14 @@ class CartController extends Controller
     {
         // यदि युजर लगइन छैन भने लगइन वा सेसनमा पठाउन सकिन्छ (यहाँ लगइन युजरको लागि हो)
         return Cart::firstOrCreate([
-            'user_id' => Auth::id()
+            'user_id' => Auth::guard('customer')->id()
         ]);
     }
 
     // १. कार्ट पेज: डेटाबेसको 'cart_items' बाट सामानहरू देखाउने
     public function index()
     {
-        if (!Auth::check()) {
+        if (!Auth::guard('customer')->check()) {
             return redirect()->route('login')->with('error', 'Please login to view cart');
         }
 
@@ -68,7 +68,7 @@ class CartController extends Controller
     // २. Add to Cart: सामान डेटाबेसमा सेभ गर्ने
     public function add(Request $request)
     {
-        if (!Auth::check()) {
+        if (!Auth::guard('customer')->check()) {
             return redirect()->route('login')->with('error', 'Please login to add items to cart');
         }
 
@@ -114,7 +114,7 @@ class CartController extends Controller
     // ३. AJAX Update: + र - थिच्दा परिमाण डेटाबेसमा अपडेट गर्ने
     public function update(Request $request)
     {
-        if (!Auth::check()) {
+        if (!Auth::guard('customer')->check()) {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
         }
 
@@ -143,7 +143,7 @@ class CartController extends Controller
     // ४. Remove Item: कार्टबाट सामान हटाउने
     public function remove($id)
     {
-        if (!Auth::check()) {
+        if (!Auth::guard('customer')->check()) {
             return redirect()->route('login');
         }
 
