@@ -17,6 +17,10 @@ Route::get('/vendor-store', function () {
     return view('frontend.vendor-store');
 });
 
+
+Route::get('/products/{product}', [ProductController::class, 'show'])
+    ->name('products.show');
+
 Route::prefix('categories')->group(function () {
     Route::get('/', [CategoryController::class, 'index'])
         ->name('categories.index');
@@ -54,12 +58,10 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
+    Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add', [App\Http\Controllers\CartController::class, 'add'])->name('cart.add');
     Route::post('/cart/update', [App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
     Route::get('/cart/remove/{id}', [App\Http\Controllers\CartController::class, 'remove'])->name('cart.remove');
-    Route::get('/products/{product}', [ProductController::class, 'show'])
-        ->name('products.show');
 
     Route::get('/user_profile', function () {
         return view('profile.user_profile');
@@ -81,8 +83,6 @@ Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name
         Route::get('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
         Route::post('/cart/update', [App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
     });
-
-
 
     Route::post('/logout', [CustomerAuthController::class, 'logout'])
         ->name('logout');
