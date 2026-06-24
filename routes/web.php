@@ -6,9 +6,10 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\ProfileController; 
-use App\Http\Controllers\AddressController; 
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AddressController;
 use Illuminate\Support\Facades\Route;
+
 
 Route::get('/', [FrontendController::class, 'home'])->name('home');
 Route::get('/shop', [FrontendController::class, 'shop'])->name('shop');
@@ -53,7 +54,10 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-
+Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/add', [App\Http\Controllers\CartController::class, 'add'])->name('cart.add');
+    Route::post('/cart/update', [App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
+    Route::get('/cart/remove/{id}', [App\Http\Controllers\CartController::class, 'remove'])->name('cart.remove');
     Route::get('/products/{product}', [ProductController::class, 'show'])
         ->name('products.show');
 
@@ -71,6 +75,11 @@ Route::middleware('auth')->group(function () {
     Route::prefix('cart')->group(function () {
         Route::get('/', [CartController::class, 'index'])
             ->name('cart.index');
+
+        Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+        Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+        Route::get('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
+        Route::post('/cart/update', [App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
     });
 
 
@@ -78,16 +87,3 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [CustomerAuthController::class, 'logout'])
         ->name('logout');
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
