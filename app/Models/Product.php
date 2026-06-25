@@ -3,6 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
+use App\Models\FlashSale;
+use App\Models\Category;
+use App\Models\ProductImage;
+use App\Models\ProductVariant;
 
 class Product extends Model
 {
@@ -26,6 +31,15 @@ class Product extends Model
         return $this->belongsTo(User::class, 'vendor_id');
     }
 
+    public function flashSale()
+    { 
+        return $this->hasOne(FlashSale::class); 
+    }
+
+    public function scopeFeatured($query) 
+    { 
+        return $query->where('is_featured', true); 
+    }
     public function category()
     {
         return $this->belongsTo(Category::class);
