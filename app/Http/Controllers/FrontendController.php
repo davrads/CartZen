@@ -36,7 +36,7 @@ class FrontendController extends Controller
     public function vendorStore($id)
     {
         $vendor = VendorProfile::findOrFail($id);
-        $products = Product::where('vendor_id', $id)->paginate(12, ['*'], 'page', request()->input('page'));
+        $products = Product::where('vendor_id', $vendor->user_id)->paginate(12, ['*'], 'page', request()->input('page'));
         return view('frontend.vendor-store', compact('vendor', 'products'));
     }
 }

@@ -12,7 +12,7 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('vendor_id')->constrained('vendor_profiles')->cascadeOnDelete(); // Link to the vendor
+            $table->foreignId('vendor_id')->constrained('users')->cascadeOnDelete(); // Link to the vendor
             $table->foreignId('category_id')->constrained('categories')->cascadeOnDelete(); // Link to the category
             $table->string('name');
             $table->string('slug')->unique();

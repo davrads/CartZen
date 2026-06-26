@@ -13,7 +13,7 @@ class ProductSeeder extends Seeder
 {
     public function run(): void
     {
-        $vendors = User::where('role', UserRole::VENDOR)->get();
+        $vendors = User::where('role', 'vendor')->get();
         $categories = Category::all();
 
         foreach ($vendors as $vendor) {
