@@ -29,10 +29,13 @@ Route::prefix('categories')->group(function () {
 });
 
 
-Route::prefix('checkout')->group(function () {
-    Route::get('/', [CheckoutController::class, 'index'])->name('checkout');
-    Route::post('/place-order', [CheckoutController::class, 'placeOrder'])->name('place.order');
-});
+// Route::prefix('checkout')->group(function () {
+//     Route::get('/', [CheckoutController::class, 'index'])->name('checkout');
+//     Route::post('/place-order', [CheckoutController::class, 'placeOrder'])->name('place.order');
+// });
+
+// Khalti callback – must be public (no auth middleware)
+Route::get('/khalti/verify', [CheckoutController::class, 'verifyKhalti'])->name('khalti.verify');
 
 Route::middleware('guest')->group(function () {
 
@@ -62,6 +65,14 @@ Route::middleware('customer')->group(function () {
     Route::post('/cart/add', [App\Http\Controllers\CartController::class, 'add'])->name('cart.add');
     Route::post('/cart/update', [App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
     Route::get('/cart/remove/{id}', [App\Http\Controllers\CartController::class, 'remove'])->name('cart.remove');
+
+
+      // Checkout routes (MOVED INSIDE customer middleware)
+    Route::prefix('checkout')->group(function () {
+        Route::get('/', [CheckoutController::class, 'index'])->name('checkout');
+        Route::post('/place-order', [CheckoutController::class, 'placeOrder'])->name('place.order');
+    });
+
 
     Route::get('/user_profile', function () {
         return view('profile.user_profile');
