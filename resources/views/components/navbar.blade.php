@@ -20,7 +20,11 @@
                     </div>
                 </div>
             </div>
+            
 
+
+
+            
             <div class="flex items-center gap-4 md:gap-6">
                 <a href="/user_profile" class="text-gray-700 hover:text-purple-600 flex items-center gap-2 text-sm font-medium transition">
                     <i class="fas fa-user-circle text-xl"></i>
@@ -29,9 +33,22 @@
                
                 <a href="{{ route('cart.index') }}" class="text-gray-700 hover:text-purple-600 flex items-center gap-2 text-sm font-medium relative transition">
                     <i class="fas fa-shopping-cart text-xl"></i>
-                    <span class="absolute -top-2 -right-3 bg-purple-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center border-2 border-white">
+                    @php
+                            $cartCount = 0;
+                            if (auth()->guard('customer')->check()) {
+                                $cart = App\Models\Cart::where('user_id', auth()->guard('customer')->id())->first();
+                                if ($cart) {
+                                    $cartCount = $cart->items->sum('quantity');
+                                }
+                            }
+                        @endphp
+                        <span class="absolute -top-1 -right-1 bg-violet-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                            {{ $cartCount }}
+                        </span>
+                    
+                    {{-- <span class="absolute -top-2 -right-3 bg-purple-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center border-2 border-white">
                         {{ $cartCount ?? 0 }}
-                    </span>
+                    </span> --}}
                     <span class="hidden sm:inline">Cart</span>
                 </a>
             </div>

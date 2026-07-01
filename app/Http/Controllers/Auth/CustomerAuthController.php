@@ -16,34 +16,58 @@ class CustomerAuthController extends Controller
         return view('auth.customer-login');
     }
 
-
     public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+{
+    $credentials = $request->validate([
+        'email'    => 'required|email',
+        'password' => 'required',
+    ]);
 
-        if (Auth::guard('customer')->attempt($credentials)) {
-            $request->session()->regenerate();
-            dd(
-        Auth::guard('customer')->check(),
-        Auth::guard('customer')->user()
-    );
+    if (Auth::guard('customer')->attempt($credentials)) {
+        $request->session()->regenerate();
 
-            if (Auth::guard('customer')->user()->role !== 'customer') {
-                Auth::guard('customer')->logout();
-
-                return back()->withErrors([
-                    'email' => 'Credentials do not match our records.',
-                ]);
-            }
-            return redirect('/');
+        // Remove the dd() and add the role check + redirect
+        if (Auth::guard('customer')->user()->role !== 'customer') {
+            Auth::guard('customer')->logout();
+            return back()->withErrors([
+                'email' => 'Credentials do not match our records.',
+            ]);
         }
-        return back()->withErrors([
-            'email' => 'Credentials do not match our records.',
-        ]);
+
+        return redirect()->intended('/');  // or route('home')
     }
+
+    return back()->withErrors([
+        'email' => 'Credentials do not match our records.',
+    ]);
+}
+    // public function login(Request $request)
+    // {
+    //     $credentials = $request->validate([
+    //         'email' => 'required|email',
+    //         'password' => 'required',
+    //     ]);
+
+    //     if (Auth::guard('customer')->attempt($credentials)) {
+    //         $request->session()->regenerate();
+    //         dd(
+    //     Auth::guard('customer')->check(),
+    //     Auth::guard('customer')->user()
+    // );
+
+    //         if (Auth::guard('customer')->user()->role !== 'customer') {
+    //             Auth::guard('customer')->logout();
+
+    //             return back()->withErrors([
+    //                 'email' => 'Credentials do not match our records.',
+    //             ]);
+    //         }
+    //         return redirect('/');
+    //     }
+    //     return back()->withErrors([
+    //         'email' => 'Credentials do not match our records.',
+    //     ]);
+    // }
     public function showRegister()
     {
         return view('auth.customer-register');
@@ -98,7 +122,8 @@ class CustomerAuthController extends Controller
 
         $action = session('google_action');
 
-        $user = User::where('email', $googleUser->getEmail())
+        $user = User::query()
+            ->where('email', $googleUser->getEmail())
             ->where('role', 'customer')
             ->first();
 
