@@ -9,6 +9,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AddressController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\OrderController;
 
 
 Route::get('/', [FrontendController::class, 'home'])->name('home');
@@ -67,11 +68,10 @@ Route::middleware('customer')->group(function () {
     Route::get('/cart/remove/{id}', [App\Http\Controllers\CartController::class, 'remove'])->name('cart.remove');
 
 
-      // Checkout routes (MOVED INSIDE customer middleware)
-    Route::prefix('checkout')->group(function () {
-        Route::get('/', [CheckoutController::class, 'index'])->name('checkout');
-        Route::post('/place-order', [CheckoutController::class, 'placeOrder'])->name('place.order');
-    });
+  Route::prefix('checkout')->group(function () {
+    Route::get('/', [CheckoutController::class, 'index'])->name('checkout');
+    Route::post('/place-order', [OrderController::class, 'placeOrder'])->name('place.order');
+});
 
 
     Route::get('/user_profile', function () {
