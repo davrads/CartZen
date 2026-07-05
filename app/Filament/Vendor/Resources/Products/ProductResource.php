@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Auth;
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
+    
 
     public static function getEloquentQuery():Builder{
         return parent::getEloquentQuery()

@@ -3,9 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User;
 
-class VendorProfile extends Model
+class VendorApplication extends Model
 {
     protected $fillable = [
         'owner_name',
@@ -16,14 +15,7 @@ class VendorProfile extends Model
         'description',
         'shop_logo',
         'pan_card',
+        'status',
+        'remarks',
     ];
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    public function products()
-    {
-        return $this->hasMany(Product::class, 'vendor_id');
-    }
 }

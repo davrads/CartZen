@@ -365,7 +365,7 @@
                         <p class="text-xs text-gray-400 mb-4 flex items-center justify-center gap-1">
                             <i class="fas fa-check-circle text-green-500"></i> Verified Seller
                         </p>
-                        <a href="{{ route('store.show', $store->shop_slug) }}" class="inline-block w-full py-2.5 text-sm font-semibold text-purple-700 bg-purple-50 rounded-xl hover:bg-purple-100 transition">
+                        <a href="#" class="inline-block w-full py-2.5 text-sm font-semibold text-purple-700 bg-purple-50 rounded-xl hover:bg-purple-100 transition">
                             Visit Store
                         </a>
                     </div>

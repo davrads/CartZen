@@ -8,6 +8,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AddressController;
+use App\Http\Controllers\Vendor\VendorRequestController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OrderController;
 
@@ -59,6 +60,18 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/auth/google/callback', [CustomerAuthController::class, 'handleGoogleCallback'])
         ->name('google.callback');
+});
+
+Route::prefix('vendor')->name('vendor.')->group(function () {
+
+    Route::get('/request', [VendorRequestController::class, 'create'])
+        ->name('request');
+
+    Route::post('/request', [VendorRequestController::class, 'store'])
+        ->name('request.store');
+
+    Route::get('/submitted', [VendorRequestController::class, 'submitted'])
+        ->name('submitted');
 });
 
 Route::middleware('customer')->group(function () {
