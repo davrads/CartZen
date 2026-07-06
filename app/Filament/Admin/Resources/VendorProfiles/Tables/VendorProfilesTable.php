@@ -20,7 +20,7 @@ class VendorProfilesTable
                     ->label('Logo'),
 
                 TextColumn::make('user.name')
-                    ->label('Owner')
+                    ->label('Vendor')
                     ->searchable(),
 
                 TextColumn::make('shop_name')

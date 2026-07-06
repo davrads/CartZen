@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('shop_logo')->nullable();
             $table->longText('description')->nullable();
             $table->string('phone')->nullable();
+            $table->string('email');
             $table->string('address')->nullable();
             $table->string('pan_number');
             $table->string('account_number');

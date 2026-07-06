@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\VendorProfile;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class VendorProfileSeeder extends Seeder
 {
@@ -14,18 +15,18 @@ class VendorProfileSeeder extends Seeder
      */
     public function run(): void
     {
-         $vendors = User::take(3)->get();
+        $vendors = User::where('role', 'vendor')->get();
 
         foreach ($vendors as $vendor) {
             VendorProfile::create([
                 'user_id' => $vendor->id,
-                'shop_name' => $vendor->name . "'s Store",
-                'shop_slug' => strtolower(str_replace(' ', '-', $vendor->name)) . '-store',
-                'description' => 'Demo vendor store',
-                'phone' => '9800000000',
-                'address' => 'Kathmandu',
-                'pan_number' => 'PAN-' . $vendor->id,
-                'account_number' => 'ACC-' . $vendor->id,
+                'shop_name' => $vendor->name,
+                'shop_slug' => Str::slug($vendor->name),
+                'description' => "Official shop of {$vendor->name}",
+                'phone' => '98' . rand(10000000, 99999999),
+                'address' => 'Kathmandu, Nepal',
+                'pan_number' => 'PAN' . rand(10000, 99999),
+                'account_number' => 'ACC' . rand(100000, 999999),
                 'status' => 'approved',
             ]);
         }
