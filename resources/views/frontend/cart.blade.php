@@ -69,6 +69,7 @@
       </div>
       @empty
       <div class="py-12 text-center text-gray-500">
+        <img src="{{ asset('images/empty_cart.png') }}" alt="Empty Cart" class="mx-auto mb-4 w-30 h-20">
           Your cart is empty!
       </div>
       @endforelse

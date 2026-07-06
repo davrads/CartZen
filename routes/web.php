@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OrderController;
 
 
+
 Route::get('/', [FrontendController::class, 'home'])->name('home');
 Route::get('/shop', [FrontendController::class, 'shop'])->name('shop');
 Route::get('/vendor-store', function () {
@@ -71,6 +72,8 @@ Route::middleware('customer')->group(function () {
   Route::prefix('checkout')->group(function () {
     Route::get('/', [CheckoutController::class, 'index'])->name('checkout');
     Route::post('/place-order', [OrderController::class, 'placeOrder'])->name('place.order');
+    Route::get('/khalti/callback', [OrderController::class, 'callback'])->name('khalti.callback');
+     Route::get('/order/history', [OrderController::class, 'history'])->name('order.history');
 });
 
 
@@ -95,3 +98,4 @@ Route::middleware('customer')->group(function () {
     Route::post('/logout', [CustomerAuthController::class, 'logout'])
         ->name('logout');
 });
+

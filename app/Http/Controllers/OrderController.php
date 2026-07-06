@@ -10,33 +10,33 @@ use App\Models\CartItem;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
     public function placeOrder(Request $request)
     {
-        // १. भ्यालिडेसन
+        
         $request->validate([
             'address_id' => 'required',
             'payment_method' => 'required',
         ]);
 
-        // २. लगइन युजर पत्ता लगाउने (checkout route 'customer' guard ले सुरक्षित छ)
+       
         $userId = Auth::guard('customer')->id();
 
         if (!$userId) {
             return redirect()->route('login')->with('error', 'कृपया पहिले लगइन गर्नुहोस्।');
         }
 
-        // ३. यो युजरको cart (header) पत्ता लगाउने
+       
         $cart = Cart::where('user_id', $userId)->first();
 
         if (!$cart) {
             return redirect()->back()->with('error', 'तपाईंको कार्ट खाली फेला पर्यो!');
         }
 
-        // ४. cart_items टेबलबाट वास्तविक सामानहरू तान्ने (product सहित)
         $cartItems = CartItem::with('product')
             ->where('cart_id', $cart->id)
             ->get();
@@ -45,18 +45,18 @@ class OrderController extends Controller
             return redirect()->back()->with('error', 'तपाईंको कार्ट खाली फेला पर्यो!');
         }
 
-        // ५. डेटाबेस ट्रान्ज्याक्सन
+       
         DB::beginTransaction();
 
         try {
-            // ६. रकम गणना
+           
             $subTotal = 0;
             foreach ($cartItems as $item) {
                 $price = $item->price ?? optional($item->product)->price ?? 0;
                 $subTotal += $price * $item->quantity;
             }
 
-            // ७. Orders टेबलमा सेभ
+            
             $order = new Order();
             $order->user_id = $userId;
             $order->address_id = $request->address_id;
@@ -70,7 +70,7 @@ class OrderController extends Controller
             $order->status = 'pending';
             $order->save();
 
-            // ८. Order Items टेबलमा सेभ (cart_items बाट)
+            
             foreach ($cartItems as $item) {
                 $orderItem = new OrderItem();
                 $orderItem->order_id = $order->id;
@@ -82,11 +82,37 @@ class OrderController extends Controller
                 $orderItem->save();
             }
 
-            // ९. कार्ट खाली गर्ने (cart_items मात्र; cart header राखिन्छ)
+           
             CartItem::where('cart_id', $cart->id)->delete();
 
-            DB::commit();
+            // Khalti API 
+            if ($request->payment_method === 'khalti') {
+                $url = env('KHALTI_BASE_URL') . '/epayment/initiate/';
+                
+                
+                $response = Http::withHeaders([
+    'Authorization' => 'Key ' . env('KHALTI_SECRET')
+])
+->timeout(30)
+->withoutVerifying() 
+->post($url, [
+    "return_url" => route('khalti.callback'),
+    "website_url" => url('/'), 
+    "amount" => $order->total_amount * 100,
+    "purchase_order_id" => $order->order_number,
+    "purchase_order_name" => "Order #" . $order->order_number,
+]);
 
+                if ($response->successful() && isset($response['payment_url'])) {
+                    DB::commit(); 
+                    return redirect($response['payment_url']); 
+                } else {
+                    throw new \Exception('खल्ती गेटवेमा समस्या आयो: ' . $response->body());
+                }
+            }
+
+            // यदि Cash on Delivery (COD) हो भने सिधै होमपेजमा पठाउने
+            DB::commit();
             return redirect()->route('home')->with('success', 'तपाईंको अर्डर सफलतापूर्वक सुरक्षित भयो!');
 
         } catch (\Throwable $e) {
@@ -97,5 +123,25 @@ class OrderController extends Controller
             ]);
             return redirect()->back()->with('error', 'त्रुटि आयो: ' . $e->getMessage());
         }
+    }
+
+    public function callback(Request $request)
+    {
+        // नोट: यदि ब्याकइन्डमा सिधै डेटा अपडेट गराउने हो भने तलको return हटाउन सक्नुहुन्छ
+       // return $request->all();
+        
+        $order = Order::find($request['purchase_order_id']);
+        if ($order) {
+            $order->status = $request['status'];
+            $order->khalti_pidx = $request['transaction_id'];
+            $order->save();
+        }
+        return redirect()->route('order.history');
+    }
+
+    public function history()
+    {
+        $orders = Order::where('user_id', Auth::guard('customer')->id())->get();
+        return view('frontend.order_history', compact('orders'));
     }
 }
