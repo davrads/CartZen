@@ -152,6 +152,7 @@ class CheckoutController extends Controller
                     'quantity'      => $item->quantity,
                     'price'         => $item->price,
                     'shipping_cost' => 0,
+                    'status'       => 'pending',
                 ]);
 
                 $product = Product::find($item->product_id);

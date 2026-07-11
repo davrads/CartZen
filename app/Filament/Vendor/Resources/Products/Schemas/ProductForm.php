@@ -66,9 +66,7 @@ class ProductForm
                                 'out_of_stock' => 'Out of Stock',
                             ])
                             ->default('available'),
-
-                        Toggle::make('featured')
-                            ->default(false),
+    
                     ])
                     ->columns(2),
                 Section::make('Product Gallery')

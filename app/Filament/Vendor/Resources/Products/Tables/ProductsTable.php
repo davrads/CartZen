@@ -3,20 +3,25 @@
 namespace App\Filament\Vendor\Resources\Products\Tables;
 
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Builder;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use PHPUnit\Util\Filter;
 
 class ProductsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+            ->defaultSort('created_at', 'desc')
+            ->striped()
             ->columns([
                 ImageColumn::make('thumbnail')
                     ->disk('public')
@@ -46,9 +51,14 @@ class ProductsTable
                     ->label('Variants'),
 
                 TextColumn::make('status')
-                    ->badge(),
+                    ->badge()
+                    ->colors([
+                        'success' => 'available',
+                        'danger' => 'out_of_stock',
+                    ]),
 
                 IconColumn::make('featured')
+                    ->label('Featured')
                     ->boolean(),
 
                 TextColumn::make('updated_at')
@@ -61,10 +71,17 @@ class ProductsTable
                         'out_of_stock' => 'Out of Stock',
                     ]),
 
-                TernaryFilter::make('featured'),
+                // Filter::make('low_stock')
+                //     ->label('Low Stock')
+                //     ->query(fn(Builder $query): Builder => $query->where('stock', '<=', 5)),
+
             ])
             ->recordActions([
                 EditAction::make(),
+            ])
+            ->headerActions([
+                CreateAction::make()
+                    ->label('Add Product'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

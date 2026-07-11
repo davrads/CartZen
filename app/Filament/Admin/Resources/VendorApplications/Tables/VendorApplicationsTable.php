@@ -7,6 +7,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\Actions;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -29,9 +30,15 @@ class VendorApplicationsTable
                 TextColumn::make('address')
                     ->searchable(),
                 ImageColumn::make('shop_logo')
-                    ->searchable(),
+                    ->label('Logo')
+                    ->disk('public')
+                    ,
+
+                    
                 ImageColumn::make('pan_card')
-                    ->searchable(),
+                    ->label('Pan Card')
+
+                    ->disk('public'),
                 TextColumn::make('status')
                     ->badge(),
                 TextColumn::make('created_at')
@@ -46,17 +53,9 @@ class VendorApplicationsTable
             ->filters([
                 //
             ])
-            ->recordActions([
+            ->actions([
+                ViewAction::make(),
                 EditAction::make(),
-                Action::make('approve')
-                    ->label('Approve')
-                    ->color('success')
-                    ->requiresConfirmation()
-                    ->icon('heroicon-o-check-circle')
-                    ->visible(fn ($record) => $record->status === 'pending')
-                    ->action(function ($record) {
-                        
-                    }),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
