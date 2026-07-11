@@ -1,39 +1,101 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
-    <title>Vendor Account Approved</title>
+    <title>Vendor Application Approved</title>
 </head>
-<body>
 
-<h2>Congratulations {{ $vendor->owner_name }}!</h2>
+<body style="font-family: Arial, Helvetica, sans-serif; background:#f5f5f5; margin:0; padding:40px;">
 
-<p>Your vendor application has been approved.</p>
+    <table width="600" align="center" cellpadding="0" cellspacing="0"
+        style="background:#ffffff; border-radius:10px; overflow:hidden;">
 
-<p><strong>Login URL:</strong></p>
+        <tr>
+            <td style="background:#6d28d9; color:white; padding:25px; text-align:center;">
+                <h1 style="margin:0;">🎉 Congratulations!</h1>
+                <p style="margin-top:8px;">
+                    Your Vendor Application has been Approved
+                </p>
+            </td>
+        </tr>
 
-<p>
-    <a href="{{ url('/vendor/login') }}">
-        {{ url('/vendor/login') }}
-    </a>
-</p>
+        <tr>
+            <td style="padding:35px;">
 
-<hr>
+                <p>Hello,</p>
 
-<p><strong>Email</strong></p>
+                <p>
+                    We're pleased to inform you that your application for
+                    <strong>{{ $shopName }}</strong>
+                    has been approved by the CartZen Team.
+                </p>
 
-<p>{{ $email }}</p>
+                <h3>Vendor Login Credentials</h3>
 
-<p><strong>Password</strong></p>
+                <table cellpadding="8" cellspacing="0" width="100%"
+                    style="border:1px solid #ddd; border-collapse:collapse;">
 
-<p>{{ $password }}</p>
+                    <tr>
+                        <td style="background:#f3f4f6;"><strong>Login URL</strong></td>
+                        <td>
+                            <a href="{{ url('/vendor/login') }}">
+                                {{ url('/vendor/login') }}
+                            </a>
+                        </td>
+                    </tr>
 
-<hr>
+                    <tr>
+                        <td style="background:#f3f4f6;"><strong>Email</strong></td>
+                        <td>{{ $email }}</td>
+                    </tr>
 
-<p>Please login and change your password immediately.</p>
+                    <tr>
+                        <td style="background:#f3f4f6;"><strong>Temporary Password</strong></td>
+                        <td>{{ $password }}</td>
+                    </tr>
 
-<p>Thank you,<br>
-CartZen Team</p>
+                </table>
+
+                <br>
+
+                <p>
+                    For security reasons, please log in and change your password
+                    immediately after your first login.
+                </p>
+
+                <div style="text-align:center; margin-top:30px;">
+
+                    <a href="{{ url('/vendor/login') }}"
+                        style="
+                            background:#6d28d9;
+                            color:white;
+                            text-decoration:none;
+                            padding:14px 28px;
+                            border-radius:6px;
+                            display:inline-block;
+                        ">
+                        Login to Vendor Dashboard
+                    </a>
+
+                </div>
+
+                <br><br>
+
+                <p>
+                    We look forward to seeing your products on CartZen.
+                </p>
+
+                <p>
+                    Regards,<br>
+                    <strong>CartZen Team</strong>
+                </p>
+
+            </td>
+        </tr>
+
+    </table>
 
 </body>
+
 </html>

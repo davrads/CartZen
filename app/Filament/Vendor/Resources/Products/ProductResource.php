@@ -15,20 +15,26 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use UnitEnum;
 
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
-    
 
-    public static function getEloquentQuery():Builder{
+
+    public static function getEloquentQuery(): Builder
+    {
         return parent::getEloquentQuery()
-        ->where('vendor_id', Auth::id());
+            ->where('vendor_id', Auth::id());
     }
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static ?string $navigationLabel = 'My Products';
 
-    
+    protected static string|UnitEnum|null $navigationGroup =  'Store Management';
+
+    protected static ?int $navigationSort = 1;
+
     public static function form(Schema $schema): Schema
     {
         return ProductForm::configure($schema);

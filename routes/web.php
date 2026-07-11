@@ -84,11 +84,11 @@ Route::middleware('customer')->group(function () {
 
   Route::prefix('checkout')->group(function () {
     Route::get('/', [CheckoutController::class, 'index'])->name('checkout');
-    Route::post('/place-order', [OrderController::class, 'placeOrder'])->name('place.order');
-    Route::get('/khalti/callback', [OrderController::class, 'callback'])->name('khalti.callback');
-     Route::get('/order/history', [OrderController::class, 'history'])->name('order.history');
+    Route::post('/place-order', [CheckoutController::class, 'placeOrder'])->name('place.order');
+    Route::get('/khalti/callback', [CheckoutController::class, 'callback'])->name('khalti.callback');
 });
 
+     Route::get('/order/history', [OrderController::class, 'history'])->name('order.history');
 
     Route::get('/user_profile', function () {
         return view('profile.user_profile');
