@@ -11,6 +11,8 @@ use App\Http\Controllers\AddressController;
 use App\Http\Controllers\Vendor\VendorRequestController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OrderController;
+use App\Models\Order;
+use Illuminate\Support\Facades\Auth;
 
 
 
@@ -91,8 +93,12 @@ Route::middleware('customer')->group(function () {
 
 
     Route::get('/user_profile', function () {
-        return view('profile.user_profile');
-    })->name('profile');
+    $orders = Order::where('user_id', Auth::guard('customer')->user()->id)
+                   ->latest()
+                   ->get();
+
+    return view('profile.user_profile', compact('orders'));
+})->name('profile');
 
     Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/password/update', [ProfileController::class, 'passwordUpdate'])->name('password.update');

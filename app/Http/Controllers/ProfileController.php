@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use App\Models\Order;
+
 
 class ProfileController extends Controller
 {
@@ -57,4 +59,16 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+    
+    public function profile()
+{
+    // लगइन भएको customer को मात्र अर्डरहरू तान्न (user_id को आधारमा)
+    // यहाँ Auth::guard('customer')->user()->id को प्रयोग गरिएको छ
+    $orders = Order::where('user_id', Auth::guard('customer')->user()->id)
+                   ->latest()
+                   ->get();
+
+    // compact('orders') गरेर डाटा भ्युमा पठाउने
+    return view('user_profile', compact('orders'));
+}
 }

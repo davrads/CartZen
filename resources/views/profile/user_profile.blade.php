@@ -71,6 +71,11 @@
         color: #92400E;
     }
 
+    .badge-pending {
+        background: #E0F2FE;
+        color: #0369A1;
+    }
+
     .badge-cancelled {
         background: #FEE2E2;
         color: #991B1B;
@@ -508,6 +513,7 @@
                     <h1 class="text-xl font-bold text-gray-900 mb-4">My Orders</h1>
                     <div class="flex gap-0 border-b border-gray-200 mb-5 overflow-x-auto">
                         <button onclick="setTab(this,'all')" data-tab="all" class="tab-active px-4 sm:px-5 py-2.5 text-sm whitespace-nowrap transition">All</button>
+                        <button onclick="setTab(this,'pending')" data-tab="pending" class="tab-inactive px-4 sm:px-5 py-2.5 text-sm whitespace-nowrap transition">Pending</button>
                         <button onclick="setTab(this,'processing')" data-tab="processing" class="tab-inactive px-4 sm:px-5 py-2.5 text-sm whitespace-nowrap transition">Processing</button>
                         <button onclick="setTab(this,'shipped')" data-tab="shipped" class="tab-inactive px-4 sm:px-5 py-2.5 text-sm whitespace-nowrap transition">Shipped</button>
                         <button onclick="setTab(this,'delivered')" data-tab="delivered" class="tab-inactive px-4 sm:px-5 py-2.5 text-sm whitespace-nowrap transition">Delivered</button>
@@ -529,16 +535,13 @@
                                 </div>
                             @endforeach
                         @else
-                            <div class="order-row flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 sm:px-6 py-4 sm:py-5" data-status="delivered">
-                                <div>
-                                    <p class="order-id font-medium text-gray-800 text-sm">Order #CZ1234567890</p>
-                                    <p class="text-xs text-gray-400 mt-0.5">May 12, 2024</p>
-                                </div>
-                                <div class="flex items-center gap-3 sm:gap-5 flex-wrap">
-                                    <span class="font-semibold text-gray-800 text-sm sm:text-base">Rs. 10,999</span>
-                                    <span class="badge badge-delivered">Delivered</span>
-                                    <a href="#" class="text-violet-600 hover:text-violet-800 text-sm font-medium hover:underline transition">View Details</a>
-                                </div>
+                            <div id="empty-state" class="py-16 text-center text-gray-400">
+                                <svg class="mx-auto mb-3 w-12 h-12 text-gray-200" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <rect x="2" y="3" width="20" height="14" rx="2" />
+                                    <line x1="8" y1="21" x2="16" y2="21" />
+                                    <line x1="12" y1="17" x2="12" y2="21" />
+                                </svg>
+                                <p class="text-sm">No orders found</p>
                             </div>
                         @endif
 
@@ -691,7 +694,9 @@
                 row.style.display = 'none';
             }
         });
-        document.getElementById('empty-state').style.display = rowsFound ? 'none' : 'block';
+        document.querySelectorAll('#empty-state').forEach(el => {
+            el.style.display = rowsFound ? 'none' : 'block';
+        });
     }
 
     function openSidebar() {
@@ -720,17 +725,14 @@ function editAddress(address) {
     const form = document.getElementById('addressForm');
     
     document.getElementById('form-title').innerText = "Edit Address";
-    // लाराभेलमा अपडेट गर्न PUT मेथड चाहिन्छ
     document.getElementById('method-field').innerHTML = '<input type="hidden" name="_method" value="PUT">';
     
-    // यहाँ तपाईंको वेब डट पीएचपी अनुसार यूआरएल डाइनामिक बनाउने
     form.action = `/addresses/${address.id}`;
     
-    // फारमका फिल्डहरूमा पुराना डाटाहरू भर्ने
     document.getElementById('adr_full_name').value = address.full_name;
     document.getElementById('adr_phone').value = address.phone;
-        document.getElementById('adr_province').value = address.province;
-           document.getElementById('adr_district').value = address.district;
+    document.getElementById('adr_province').value = address.province;
+    document.getElementById('adr_district').value = address.district;
     document.getElementById('adr_city').value = address.city;
     document.getElementById('adr_address_line').value = address.address_line; 
     document.getElementById('adr_postal_code').value = address.postal_code;
