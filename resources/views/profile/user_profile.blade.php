@@ -261,7 +261,7 @@
                     Address Book
                 </button>
                 <button type="button" onclick="navigate('orders')" data-nav="orders"
-                    class="sidebar-link sidebar-active w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm">
+                    class="sidebar-link sidebar-inactive w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm">
                     <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7"
                         viewBox="0 0 24 24">
                         <rect x="2" y="3" width="20" height="14" rx="2" />
@@ -271,7 +271,7 @@
                     My Orders
                 </button>
                 <button type="button" onclick="navigate('wishlist')" data-nav="wishlist"
-                    class="sidebar-link sidebar-inactive w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm">
+                    class="sidebar-link sidebar-active w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm">
                     <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7"
                         viewBox="0 0 24 24">
                         <path
@@ -352,22 +352,22 @@
                                     <button type="button" class="ml-auto text-sm text-violet-600 font-medium hover:underline">Change Photo</button>
                                 </div>
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-    <div class="sm:col-span-2">
-        <label class="block text-xs font-semibold text-gray-500 mb-1.5">Full Name</label>
-        <input type="text" name="name" value="{{ old('name', Auth::guard('customer')->user()->name) }}"
-            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition" required />
-    </div>
-    <div>
-        <label class="block text-xs font-semibold text-gray-500 mb-1.5">Email Address</label>
-        <input type="email" name="email" value="{{ old('email', Auth::guard('customer')->user()->email) }}"
-            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition" required />
-    </div>
-    <div>
-        <label class="block text-xs font-semibold text-gray-500 mb-1.5">Phone Number</label>
-        <input type="tel" name="phone" value="{{ old('phone', Auth::guard('customer')->user()->phone ?? (Auth::guard('customer')->user()->addresses->where('is_default', 1)->first()->phone ?? (Auth::guard('customer')->user()->addresses->first()->phone ?? ''))) }}"
-            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition" />
-    </div>
-</div>
+                                    <div class="sm:col-span-2">
+                                        <label class="block text-xs font-semibold text-gray-500 mb-1.5">Full Name</label>
+                                        <input type="text" name="name" value="{{ old('name', Auth::guard('customer')->user()->name) }}"
+                                            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition" required />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-gray-500 mb-1.5">Email Address</label>
+                                        <input type="email" name="email" value="{{ old('email', Auth::guard('customer')->user()->email) }}"
+                                            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition" required />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-gray-500 mb-1.5">Phone Number</label>
+                                        <input type="tel" name="phone" value="{{ old('phone', Auth::guard('customer')->user()->phone ?? (Auth::guard('customer')->user()->addresses->where('is_default', 1)->first()->phone ?? (Auth::guard('customer')->user()->addresses->first()->phone ?? ''))) }}"
+                                            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition" />
+                                    </div>
+                                </div>
                                 <button type="submit" class="mt-5 bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition">Save Changes</button>
                             </form>
                         </div>
@@ -401,115 +401,116 @@
                 </div>
 
                 <div id="page-address" class="page">
-    <h1 class="text-xl font-bold text-gray-900 mb-6">Address Book</h1>
-    <div class="max-w-2xl">
-        <div class="flex items-center justify-between mb-4">
-            <p class="text-sm text-gray-500">Your saved addresses</p>
-            <button onclick="openAddressForm()"
-                class="flex items-center gap-1.5 text-sm font-semibold text-violet-600 hover:text-violet-800 transition">
-                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                    <line x1="12" y1="5" x2="12" y2="19" />
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
-                Add New Address
-            </button>
-        </div>
-
-        <div id="add-address-form" class="hidden bg-violet-50 border border-violet-200 rounded-2xl p-5 mb-4">
-            <form id="addressForm" method="POST" action="{{ route('addresses.store') }}">
-                @csrf
-                <div id="method-field"></div> <h3 id="form-title" class="font-semibold text-gray-800 text-sm mb-3">New Address</h3>
-               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-    <div>
-        <label for="adr_full_name" class="block text-xs font-semibold text-gray-500 mb-1.5">Full Name</label>
-        <input type="text" name="full_name" id="adr_full_name" placeholder="Full Name" required
-            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 bg-white transition" />
-    </div>
-
-    <div>
-        <label for="adr_phone" class="block text-xs font-semibold text-gray-500 mb-1.5">Phone Number</label>
-        <input type="tel" name="phone" id="adr_phone" placeholder="Phone Number" required
-            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 bg-white transition" />
-    </div>
-
-    <div class="sm:col-span-2">
-        <label for="adr_province" class="block text-xs font-semibold text-gray-500 mb-1.5">Province</label>
-        <input type="text" name="province" id="adr_province" placeholder="Province" required
-            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 bg-white transition" />
-    </div>
-
-    <div>
-        <label for="adr_district" class="block text-xs font-semibold text-gray-500 mb-1.5">District</label>
-        <input type="text" name="district" id="adr_district" placeholder="District" required
-            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 bg-white transition" />
-    </div>
-
-    <div>
-        <label for="adr_city" class="block text-xs font-semibold text-gray-500 mb-1.5">City</label>
-        <input type="text" name="city" id="adr_city" placeholder="City" required
-            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 bg-white transition" />
-    </div>
-
-    <div>
-        <label for="adr_address_line" class="block text-xs font-semibold text-gray-500 mb-1.5">Address Line</label>
-        <input type="text" name="address_line" id="adr_address_line" placeholder="Address Line" required
-            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 bg-white transition" />
-    </div>
-
-    <div>
-        <label for="adr_postal_code" class="block text-xs font-semibold text-gray-500 mb-1.5">Postal Code</label>
-        <input type="text" name="postal_code" id="adr_postal_code" placeholder="Postal Code" required
-            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 bg-white transition" />
-    </div>
-
-    <div class="sm:col-span-2 flex items-center gap-2 mt-2">
-        <input type="checkbox" name="is_default" id="is_default" value="1" 
-            class="rounded text-violet-600 focus:ring-violet-500 w-4 h-4 cursor-pointer">
-        <label for="is_default" class="text-xs font-medium text-gray-600 cursor-pointer select-none">Set as default address</label>
-    </div>
-</div>
-                <div class="flex gap-2 mt-3">
-                    <button type="submit" class="bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold px-5 py-2 rounded-xl transition">Save</button>
-                    <button type="button" onclick="document.getElementById('add-address-form').classList.add('hidden')"
-                        class="text-sm font-medium text-gray-500 hover:text-gray-700 px-4 py-2 rounded-xl border border-gray-200 bg-white transition">Cancel</button>
-                </div>
-            </form>
-        </div>
-
-        <div class="space-y-4">
-            @forelse(Auth::guard('customer')->user()->addresses ?? [] as $address)
-                <div class="bg-white rounded-2xl shadow-sm {{ $address->is_default ? 'border-2 border-violet-400' : 'border border-gray-100' }} p-5">
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <div class="flex items-center gap-2 mb-1">
-                                @if($address->is_default)
-                                    <span class="tag">Default</span>
-                                @endif
-                                <span class="tag">Saved</span>
-                            </div>
-                            <p class="font-semibold text-gray-800 text-sm mt-2">{{ $address->full_name }}</p>
-                            <p class="text-sm text-gray-500 mt-0.5">{{ $address->province }}, {{ $address->district }}, {{ $address->city }}, {{ $address->address_line }}</p>
-                            <p class="text-sm text-gray-400 mt-1">{{ $address->phone }}</p>
+                    <h1 class="text-xl font-bold text-gray-900 mb-6">Address Book</h1>
+                    <div class="max-w-2xl">
+                        <div class="flex items-center justify-between mb-4">
+                            <p class="text-sm text-gray-500">Your saved addresses</p>
+                            <button onclick="openAddressForm()"
+                                class="flex items-center gap-1.5 text-sm font-semibold text-violet-600 hover:text-violet-800 transition">
+                                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                    <line x1="12" y1="5" x2="12" y2="19" />
+                                    <line x1="5" y1="12" x2="19" y2="12" />
+                                </svg>
+                                Add New Address
+                            </button>
                         </div>
-                        <div class="flex gap-2 shrink-0 ml-3">
-                            <button onclick="editAddress({{ $address->toJson() }})" class="text-xs text-violet-600 hover:underline font-medium"><i class=" text-lg fa-solid fa-pen-to-square"></i></button>
-                            <form method="POST" action="{{ route('addresses.destroy', $address->id) }}" onsubmit="return confirm('Are you sure?')">
+
+                        <div id="add-address-form" class="hidden bg-violet-50 border border-violet-200 rounded-2xl p-5 mb-4">
+                            <form id="addressForm" method="POST" action="{{ route('addresses.store') }}">
                                 @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-xs text-red-400 hover:underline font-medium">Delete</button>
+                                <div id="method-field"></div> <h3 id="form-title" class="font-semibold text-gray-800 text-sm mb-3">New Address</h3>
+                               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="adr_full_name" class="block text-xs font-semibold text-gray-500 mb-1.5">Full Name</label>
+                                        <input type="text" name="full_name" id="adr_full_name" placeholder="Full Name" required
+                                            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 bg-white transition" />
+                                    </div>
+
+                                    <div>
+                                        <label for="adr_phone" class="block text-xs font-semibold text-gray-500 mb-1.5">Phone Number</label>
+                                        <input type="tel" name="phone" id="adr_phone" placeholder="Phone Number" required
+                                            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 bg-white transition" />
+                                    </div>
+
+                                    <div class="sm:col-span-2">
+                                        <label for="adr_province" class="block text-xs font-semibold text-gray-500 mb-1.5">Province</label>
+                                        <input type="text" name="province" id="adr_province" placeholder="Province" required
+                                            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 bg-white transition" />
+                                    </div>
+
+                                    <div>
+                                        <label for="adr_district" class="block text-xs font-semibold text-gray-500 mb-1.5">District</label>
+                                        <input type="text" name="district" id="adr_district" placeholder="District" required
+                                            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 bg-white transition" />
+                                    </div>
+
+                                    <div>
+                                        <label for="adr_city" class="block text-xs font-semibold text-gray-500 mb-1.5">City</label>
+                                        <input type="text" name="city" id="adr_city" placeholder="City" required
+                                            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 bg-white transition" />
+                                    </div>
+
+                                    <div>
+                                        <label for="adr_address_line" class="block text-xs font-semibold text-gray-500 mb-1.5">Address Line</label>
+                                        <input type="text" name="address_line" id="adr_address_line" placeholder="Address Line" required
+                                            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 bg-white transition" />
+                                    </div>
+
+                                    <div>
+                                        <label for="adr_postal_code" class="block text-xs font-semibold text-gray-500 mb-1.5">Postal Code</label>
+                                        <input type="text" name="postal_code" id="adr_postal_code" placeholder="Postal Code" required
+                                            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 bg-white transition" />
+                                    </div>
+
+                                    <div class="sm:col-span-2 flex items-center gap-2 mt-2">
+                                        <input type="checkbox" name="is_default" id="is_default" value="1" 
+                                            class="rounded text-violet-600 focus:ring-violet-500 w-4 h-4 cursor-pointer">
+                                        <label for="is_default" class="text-xs font-medium text-gray-600 cursor-pointer select-none">Set as default address</label>
+                                    </div>
+                                </div>
+                                <div class="flex gap-2 mt-3">
+                                    <button type="submit" class="bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold px-5 py-2 rounded-xl transition">Save</button>
+                                    <button type="button" onclick="document.getElementById('add-address-form').classList.add('hidden')"
+                                        class="text-sm font-medium text-gray-500 hover:text-gray-700 px-4 py-2 rounded-xl border border-gray-200 bg-white transition">Cancel</button>
+                                </div>
                             </form>
+                        </div>
+
+                        <div class="space-y-4">
+                            @forelse(Auth::guard('customer')->user()->addresses ?? [] as $address)
+                                <div class="bg-white rounded-2xl shadow-sm {{ $address->is_default ? 'border-2 border-violet-400' : 'border border-gray-100' }} p-5">
+                                    <div class="flex items-start justify-between">
+                                        <div>
+                                            <div class="flex items-center gap-2 mb-1">
+                                                @if($address->is_default)
+                                                    <span class="tag">Default</span>
+                                                @endif
+                                                <span class="tag">Saved</span>
+                                            </div>
+                                            <p class="font-semibold text-gray-800 text-sm mt-2">{{ $address->full_name }}</p>
+                                            <p class="text-sm text-gray-500 mt-0.5">{{ $address->province }}, {{ $address->district }}, {{ $address->city }}, {{ $address->address_line }}</p>
+                                            <p class="text-sm text-gray-400 mt-1">{{ $address->phone }}</p>
+                                        </div>
+                                        <div class="flex gap-2 shrink-0 ml-3">
+                                            <button onclick="editAddress({{ $address->toJson() }})" class="text-xs text-violet-600 hover:underline font-medium"><i class=" text-lg fa-solid fa-pen-to-square"></i></button>
+                                            <form method="POST" action="{{ route('addresses.destroy', $address->id) }}" onsubmit="return confirm('Are you sure?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-xs text-red-400 hover:underline font-medium">Delete</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="text-center py-8 text-gray-400 bg-white rounded-2xl border border-gray-100">
+                                    <p class="text-sm">No saved addresses found.</p>
+                                </div>
+                            @endforelse
                         </div>
                     </div>
                 </div>
-            @empty
-                <div class="text-center py-8 text-gray-400 bg-white rounded-2xl border border-gray-100">
-                    <p class="text-sm">No saved addresses found.</p>
-                </div>
-            @endforelse
-        </div>
-    </div>
-</div>
-                <div id="page-orders" class="page active">
+
+                <div id="page-orders" class="page">
                     <h1 class="text-xl font-bold text-gray-900 mb-4">My Orders</h1>
                     <div class="flex gap-0 border-b border-gray-200 mb-5 overflow-x-auto">
                         <button onclick="setTab(this,'all')" data-tab="all" class="tab-active px-4 sm:px-5 py-2.5 text-sm whitespace-nowrap transition">All</button>
@@ -544,44 +545,52 @@
                                 <p class="text-sm">No orders found</p>
                             </div>
                         @endif
-
-                        <div id="empty-state" class="hidden py-16 text-center text-gray-400">
-                            <svg class="mx-auto mb-3 w-12 h-12 text-gray-200" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <rect x="2" y="3" width="20" height="14" rx="2" />
-                                <line x1="8" y1="21" x2="16" y2="21" />
-                                <line x1="12" y1="17" x2="12" y2="21" />
-                            </svg>
-                            <p class="text-sm">No orders found</p>
-                        </div>
                     </div>
                 </div>
 
-                <div id="page-wishlist" class="page">
+                <div id="page-wishlist" class="page active">
                     <h1 class="text-xl font-bold text-gray-900 mb-6">Wishlist</h1>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <div class="wishlist-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden group">
-                            <div class="relative bg-gray-50 h-44 flex items-center justify-center">
-                                <svg width="64" height="64" fill="none" stroke="#D1D5DB" stroke-width="1" viewBox="0 0 24 24">
-                                    <rect x="3" y="3" width="18" height="18" rx="2" />
-                                    <circle cx="8.5" cy="8.5" r="1.5" />
-                                    <polyline points="21 15 16 10 5 21" />
-                                </svg>
-                                <button class="remove-btn absolute top-2 right-2 w-7 h-7 bg-white rounded-full flex items-center justify-center shadow text-red-400 hover:text-red-600 hover:shadow-md transition">
-                                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                        <line x1="18" y1="6" x2="6" y2="18" />
-                                        <line x1="6" y1="6" x2="18" y2="18" />
-                                    </svg>
-                                </button>
-                            </div>
-                            <div class="p-4">
-                                <p class="font-semibold text-gray-800 text-sm">Wireless Noise-Cancelling Headphones</p>
-                                <p class="text-xs text-gray-400 mt-0.5">Sony</p>
-                                <div class="flex items-center justify-between mt-3">
-                                    <span class="font-bold text-gray-900">Rs. 12,500</span>
-                                    <button class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">Add to Cart</button>
+                        
+                        @forelse($wishlistItems ?? [] as $id => $item)
+                            <div class="wishlist-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden group">
+                                <div class="relative bg-gray-50 h-44 flex items-center justify-center">
+                                    @if(isset($item['image']))
+                                        <img src="{{ asset('storage/' . $item['image']) }}" alt="{{ $item['name'] }}" class="object-cover h-full w-full">
+                                    @else
+                                        <svg width="64" height="64" fill="none" stroke="#D1D5DB" stroke-width="1" viewBox="0 0 24 24">
+                                            <rect x="3" y="3" width="18" height="18" rx="2" />
+                                            <circle cx="8.5" cy="8.5" r="1.5" />
+                                            <polyline points="21 15 16 10 5 21" />
+                                        </svg>
+                                    @endif
+                                    
+                                    <a href="{{ route('wishlist.remove', $id) }}" class="remove-btn absolute top-2 right-2 w-7 h-7 bg-white rounded-full flex items-center justify-center shadow text-red-400 hover:text-red-600 hover:shadow-md transition">
+                                        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                            <line x1="18" y1="6" x2="6" y2="18" />
+                                            <line x1="6" y1="6" x2="18" y2="18" />
+                                        </svg>
+                                    </a>
+                                </div>
+                                <div class="p-4">
+                                    <p class="font-semibold text-gray-800 text-sm">{{ $item['name'] }}</p>
+                                    <p class="text-xs text-gray-400 mt-0.5">Quantity: {{ $item['quantity'] }}</p>
+                                    <div class="flex items-center justify-between mt-3">
+                                        <span class="font-bold text-gray-900">Rs. {{ number_format($item['price']) }}</span>
+                                        
+                                        {{-- Add to Cart बटनलाई सच्याएर यो डायनामिक एङ्कर ट्याग हालिएको छ --}}
+                                        <a href="{{ route('wishlist.toCart', $id) }}" class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition inline-block text-center">
+                                            Add to Cart
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        @empty
+                            <div class="col-span-full text-center py-12 text-gray-400 bg-white rounded-2xl border border-gray-100">
+                                <p class="text-sm">Wishlist मा कुनै पनि सामान छैन ।</p>
+                            </div>
+                        @endforelse
+
                     </div>
                 </div>
 
@@ -708,38 +717,39 @@
         document.getElementById('sidebar').classList.add('-translate-x-full');
         document.getElementById('sidebar-overlay').classList.remove('show');
     }
-    function openAddressForm() {
-    const formContainer = document.getElementById('add-address-form');
-    const form = document.getElementById('addressForm');
-    
-    document.getElementById('form-title').innerText = "New Address";
-    document.getElementById('method-field').innerHTML = "";
-    form.action = "{{ route('addresses.store') }}";
-    form.reset();
-    
-    formContainer.classList.remove('hidden');
-}
 
-function editAddress(address) {
-    const formContainer = document.getElementById('add-address-form');
-    const form = document.getElementById('addressForm');
-    
-    document.getElementById('form-title').innerText = "Edit Address";
-    document.getElementById('method-field').innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    
-    form.action = `/addresses/${address.id}`;
-    
-    document.getElementById('adr_full_name').value = address.full_name;
-    document.getElementById('adr_phone').value = address.phone;
-    document.getElementById('adr_province').value = address.province;
-    document.getElementById('adr_district').value = address.district;
-    document.getElementById('adr_city').value = address.city;
-    document.getElementById('adr_address_line').value = address.address_line; 
-    document.getElementById('adr_postal_code').value = address.postal_code;
-    document.getElementById('is_default').checked = address.is_default == 1;
-    
-    formContainer.classList.remove('hidden');
-    formContainer.scrollIntoView({ behavior: 'smooth' });
-}
+    function openAddressForm() {
+        const formContainer = document.getElementById('add-address-form');
+        const form = document.getElementById('addressForm');
+        
+        document.getElementById('form-title').innerText = "New Address";
+        document.getElementById('method-field').innerHTML = "";
+        form.action = "{{ route('addresses.store') }}";
+        form.reset();
+        
+        formContainer.classList.remove('hidden');
+    }
+
+    function editAddress(address) {
+        const formContainer = document.getElementById('add-address-form');
+        const form = document.getElementById('addressForm');
+        
+        document.getElementById('form-title').innerText = "Edit Address";
+        document.getElementById('method-field').innerHTML = '<input type="hidden" name="_method" value="PUT">';
+        
+        form.action = `/addresses/${address.id}`;
+        
+        document.getElementById('adr_full_name').value = address.full_name;
+        document.getElementById('adr_phone').value = address.phone;
+        document.getElementById('adr_province').value = address.province;
+        document.getElementById('adr_district').value = address.district;
+        document.getElementById('adr_city').value = address.city;
+        document.getElementById('adr_address_line').value = address.address_line; 
+        document.getElementById('adr_postal_code').value = address.postal_code;
+        document.getElementById('is_default').checked = address.is_default == 1;
+        
+        formContainer.classList.remove('hidden');
+        formContainer.scrollIntoView({ behavior: 'smooth' });
+    }
 </script>
 @endsection

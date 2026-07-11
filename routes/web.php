@@ -1,18 +1,19 @@
 <?php
 
+use App\Http\Controllers\AddressController;
 use App\Http\Controllers\Auth\CustomerAuthController;
-use App\Http\Controllers\FrontendController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\FrontendController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\AddressController;
 use App\Http\Controllers\Vendor\VendorRequestController;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\OrderController;
+use App\Http\Controllers\WishlistController;
 use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 
 
@@ -97,7 +98,18 @@ Route::middleware('customer')->group(function () {
                    ->latest()
                    ->get();
 
-    return view('profile.user_profile', compact('orders'));
+    return view('profile.user_profile', compact('orders',));
+})->name('profile');
+Route::get('/user_profile', function () {
+    // अर्डरहरू तान्ने
+    $orders = \App\Models\Order::where('user_id', Auth::guard('customer')->user()->id)
+                   ->latest()
+                   ->get();
+
+    // सेसनबाट 'wishlist' तान्ने (नाम एकदमै मिल्नुपर्छ)
+    $wishlistItems = session()->get('wishlist', []);
+
+    return view('profile.user_profile', compact('orders', 'wishlistItems'));
 })->name('profile');
 
     Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
@@ -118,3 +130,9 @@ Route::middleware('customer')->group(function () {
         ->name('logout');
 });
 
+Route::prefix('wishlist')->group(function () {
+    Route::get('/wishlist/add/{id}', [CartController::class, 'moveToWishlist'])->name('wishlist.add');
+    Route::get('/wishlist/to-cart/{id}', [CartController::class, 'wishlistToCart'])->name('wishlist.toCart');
+    Route::get('/wishlist/remove/{id}', [CartController::class, 'removeFromWishlist'])->name('wishlist.remove');
+
+});
