@@ -6,7 +6,8 @@
         </div>
         <div class="flex items-center gap-6">
             <a href="#" class="hover:text-purple-400">Download App</a>
-            <a href="{{ route('vendor.request') }}" class="hover:text-purple-400">Sell on Cartzen</a>
+            <a href="{{ route('vendor.request') }}" class="hover:text-purple-400">Join as Seller</a>
+            <a href="{{route('filament.vendor.auth.login')}}" class="hover:text-purple-400">Sell on Cartzen</a>
             <a href="#" class="hover:text-purple-400">Help</a>
         </div>
     </div>

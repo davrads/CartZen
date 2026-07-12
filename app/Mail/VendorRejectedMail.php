@@ -10,27 +10,31 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class VendorApprovedMail extends Mailable
+class VendorRejectedMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public string $email;
-    public string $password;
-    public string $shopName;
+    public String $shopName;
+    public String $remarks;
 
-    public function __construct(String $email, string $password, string $shopName)
+    /**
+     * Create a new message instance.
+     */
+    public function __construct(String $shopName, String $remarks)
     {
-        $this->email = $email;
-        $this->password = $password;
         $this->shopName = $shopName;
+        $this->remarks = $remarks;
     }
 
+    /**
+     * Get the message envelope.
+     */
     public function build()
     {
         return $this
-            ->subject('Your Cartzen Shop Application Has Been Approved')
-            ->view('emails.vendor-approved');
-
-           
+            ->subject('Your Vendor Application Status')
+            ->view(
+                'emails.rejected'
+            );
     }
 }
