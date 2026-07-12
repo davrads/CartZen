@@ -144,14 +144,4 @@ class OrderController extends Controller
         $orders = Order::where('user_id', Auth::guard('customer')->id())->get();
         return view('frontend.order_history', compact('orders'));
     }
-    public function index()
-{
-    // लगइन भएको प्रयोगकर्ताको अर्डर र त्यस भित्रका सामानहरू (items र product) तान्ने
-    $orders = Auth::user()->orders()
-                          ->with('items.product') 
-                          ->latest()
-                          ->get();
-
-    return view('orders.index', compact('orders'));
-}
 }
