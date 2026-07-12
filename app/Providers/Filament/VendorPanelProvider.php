@@ -28,6 +28,7 @@ class VendorPanelProvider extends PanelProvider
             ->path('vendor')
             ->authGuard('vendor')
             ->login()
+            ->profile()
             ->colors([
                 'primary' => Color::Amber,
             ])

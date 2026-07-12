@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Filament\Admin\Resources\VendorProfiles\Schemas;
+namespace App\Filament\Vendor\Resources\VendorProfiles\Schemas;
 
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
 class VendorProfileForm
@@ -14,42 +14,32 @@ class VendorProfileForm
     {
         return $schema
             ->components([
-                Select::make('user_id')
-                    ->relationship('user', 'name')
-                    ->searchable()
-                    ->required()
-                    ->preload(),
 
-                TextInput::make('shop_name')
-                    ->required(),
+                Section::make('Shop Information')
+                    ->schema([
 
-                TextInput::make('shop_slug')
-                    ->required(),
+                        FileUpload::make('shop_logo')
+                            ->image()
+                            ->disk('public')
+                            ->directory('vendor_profiles'),
 
-                FileUpload::make('shop_logo')
-                    ->image()
-                    ->directory('vendor_profiles'),
+                        TextInput::make('shop_name')
+                            ->required(),
 
-                Textarea::make('description')
-                    ->columnSpanFull(),
+                        TextInput::make('shop_slug')
+                            ->required(),
 
-                TextInput::make('phone')
-                    ->tel()
-                    ->default(null),
+                        Textarea::make('description')
+                            ->columnSpanFull(),
 
-                TextInput::make('address')
-                    ->default(null),
+                        TextInput::make('phone')
+                            ->tel(),
 
-                TextInput::make('pan_number')
-                    ->required(),
+                        TextInput::make('address'),
 
-                TextInput::make('account_number')
-                    ->required(),
+                    ])
+                    ->columns(2)
 
-                Select::make('status')
-                    ->options(['pending' => 'Pending', 'approved' => 'Approved', 'rejected' => 'Rejected'])
-                    ->default('pending')
-                    ->required(),
             ]);
     }
 }

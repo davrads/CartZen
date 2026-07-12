@@ -64,4 +64,14 @@ class User extends Authenticatable implements FilamentUser
             default => false,
         };
     }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function vendorOrderItems()
+{
+    return $this->hasMany(OrderItem::class, 'vendor_id');
+}
 }
