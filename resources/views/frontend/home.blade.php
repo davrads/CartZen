@@ -183,30 +183,36 @@
             <div class="flex items-center gap-4">
                 <span class="text-4xl animate-bounce">⚡</span>
                 <h2 class="text-2xl md:text-3xl font-extrabold text-gray-800 tracking-tight">FLASH SALE</h2>
-                @if(isset($flashSales) && $flashSales->count())
-                <div class="flex items-center gap-2 ml-4"
-                     x-data="flashCountdown('{{ $flashSales->min('ends_at')->toIso8601String() }}')">
-                    <div class="timer-box" x-text="time.hours"></div>
-                    <span class="text-2xl font-bold text-purple-600">:</span>
-                    <div class="timer-box" x-text="time.minutes"></div>
-                    <span class="text-2xl font-bold text-purple-600">:</span>
-                    <div class="timer-box" x-text="time.seconds"></div>
-                </div>
+                @if(isset($flashProducts) && $flashProducts->count() > 0)
+                    @php
+                        // Earliest end date for countdown
+                        $earliestEnd = $flashProducts->min('flash_deal_ends_at');
+                    @endphp
+                    <div class="flex items-center gap-2 ml-4"
+                         x-data="flashCountdown('{{ $earliestEnd->toIso8601String() }}')">
+                        <div class="timer-box" x-text="time.hours"></div>
+                        <span class="text-2xl font-bold text-purple-600">:</span>
+                        <div class="timer-box" x-text="time.minutes"></div>
+                        <span class="text-2xl font-bold text-purple-600">:</span>
+                        <div class="timer-box" x-text="time.seconds"></div>
+                    </div>
                 @endif
             </div>
-            <a href="#" class="inline-flex items-center gap-2 px-5 py-2.5 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition shadow-md font-semibold text-sm">
+            <a href="{{ route('shop') }}?flash=1" 
+               class="inline-flex items-center gap-2 px-5 py-2.5 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition shadow-md font-semibold text-sm">
                 Shop More <i class="fas fa-arrow-right text-xs"></i>
             </a>
         </div>
 
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
-            @if(isset($flashSales) && $flashSales->count())
-                @foreach($flashSales as $flash)
+            @if(isset($flashProducts) && $flashProducts->count() > 0)
+                @foreach($flashProducts as $product)
                     @php
-                        $product = $flash->product;
-                        $originalPrice = $product->price;
-                        $discountPercent = $originalPrice > 0 ? round((($originalPrice - $flash->flash_price) / $originalPrice) * 100) : 0;
-                        $imgUrl = $product->image ? Storage::url($product->image) : 'https://loremflickr.com/200/200/'.urlencode($product->name).'?random='.$product->id;
+                        $flashPrice = $product->discounted_price ?? $product->price;
+                        $discountPercent = $product->flash_discount_percent;
+                        $imgUrl = $product->thumbnail 
+                            ? Storage::url($product->thumbnail) 
+                            : 'https://placehold.co/200x200/7c3aed/white?text=' . urlencode($product->name);
                     @endphp
                     <div class="product-card bg-white rounded-2xl p-4 text-center border border-gray-100" style="animation-delay: {{ $loop->index * 0.1 }}s">
                         <div class="relative overflow-hidden rounded-xl bg-gray-50 mb-3">
@@ -219,11 +225,12 @@
                             </div>
                         </div>
                         <h3 class="font-semibold text-gray-800 text-xs sm:text-sm mt-2 line-clamp-2 h-10">{{ $product->name }}</h3>
-                        <div class="text-purple-600 font-bold text-lg mt-2">रु {{ number_format($flash->flash_price) }}</div>
-                        <div class="text-gray-400 text-[11px] sm:text-xs line-through">रु {{ number_format($originalPrice) }}</div>
+                        <div class="text-purple-600 font-bold text-lg mt-2">रु {{ number_format($flashPrice) }}</div>
+                        <div class="text-gray-400 text-[11px] sm:text-xs line-through">रु {{ number_format($product->price) }}</div>
                     </div>
                 @endforeach
             @else
+                {{-- Fallback dummy products --}}
                 @php
                 $dummyFlash = [
                     ['name' => 'Wireless Earbuds', 'price' => 1299, 'old' => 3999, 'disc' => '67%'],
