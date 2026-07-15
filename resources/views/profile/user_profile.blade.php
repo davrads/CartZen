@@ -228,7 +228,7 @@
 
     <div class="bg-white grid lg:grid-cols-[auto,1fr]">
         <aside id="sidebar"
-            class=" left-0 h-[calc(100vh-5rem)] overflow-y-auto w-64 bg-white shadow-xl z-50 flex flex-col transition-transform duration-300 -translate-x-full lg:translate-x-0 lg:shadow-none lg:border-r lg:border-gray-100">
+            class="fixed lg:static top-0 left-0 h-screen lg:h-[calc(100vh-5rem)] overflow-y-auto w-64 bg-white shadow-xl z-50 flex flex-col transition-transform duration-300 -translate-x-full lg:translate-x-0 lg:shadow-none lg:border-r lg:border-gray-100">
 
             <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-100 shrink-0">
                 <div
@@ -261,7 +261,7 @@
                     Address Book
                 </button>
                 <button type="button" onclick="navigate('orders')" data-nav="orders"
-                    class="sidebar-link sidebar-inactive w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm">
+                    class="sidebar-link sidebar-active w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm">
                     <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7"
                         viewBox="0 0 24 24">
                         <rect x="2" y="3" width="20" height="14" rx="2" />
@@ -271,7 +271,7 @@
                     My Orders
                 </button>
                 <button type="button" onclick="navigate('wishlist')" data-nav="wishlist"
-                    class="sidebar-link sidebar-active w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm">
+                    class="sidebar-link sidebar-inactive w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm">
                     <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7"
                         viewBox="0 0 24 24">
                         <path
@@ -295,8 +295,11 @@
                         <path d="M13.73 21a2 2 0 0 1-3.46 0" />
                     </svg>
                     Notifications
-                    <span
-                        class="ml-auto bg-violet-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">3</span>
+                    @if(isset($notifications) && count($notifications) > 0)
+                        <span class="ml-auto bg-violet-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                            {{ count($notifications->where('read_at', null)) }}
+                        </span>
+                    @endif
                 </button>
                 <button type="button" onclick="navigate('settings')" data-nav="settings"
                     class="sidebar-link sidebar-inactive w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm">
@@ -318,8 +321,8 @@
             </form>
         </aside>
 
-        <div class="lg:ml--60 min-h-screen flex flex-col">
-            <main class="flex-1 px-0 sm:px-6 lg:px-8 py-6 mt-14 lg:mt-0">
+        <div class="lg:ml-0 min-h-screen flex flex-col">
+            <main class="flex-1 px-4 sm:px-6 lg:px-8 py-6 mt-14 lg:mt-0">
 
                 <div id="page-profile" class="page">
                     <h1 class="text-xl font-bold text-gray-900 mb-6">My Profile</h1>
@@ -510,7 +513,7 @@
                     </div>
                 </div>
 
-                <div id="page-orders" class="page">
+                <div id="page-orders" class="page active">
                     <h1 class="text-xl font-bold text-gray-900 mb-4">My Orders</h1>
                     <div class="flex gap-0 border-b border-gray-200 mb-5 overflow-x-auto">
                         <button onclick="setTab(this,'all')" data-tab="all" class="tab-active px-4 sm:px-5 py-2.5 text-sm whitespace-nowrap transition">All</button>
@@ -548,7 +551,7 @@
                     </div>
                 </div>
 
-                <div id="page-wishlist" class="page active">
+                <div id="page-wishlist" class="page">
                     <h1 class="text-xl font-bold text-gray-900 mb-6">Wishlist</h1>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         
@@ -577,8 +580,6 @@
                                     <p class="text-xs text-gray-400 mt-0.5">Quantity: {{ $item['quantity'] }}</p>
                                     <div class="flex items-center justify-between mt-3">
                                         <span class="font-bold text-gray-900">Rs. {{ number_format($item['price']) }}</span>
-                                        
-                                        {{-- Add to Cart बटनलाई सच्याएर यो डायनामिक एङ्कर ट्याग हालिएको छ --}}
                                         <a href="{{ route('wishlist.toCart', $id) }}" class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition inline-block text-center">
                                             Add to Cart
                                         </a>
@@ -597,51 +598,79 @@
                 <div id="page-reviews" class="page">
                     <h1 class="text-xl font-bold text-gray-900 mb-6">Reviews</h1>
                     <div class="max-w-2xl space-y-4">
-                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-                            <div class="flex items-start gap-4">
-                                <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center shrink-0">
-                                    <svg width="24" height="24" fill="none" stroke="#9CA3AF" stroke-width="1" viewBox="0 0 24 24">
-                                        <rect x="3" y="3" width="18" height="18" rx="2" />
-                                        <circle cx="8.5" cy="8.5" r="1.5" />
-                                        <polyline points="21 15 16 10 5 21" />
-                                    </svg>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex items-center justify-between flex-wrap gap-2">
-                                        <p class="font-semibold text-gray-800 text-sm">Wireless Headphones</p>
-                                        <span class="text-xs text-gray-400">May 15, 2024</span>
+                        @forelse($reviews ?? [] as $review)
+                            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                                <div class="flex items-start gap-4">
+                                    <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
+                                        @if(isset($review->product) && $review->product->image)
+                                            <img src="{{ asset('storage/' . $review->product->image) }}" alt="Product" class="object-cover w-full h-full">
+                                        @else
+                                            <svg width="24" height="24" fill="none" stroke="#9CA3AF" stroke-width="1" viewBox="0 0 24 24">
+                                                <rect x="3" y="3" width="18" height="18" rx="2" />
+                                                <circle cx="8.5" cy="8.5" r="1.5" />
+                                                <polyline points="21 15 16 10 5 21" />
+                                            </svg>
+                                        @endif
                                     </div>
-                                    <div class="flex gap-0.5 mt-1 mb-2">
-                                        <span class="star text-base">★</span><span class="star text-base">★</span><span class="star text-base">★</span><span class="star text-base">★</span><span class="star empty text-base">★</span>
-                                    </div>
-                                    <p class="text-sm text-gray-600">Really great sound quality and the noise cancellation is top notch.</p>
-                                    <div class="flex gap-3 mt-3">
-                                        <button class="text-xs text-violet-600 hover:underline font-medium">Edit</button>
-                                        <button class="text-xs text-red-400 hover:underline font-medium">Delete</button>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center justify-between flex-wrap gap-2">
+                                            <p class="font-semibold text-gray-800 text-sm">{{ $review->product->name ?? 'Product Name' }}</p>
+                                            <span class="text-xs text-gray-400">{{ $review->created_at->format('M d, Y') }}</span>
+                                        </div>
+                                        <div class="flex gap-0.5 mt-1 mb-2">
+                                            @for ($i = 1; $i <= 5; $i++)
+                                                <span class="star text-base {{ $i <= $review->rating ? '' : 'empty' }}">★</span>
+                                            @endfor
+                                        </div>
+                                        <p class="text-sm text-gray-600">{{ $review->comment }}</p>
+                                        <div class="flex gap-3 mt-3">
+                                            <button onclick="editReview({{ $review->id }})" class="text-xs text-violet-600 hover:underline font-medium">Edit</button>
+                                            <form method="POST" action="{{ route('reviews.destroy', $review->id) }}" onsubmit="return confirm('Are you sure you want to delete this review?')" class="inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-xs text-red-400 hover:underline font-medium">Delete</button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        @empty
+                            <div class="text-center py-12 text-gray-400 bg-white rounded-2xl border border-gray-100">
+                                <p class="text-sm">तपाईंले अहिलेसम्म कुनै पनि Review लेख्नुभएको छैन।</p>
+                            </div>
+                        @endforelse
                     </div>
                 </div>
 
                 <div id="page-notifications" class="page">
                     <h1 class="text-xl font-bold text-gray-900 mb-6">Notifications</h1>
                     <div class="max-w-2xl space-y-3">
-                        <div class="bg-violet-50 border border-violet-100 rounded-2xl p-4 flex items-start gap-3">
-                            <span class="notif-dot mt-1.5 shrink-0"></span>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-sm font-semibold text-gray-800">Your order has been shipped!</p>
-                                <p class="text-xs text-gray-500 mt-0.5">Order #CZ1234567889 is on its way.</p>
-                                <p class="text-xs text-violet-400 mt-1.5 font-medium">2 hours ago</p>
+                        @forelse($notifications ?? [] as $notification)
+                            <div class="bg-violet-50 border border-violet-100 rounded-2xl p-4 flex items-start gap-3 relative">
+                                @if(is_null($notification->read_at))
+                                    <span class="notif-dot mt-1.5 shrink-0"></span>
+                                @endif
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-semibold text-gray-800">{{ $notification->data['title'] ?? 'Notification' }}</p>
+                                    <p class="text-xs text-gray-500 mt-0.5">{{ $notification->data['message'] ?? '' }}</p>
+                                    <p class="text-xs text-violet-400 mt-1.5 font-medium">{{ $notification->created_at->diffForHumans() }}</p>
+                                </div>
+                                <form method="POST" action="{{ route('notifications.destroy', $notification->id) }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-gray-400 hover:text-gray-600 transition shrink-0">
+                                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <line x1="18" y1="6" x2="6" y2="18" />
+                                            <line x1="6" y1="6" x2="18" y2="18" />
+                                        </svg>
+                                    </button>
+                                </form>
                             </div>
-                            <button onclick="this.parentElement.remove()" class="text-gray-400 hover:text-gray-600 transition shrink-0">
-                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <line x1="18" y1="6" x2="6" y2="18" />
-                                    <line x1="6" y1="6" x2="18" y2="18" />
-                                </svg>
-                            </button>
-                        </div>
+                        @empty
+                            <div class="text-center py-12 text-gray-400 bg-white rounded-2xl border border-gray-100">
+                                <p class="text-sm">कुनै पनि नयाँ सूचना (Notification) छैन।</p>
+                            </div>
+                        @endforelse
                     </div>
                 </div>
 
