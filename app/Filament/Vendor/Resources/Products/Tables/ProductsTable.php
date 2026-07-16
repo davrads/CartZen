@@ -79,10 +79,10 @@ class ProductsTable
             ->recordActions([
                 EditAction::make(),
             ])
-            ->headerActions([
-                CreateAction::make()
-                    ->label('Add Product'),
-            ])
+            // ->headerActions([
+            //     CreateAction::make()
+            //         ->label('Add Product'),
+            // ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

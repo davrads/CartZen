@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Vendor\Resources\VendorProfiles\Tables;
+namespace App\Filament\Admin\Resources\VendorProfiles\Tables;
 
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\ImageColumn;

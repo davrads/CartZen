@@ -30,17 +30,21 @@ class EditVendorApplication extends EditRecord
 
                 $password = Str::password(8);
 
-                $user = User::create([
-                    'name' => $record->owner_name,
+                $user = User::firstOrcreate([
                     'email' => $record->email,
+                ],
+                [
+                    'name' => $record->owner_name,
                     'password' => Hash::make($password),
                     'role' => 'vendor',
                 ]);
 
-                if (!User::where('email', $record->email)->exists()) {
-
-                    VendorProfile::create([
+                try {
+                    VendorProfile::updateOrcreate(
+                        [
                         'user_id' => $user->id,
+                        ],
+                        [
                         'shop_name' => $record->shop_name,
                         'shop_slug' => Str::slug($record->shop_name),
                         'shop_logo' => $record->shop_logo,
@@ -54,6 +58,8 @@ class EditVendorApplication extends EditRecord
 
                         'status' => 'approved',
                     ]);
+                } catch (\Throwable $e) {
+                    dd($e->getMessage(), $e->getTraceAsString());
                 }
 
                 Mail::to($record->email)->send(

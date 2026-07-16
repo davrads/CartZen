@@ -8,14 +8,17 @@ use App\Models\User;
 class VendorProfile extends Model
 {
     protected $fillable = [
-        'owner_name',
+        'user_id',
         'shop_name',
-        'email',
-        'phone',
-        'address',
-        'description',
+        'shop_slug',
         'shop_logo',
-        'pan_card',
+        'description',
+        'phone',
+        'email',
+        'address',
+        'pan_number',
+        'account_number',
+        'status',
     ];
     public function user()
     {

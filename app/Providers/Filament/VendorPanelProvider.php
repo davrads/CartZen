@@ -4,6 +4,9 @@ namespace App\Providers\Filament;
 
 use App\Filament\Vendor\Widgets\VendorStatsOverview;
 use App\Filament\Vendor\Widgets\LatestProducts;
+use App\Filament\Vendor\Widgets\MonthlySalesChart;
+use App\Filament\Vendor\Widgets\RecentOrders;
+use App\Filament\Vendor\Widgets\VendorOrderStats;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -48,10 +51,13 @@ class VendorPanelProvider extends PanelProvider
                 for: 'App\Filament\Widgets'
             )
             ->widgets([
-              VendorStatsOverview::class,
+                VendorOrderStats::class,
+                RecentOrders::class,
+                VendorStatsOverview::class,
                 LatestProducts::class,
                 AccountWidget::class,
                 FilamentInfoWidget::class,
+                MonthlySalesChart::class
             ])
             ->middleware([
                 EncryptCookies::class,
