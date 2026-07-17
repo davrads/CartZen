@@ -7,7 +7,7 @@ use App\Models\User;
 use App\Models\Category;
 use App\Models\ProductImage;
 use App\Models\ProductVariant;
-use Illuminate\Database\Eloquent\Builder;
+use App\Models\FlashSale;
 
 class Product extends Model
 {
@@ -16,32 +16,37 @@ class Product extends Model
         'category_id',
         'name',
         'slug',
+        'short_description',
         'description',
         'brand',
         'sku',
         'price',
+        'sale_price',
         'discounted_price',
+        'compare_at_price',
         'stock',
+        'stock_quantity',
         'thumbnail',
+        'image',
         'status',
-        'featured',           // boolean – featured product
-        'is_flash_deal',      // NEW: boolean – flash deal active
-        'flash_deal_ends_at', // NEW: datetime – when flash deal ends
+        'featured',
+        'is_active',
+        'is_featured',
     ];
 
-    // Casts for proper data types
     protected $casts = [
         'price' => 'decimal:2',
+        'sale_price' => 'decimal:2',
         'discounted_price' => 'decimal:2',
+        'compare_at_price' => 'decimal:2',
         'featured' => 'boolean',
-        'is_flash_deal' => 'boolean',
-        'flash_deal_ends_at' => 'datetime',
+        'is_active' => 'boolean',
+        'is_featured' => 'boolean',
         'stock' => 'integer',
+        'stock_quantity' => 'integer',
     ];
 
-    // ------------------------------------------------------------------
-    // Relationships
-    // ------------------------------------------------------------------
+   
 
     public function vendor()
     {
@@ -68,51 +73,25 @@ class Product extends Model
         return $this->hasMany(OrderItem::class);
     }
 
-    // ------------------------------------------------------------------
-    // Scopes
-    // ------------------------------------------------------------------
+    public function flashSale()
+    {
+        return $this->hasOne(FlashSale::class);
+    }
+
+   public function getIsFlashSaleAttribute()
+{
+    return $this->flashSale()->exists();
+}
 
     public function scopeFeatured($query)
     {
-        return $query->where('featured', true);
+        return $query
+            ->where('featured', true)
+            ->where('status', 'available');
     }
 
-    /**
-     * Scope to get only products that are currently on flash deal.
-     * Condition: is_flash_deal = true AND flash_deal_ends_at > now()
-     */
-    public function scopeActiveFlashDeal($query)
-    {
-        return $query->where('is_flash_deal', true)
-                     ->where('flash_deal_ends_at', '>', now());
-    }
+ 
 
-    // ------------------------------------------------------------------
-    // Accessors / Helpers
-    // ------------------------------------------------------------------
-
-    /**
-     * Check if this product is currently on a flash deal.
-     */
-    public function getIsFlashDealActiveAttribute(): bool
-    {
-        return $this->is_flash_deal && $this->flash_deal_ends_at && $this->flash_deal_ends_at > now();
-    }
-
-    /**
-     * Get the discount percentage if a flash deal is active.
-     */
-    public function getFlashDiscountPercentAttribute(): float
-    {
-        if (!$this->is_flash_deal_active || !$this->discounted_price || $this->price <= 0) {
-            return 0;
-        }
-        return round((($this->price - $this->discounted_price) / $this->price) * 100);
-    }
-
-    /**
-     * Route binding uses slug.
-     */
     public function getRouteKeyName()
     {
         return 'slug';

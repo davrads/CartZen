@@ -8,6 +8,7 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 
 class ProductsTable
@@ -16,9 +17,11 @@ class ProductsTable
     {
         return $table
             ->columns([
+
                 ImageColumn::make('thumbnail')
-                    ->label('Thumbnail')
-                    ->disk('public'),
+                    ->label('Image')
+                    ->disk('public')
+                    ->square(),
 
                 TextColumn::make('name')
                     ->searchable()
@@ -43,7 +46,25 @@ class ProductsTable
                     ->badge(),
 
                 IconColumn::make('featured')
-                    ->boolean(),
+                    ->label('Featured')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-star')
+                    ->falseIcon('heroicon-o-x-mark')
+                    ->trueColor('warning')
+                    ->falseColor('gray'),
+
+                IconColumn::make('is_flash_deal')
+                    ->label('Flash Deal')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-bolt')
+                    ->falseIcon('heroicon-o-x-mark')
+                    ->trueColor('success')
+                    ->falseColor('danger'),
+
+                TextColumn::make('flash_deal_ends_at')
+                    ->label('Flash Ends')
+                    ->dateTime()
+                    ->sortable(),
 
                 TextColumn::make('images_count')
                     ->counts('images')
@@ -53,12 +74,21 @@ class ProductsTable
                     ->counts('variants')
                     ->label('Variants'),
             ])
+
             ->filters([
-                //
+
+                TernaryFilter::make('featured')
+                    ->label('Featured'),
+
+                TernaryFilter::make('is_flash_deal')
+                    ->label('Flash Deal'),
+
             ])
+
             ->recordActions([
                 EditAction::make(),
             ])
+
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

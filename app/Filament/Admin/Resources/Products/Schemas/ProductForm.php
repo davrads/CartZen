@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Products\Schemas;
 
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -10,6 +11,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Str;
 
 class ProductForm
 {
@@ -19,23 +21,31 @@ class ProductForm
             ->components([
                 Section::make('Product Information')
                     ->schema([
+
                         Select::make('vendor_id')
                             ->relationship('vendor', 'name')
-                            ->required()
                             ->searchable()
-                            ->preload(),
+                            ->preload()
+                            ->required(),
 
                         Select::make('category_id')
                             ->relationship('category', 'name')
-                            ->required()
                             ->searchable()
-                            ->preload(),
+                            ->preload()
+                            ->required(),
 
                         TextInput::make('name')
-                            ->required(),
+                            ->required()
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(fn (string $operation, $state, $set) =>
+                                $operation === 'create'
+                                    ? $set('slug', Str::slug($state))
+                                    : null
+                            ),
 
                         TextInput::make('slug')
-                            ->required(),
+                            ->required()
+                            ->unique(ignoreRecord: true),
 
                         Textarea::make('description')
                             ->columnSpanFull(),
@@ -47,11 +57,13 @@ class ProductForm
 
                         TextInput::make('price')
                             ->numeric()
-                            ->required(),
+                            ->required()
+                            ->prefix('Rs.'),
 
                         TextInput::make('discounted_price')
                             ->numeric()
-                            ->nullable(),
+                            ->prefix('Rs.')
+                            ->label('Discounted Price'),
 
                         TextInput::make('stock')
                             ->numeric()
@@ -70,48 +82,68 @@ class ProductForm
                             ->default('available')
                             ->required(),
 
+                    ])
+                    ->columns(2),
+
+                Section::make('Marketing')
+                    ->schema([
+
                         Toggle::make('featured')
+                            ->label('Featured Product')
                             ->default(false),
+
+                        Toggle::make('is_flash_deal')
+                            ->label('Flash Deal')
+                            ->live(),
+
+                        DateTimePicker::make('flash_deal_ends_at')
+                            ->label('Flash Deal Ends At')
+                            ->visible(fn ($get) => $get('is_flash_deal'))
+                            ->required(fn ($get) => $get('is_flash_deal')),
+
                     ])
                     ->columns(2),
 
                 Section::make('Product Gallery')
                     ->schema([
+
                         Repeater::make('images')
-                        ->relationship()
-                        ->schema([
-                            FileUpload::make('product_image')
-                                ->image()
-                                ->disk('public')
-                                ->directory('products/gallery')
-                                ->required(),
-                                
-                        ]),
+                            ->relationship()
+                            ->schema([
+                                FileUpload::make('product_image')
+                                    ->image()
+                                    ->disk('public')
+                                    ->directory('products/gallery')
+                                    ->required(),
+                            ]),
 
                     ]),
 
-                    Section::make('Product Variants')
+                Section::make('Product Variants')
                     ->schema([
+
                         Repeater::make('variants')
-                        ->relationship()
-                        ->schema([
-                            TextInput::make('color')
-                                ->required(),
+                            ->relationship()
+                            ->schema([
 
-                            TextInput::make('size')
-                                ->required(),
+                                TextInput::make('color')
+                                    ->required(),
 
-                            TextInput::make('price')
-                                ->numeric()
-                                ->required(),
+                                TextInput::make('size')
+                                    ->required(),
 
-                            TextInput::make('stock')
-                                ->numeric()
-                                ->required(),
-                        ])
-                        ->columns(2),
+                                TextInput::make('price')
+                                    ->numeric()
+                                    ->required(),
+
+                                TextInput::make('stock')
+                                    ->numeric()
+                                    ->required(),
+
+                            ])
+                            ->columns(2),
+
                     ]),
-
             ]);
     }
 }

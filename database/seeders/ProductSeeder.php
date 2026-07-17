@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Enums\UserRole;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
@@ -28,15 +27,14 @@ class ProductSeeder extends Seeder
                     'slug' => Str::slug("{$vendor->name}-product-{$i}"),
 
                     'description' => "Sample description for {$vendor->name} Product {$i}",
+                    'short_description' => "Short description for {$vendor->name} Product {$i}",
 
                     'brand' => 'CartZen',
 
                     'sku' => strtoupper(Str::random(8)),
 
                     'price' => rand(1000, 10000),
-
-                    'discounted_price' => rand(800, 9000),
-
+'sale_price' => rand(900, 9500),
                     'stock' => rand(10, 100),
 
                     'status' => 'available',

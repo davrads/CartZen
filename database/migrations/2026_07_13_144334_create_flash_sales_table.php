@@ -1,142 +1,35 @@
 <?php
 
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class FlashSale extends Model
+return new class extends Migration
 {
-    protected $fillable = [
-        'product_id',
-        'name',
-        'flash_price',
-        'start_date',
-        'end_date',
-        'is_active',
-    ];
-
-    protected $casts = [
-        'start_date'   => 'datetime',
-        'end_date'     => 'datetime',
-        'is_active'    => 'boolean',
-        'flash_price'  => 'decimal:2',
-    ];
-
-    // ------------------------------------------------------------------
-    // Relationships
-    // ------------------------------------------------------------------
-
-    public function product(): BelongsTo
-    {
-        return $this->belongsTo(Product::class);
-    }
-
-    // ------------------------------------------------------------------
-    // Scopes (with safety checks)
-    // ------------------------------------------------------------------
-
     /**
-     * Scope to get only currently active flash sales.
-     * If the required columns are missing, returns an empty query.
+     * Run the migrations.
      */
-    public function scopeActive($query)
+    public function up(): void
     {
-        // Check if the date columns exist to avoid SQL errors
-        if (! $this->hasDateColumns()) {
-            return $query->whereRaw('1 = 0'); // force empty result
-        }
+        Schema::create('flash_sales', function (Blueprint $table) {
+            $table->id();
 
-        return $query->where('is_active', true)
-                     ->where('start_date', '<=', now())
-                     ->where('end_date', '>=', now());
+            $table->foreignId('product_id')
+                ->constrained()
+                ->cascadeOnDelete();
+            $table->decimal('flash_price', 10, 2);
+            $table->dateTime('start_date');
+            $table->dateTime('end_date');
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
+        });
     }
 
     /**
-     * Scope to get upcoming flash sales (not yet started).
+     * Reverse the migrations.
      */
-    public function scopeUpcoming($query)
+    public function down(): void
     {
-        if (! $this->hasDateColumns()) {
-            return $query->whereRaw('1 = 0');
-        }
-
-        return $query->where('is_active', true)
-                     ->where('start_date', '>', now());
+        Schema::dropIfExists('flash_sales');
     }
-
-    /**
-     * Scope to get expired flash sales (ended).
-     */
-    public function scopeExpired($query)
-    {
-        if (! $this->hasDateColumns()) {
-            return $query->whereRaw('1 = 0');
-        }
-
-        return $query->where('end_date', '<', now());
-    }
-
-    // ------------------------------------------------------------------
-    // Helper method to check columns
-    // ------------------------------------------------------------------
-
-    /**
-     * Check if the required date columns exist in the table.
-     */
-    protected function hasDateColumns(): bool
-    {
-        return Schema::hasColumns($this->getTable(), ['start_date', 'end_date']);
-    }
-
-    // ------------------------------------------------------------------
-    // Accessors & Helpers
-    // ------------------------------------------------------------------
-
-    /**
-     * Check if this flash sale is currently active.
-     */
-    public function isActive(): bool
-    {
-        // If columns are missing, treat as inactive
-        if (! $this->hasDateColumns()) {
-            return false;
-        }
-
-        return $this->is_active
-            && $this->start_date <= now()
-            && $this->end_date >= now();
-    }
-
-    /**
-     * Get the discount percentage based on the original product price.
-     */
-    public function getDiscountPercentAttribute(): float
-    {
-        $product = $this->product;
-        if (! $product || $product->price <= 0 || ! $this->flash_price) {
-            return 0;
-        }
-        return round((($product->price - $this->flash_price) / $product->price) * 100);
-    }
-
-    /**
-     * Get the formatted discount percentage (e.g., "25%").
-     */
-    public function getDiscountPercentFormattedAttribute(): string
-    {
-        return $this->discount_percent . '%';
-    }
-
-    /**
-     * Get the remaining time as a human‑readable string (for countdowns).
-     */
-    public function getRemainingTimeAttribute(): string
-    {
-        if (! $this->isActive()) {
-            return 'Expired';
-        }
-        return $this->end_date->diffForHumans(now(), ['parts' => 2, 'join' => ', ']);
-    }
-}
+};

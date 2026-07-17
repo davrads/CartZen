@@ -29,10 +29,19 @@
 
     /* Background gradient animation */
     @keyframes gradient-shift {
-        0%   { background-position: 0% 50%; }
-        50%  { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
+        0% {
+            background-position: 0% 50%;
+        }
+
+        50% {
+            background-position: 100% 50%;
+        }
+
+        100% {
+            background-position: 0% 50%;
+        }
     }
+
     .animate-gradient-shift {
         background-size: 200% 200%;
         animation: gradient-shift 8s ease infinite;
@@ -40,38 +49,57 @@
 
     /* Floating items animation */
     @keyframes float {
-        0%   { transform: translateY(0px) rotate(0deg); }
-        50%  { transform: translateY(-15px) rotate(5deg); }
-        100% { transform: translateY(0px) rotate(0deg); }
+        0% {
+            transform: translateY(0px) rotate(0deg);
+        }
+
+        50% {
+            transform: translateY(-15px) rotate(5deg);
+        }
+
+        100% {
+            transform: translateY(0px) rotate(0deg);
+        }
     }
+
     .floating-item {
         animation: float 6s ease-in-out infinite;
-        filter: brightness(0) invert(1); /* makes them white silhouettes */
+        filter: brightness(0) invert(1);
+        /* makes them white silhouettes */
         opacity: 0.6;
     }
-    .floating-item:nth-child(odd)  { animation-duration: 7s; }
-    .floating-item:nth-child(even) { animation-duration: 5s; }
+
+    .floating-item:nth-child(odd) {
+        animation-duration: 7s;
+    }
+
+    .floating-item:nth-child(even) {
+        animation-duration: 5s;
+    }
 
     .section-card {
         background: #fff;
         border: 1px solid #e5e7eb;
         border-radius: 1.5rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 4px 12px rgba(0,0,0,0.03);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.03);
         transition: box-shadow 0.2s;
     }
+
     .section-card:hover {
-        box-shadow: 0 2px 6px rgba(0,0,0,0.04), 0 10px 24px rgba(0,0,0,0.06);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04), 0 10px 24px rgba(0, 0, 0, 0.06);
     }
 
     .product-card {
         transition: all 0.25s ease;
         animation: fadeInUp 0.5s ease both;
     }
+
     .product-card:hover {
         transform: translateY(-6px);
         border-color: var(--primary);
-        box-shadow: 0 14px 28px -12px rgba(124,58,237,0.2), 0 4px 12px -4px rgba(0,0,0,0.08);
+        box-shadow: 0 14px 28px -12px rgba(124, 58, 237, 0.2), 0 4px 12px -4px rgba(0, 0, 0, 0.08);
     }
+
     .product-card:hover .product-image {
         transform: scale(1.07);
     }
@@ -90,30 +118,33 @@
         font-size: 1.1rem;
         min-width: 50px;
         text-align: center;
-        box-shadow: 0 4px 10px rgba(124,58,237,0.25);
-        border: 1px solid rgba(255,255,255,0.15);
+        box-shadow: 0 4px 10px rgba(124, 58, 237, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.15);
     }
 
     .swiper-button-next,
     .swiper-button-prev {
         color: #fff !important;
-        background: rgba(0,0,0,0.4) !important;
+        background: rgba(0, 0, 0, 0.4) !important;
         width: 40px !important;
         height: 40px !important;
         border-radius: 50% !important;
         backdrop-filter: blur(6px);
         transition: all 0.2s;
     }
+
     .swiper-button-next:hover,
     .swiper-button-prev:hover {
-        background: rgba(0,0,0,0.6) !important;
+        background: rgba(0, 0, 0, 0.6) !important;
         transform: scale(1.05);
     }
+
     .swiper-button-next:after,
     .swiper-button-prev:after {
         font-size: 18px !important;
         font-weight: bold;
     }
+
     .swiper-pagination-bullet-active {
         background-color: var(--primary) !important;
     }
@@ -124,6 +155,7 @@
         padding-left: 1.25rem;
         color: #1f2937;
     }
+
     .section-heading::before {
         content: '';
         position: absolute;
@@ -139,17 +171,33 @@
     .category-icon {
         background: linear-gradient(135deg, #faf5ff, #ede9fe);
     }
+
     .store-icon {
         background: linear-gradient(135deg, #ede9fe, #ddd6fe);
     }
 
     @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
+
     @keyframes pulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.05); }
+
+        0%,
+        100% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
     }
 </style>
 
@@ -178,87 +226,56 @@
 
 {{-- ===== FLASH SALE ===== --}}
 <section class="max-w-7xl mx-auto px-4 pb-8 min-h-[30px]">
-    <div class="section-card p-6 md:p-8">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-5 mb-8">
-            <div class="flex items-center gap-4">
-                <span class="text-4xl animate-bounce">⚡</span>
-                <h2 class="text-2xl md:text-3xl font-extrabold text-gray-800 tracking-tight">FLASH SALE</h2>
-                @if(isset($flashProducts) && $flashProducts->count() > 0)
-                    @php
-                        // Earliest end date for countdown
-                        $earliestEnd = $flashProducts->min('flash_deal_ends_at');
-                    @endphp
-                    <div class="flex items-center gap-2 ml-4"
-                         x-data="flashCountdown('{{ $earliestEnd->toIso8601String() }}')">
-                        <div class="timer-box" x-text="time.hours"></div>
-                        <span class="text-2xl font-bold text-purple-600">:</span>
-                        <div class="timer-box" x-text="time.minutes"></div>
-                        <span class="text-2xl font-bold text-purple-600">:</span>
-                        <div class="timer-box" x-text="time.seconds"></div>
-                    </div>
-                @endif
-            </div>
-            <a href="{{ route('shop') }}?flash=1" 
-               class="inline-flex items-center gap-2 px-5 py-2.5 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition shadow-md font-semibold text-sm">
-                Shop More <i class="fas fa-arrow-right text-xs"></i>
-            </a>
-        </div>
+    <div class="mb-8">
+        <h2 class="section-heading text-2xl md:text-3xl text-gray-800 font-bold">Flash Sale</h2>
+    </div>
+    
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
 
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
-            @if(isset($flashProducts) && $flashProducts->count() > 0)
-                @foreach($flashProducts as $product)
-                    @php
-                        $flashPrice = $product->discounted_price ?? $product->price;
-                        $discountPercent = $product->flash_discount_percent;
-                        $imgUrl = $product->thumbnail 
-                            ? Storage::url($product->thumbnail) 
-                            : 'https://placehold.co/200x200/7c3aed/white?text=' . urlencode($product->name);
-                    @endphp
-                    <div class="product-card bg-white rounded-2xl p-4 text-center border border-gray-100" style="animation-delay: {{ $loop->index * 0.1 }}s">
-                        <div class="relative overflow-hidden rounded-xl bg-gray-50 mb-3">
-                            <img src="{{ $imgUrl }}"
-                                 class="product-image w-full h-36 sm:h-44 object-cover transition-transform duration-300 mx-auto"
-                                 alt="{{ $product->name }}"
-                                 onerror="this.onerror=null; this.src='https://placehold.co/200x200/7c3aed/white?text={{ urlencode($product->name) }}';">
-                            <div class="absolute top-3 left-3 flash-badge text-white text-[10px] sm:text-xs px-2.5 py-1 rounded-full font-bold shadow">
-                                {{ $discountPercent }}% OFF
-                            </div>
-                        </div>
-                        <h3 class="font-semibold text-gray-800 text-xs sm:text-sm mt-2 line-clamp-2 h-10">{{ $product->name }}</h3>
-                        <div class="text-purple-600 font-bold text-lg mt-2">रु {{ number_format($flashPrice) }}</div>
-                        <div class="text-gray-400 text-[11px] sm:text-xs line-through">रु {{ number_format($product->price) }}</div>
-                    </div>
-                @endforeach
-            @else
-                {{-- Fallback dummy products --}}
+        @if(isset($flashSales) && $flashSales->count())
+            @foreach($flashSales as $flashSale)
                 @php
-                $dummyFlash = [
-                    ['name' => 'Wireless Earbuds', 'price' => 1299, 'old' => 3999, 'disc' => '67%'],
-                    ['name' => 'Men\'s Running Shoes', 'price' => 2499, 'old' => 5990, 'disc' => '58%'],
-                    ['name' => 'Smart Watch Ultra', 'price' => 4999, 'old' => 12999, 'disc' => '62%'],
-                    ['name' => 'Cotton T-Shirt', 'price' => 599, 'old' => 1499, 'disc' => '60%'],
-                    ['name' => 'Power Bank 20000mAh', 'price' => 1799, 'old' => 3499, 'disc' => '49%'],
-                    ['name' => 'Backpack 40L', 'price' => 1599, 'old' => 3200, 'disc' => '50%'],
-                ];
+                    $product = $flashSale->product;
+                    // Ensure the product object has the flag
+                    if (!$product->is_flash_sale) {
+                        $product->is_flash_sale = true;
+                    }
                 @endphp
-                @foreach($dummyFlash as $i => $item)
-                <div class="product-card bg-white rounded-2xl p-4 text-center border border-gray-100" style="animation-delay: {{ $i * 0.1 }}s">
-                    <div class="relative overflow-hidden rounded-xl bg-gray-50 mb-3">
-                        <img src="https://loremflickr.com/200/200/{{ urlencode($item['name']) }}?random={{ $i }}"
-                             class="product-image w-full h-36 sm:h-44 object-cover transition-transform duration-300 mx-auto"
-                             alt="{{ $item['name'] }}"
-                             onerror="this.onerror=null; this.src='https://placehold.co/200x200/7c3aed/white?text={{ urlencode($item['name']) }}';">
-                        <div class="absolute top-3 left-3 flash-badge text-white text-[10px] sm:text-xs px-2.5 py-1 rounded-full font-bold shadow">
-                            {{ $item['disc'] }} OFF
-                        </div>
-                    </div>
-                    <h3 class="font-semibold text-gray-800 text-xs sm:text-sm mt-2 line-clamp-2 h-10">{{ $item['name'] }}</h3>
-                    <div class="text-purple-600 font-bold text-lg mt-2">रु {{ number_format($item['price']) }}</div>
-                    <div class="text-gray-400 text-[11px] sm:text-xs line-through">रु {{ number_format($item['old']) }}</div>
-                </div>
-                @endforeach
-            @endif
-        </div>
+                @continue(!$product)
+                
+                {{-- 
+                   FIX: REMOVED THE WRAPPER DIV. 
+                   The <x-product-card /> is now the direct child of the grid.
+                   It handles its own styling (bg-white, rounded-2xl, border, shadow).
+                --}}
+                <x-product-card :product="$product" />
+            @endforeach
+        @else
+            {{-- Dummy Products (Keep the wrapper here ONLY for dummy data if the component isn't rendered) --}}
+            @php
+                $dummyFlash = [
+                    ['name' => 'Wireless Earbuds', 'price' => 1299, 'old' => 3999],
+                    ['name' => 'Running Shoes', 'price' => 2499, 'old' => 5990],
+                    ['name' => 'Smart Watch', 'price' => 4999, 'old' => 12999],
+                    ['name' => 'Cotton T-Shirt', 'price' => 599, 'old' => 1499],
+                    ['name' => 'Power Bank', 'price' => 1799, 'old' => 3499],
+                    ['name' => 'Backpack', 'price' => 1599, 'old' => 3200],
+                ];
+            @endphp
+
+            @foreach($dummyFlash as $i => $item)
+                <x-product-card :product="(object)[
+                    'name' => $item['name'], 
+                    'price' => $item['price'], 
+                    'discounted_price' => $item['price'] * 0.8, // Example discount
+                    'thumbnail' => 'https://loremflickr.com/400/300/' . urlencode($item['name']) . '?random=' . $i,
+                    'featured' => false,
+                    'is_flash_sale' => true,
+                    'brand' => 'CartZen'
+                ]" />
+            @endforeach
+        @endif
+
     </div>
 </section>
 
@@ -269,41 +286,84 @@
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         @if(isset($featuredProducts) && $featuredProducts->count())
-            @foreach($featuredProducts as $product)
-                <div class="product-card bg-white rounded-2xl border border-gray-100 overflow-hidden" style="animation-delay: {{ $loop->index * 0.1 }}s">
+        @foreach($featuredProducts as $product)
+        <div class="product-card bg-white rounded-2xl border border-gray-100 overflow-hidden" style="animation-delay: {{ $loop->index * 0.1 }}s">
+            <x-product-card :product="$product" />
+        </div>
+        @endforeach
+        @else
+        @php
+        $dummyFeatured = [
+        ['name' => 'Nepali Dhaka Topi', 'price' => 850, 'old' => 1200],
+        ['name' => 'Organic Green Tea', 'price' => 450, 'old' => 750],
+        ['name' => 'Smart LED TV 32"', 'price' => 22999, 'old' => 29999],
+        ['name' => 'Laptop Cooling Pad', 'price' => 1299, 'old' => 1999],
+        ];
+        @endphp
+        @foreach($dummyFeatured as $i => $item)
+        <div class="product-card bg-white rounded-2xl border border-gray-100 overflow-hidden" style="animation-delay: {{ $i * 0.1 }}s">
+            <div class="relative overflow-hidden bg-gray-50">
+                <img src="https://loremflickr.com/400/300/{{ urlencode($item['name']) }}?random={{ $i }}"
+                    class="w-full h-48 object-cover" alt="{{ $item['name'] }}"
+                    onerror="this.onerror=null; this.src='https://placehold.co/400x300/7c3aed/white?text={{ urlencode($item['name']) }}';">
+            </div>
+            <div class="p-4">
+                <h3 class="font-semibold text-gray-800">{{ $item['name'] }}</h3>
+                <p class="text-sm text-gray-500 mt-1">Best Seller</p>
+                <div class="flex items-center justify-between mt-2">
+                    <span class="text-lg font-bold text-purple-600">रु {{ number_format($item['price']) }}</span>
+                    <span class="text-xs text-gray-400 line-through">रु {{ number_format($item['old']) }}</span>
+                </div>
+            </div>
+        </div>
+        @endforeach
+        @endif
+    </div>
+</section>
+{{-- ===== JUST FOR YOU (All Products) ===== --}}
+<section class="max-w-7xl mx-auto px-4 pb-12">
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h2 class="section-heading text-2xl md:text-3xl text-white font-bold">Our Products</h2>
+            <p class="text-white mt-1 text-sm md:text-base">Discover our complete collection of products tailored for you.</p>
+        </div>
+        {{-- Optional: View All Link if using pagination --}}
+            <a href="{{ route('products.index') }}" class="text-white hover:text-white font-medium text-sm flex items-center gap-1 transition-colors">
+                View All Products
+            </a>
+    </div>
+
+    {{-- Grid Container --}}
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+
+        @if(isset($justForYouProducts) && $justForYouProducts->count())
+            @foreach($justForYouProducts as $product)
+               
+                <div class="flex flex-col h-full">
                     <x-product-card :product="$product" />
                 </div>
             @endforeach
         @else
-            @php
-            $dummyFeatured = [
-                ['name' => 'Nepali Dhaka Topi', 'price' => 850, 'old' => 1200],
-                ['name' => 'Organic Green Tea', 'price' => 450, 'old' => 750],
-                ['name' => 'Smart LED TV 32"', 'price' => 22999, 'old' => 29999],
-                ['name' => 'Laptop Cooling Pad', 'price' => 1299, 'old' => 1999],
-            ];
-            @endphp
-            @foreach($dummyFeatured as $i => $item)
-            <div class="product-card bg-white rounded-2xl border border-gray-100 overflow-hidden" style="animation-delay: {{ $i * 0.1 }}s">
-                <div class="relative overflow-hidden bg-gray-50">
-                    <img src="https://loremflickr.com/400/300/{{ urlencode($item['name']) }}?random={{ $i }}"
-                         class="w-full h-48 object-cover" alt="{{ $item['name'] }}"
-                         onerror="this.onerror=null; this.src='https://placehold.co/400x300/7c3aed/white?text={{ urlencode($item['name']) }}';">
-                </div>
-                <div class="p-4">
-                    <h3 class="font-semibold text-gray-800">{{ $item['name'] }}</h3>
-                    <p class="text-sm text-gray-500 mt-1">Best Seller</p>
-                    <div class="flex items-center justify-between mt-2">
-                        <span class="text-lg font-bold text-purple-600">रु {{ number_format($item['price']) }}</span>
-                        <span class="text-xs text-gray-400 line-through">रु {{ number_format($item['old']) }}</span>
-                    </div>
-                </div>
+            {{-- Empty State --}}
+            <div class="col-span-full py-16 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                </svg>
+                <h3 class="text-lg font-medium text-gray-900">No products available</h3>
+                <p class="text-gray-500 mt-1">Check back later for new arrivals!</p>
             </div>
-            @endforeach
         @endif
-    </div>
-</section>
 
+    </div>
+
+    {{-- Pagination Links (Only if using Paginate) --}}
+    @if(isset($justForYouProducts) && method_exists($justForYouProducts, 'links'))
+        <div class="mt-12 flex justify-center">
+            {{ $justForYouProducts->links() }}
+        </div>
+    @endif
+
+</section>
 {{-- ===== SHOP BY CATEGORY ===== --}}
 <section class="max-w-7xl mx-auto px-4 pb-8 min-h-[30px]">
     <div class="section-card p-6 md:p-8">
@@ -316,33 +376,33 @@
         </div>
         <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 md:gap-5">
             @if(isset($categories) && $categories->count())
-                @foreach($categories as $category)
-                    <a href="{{ route('categories.show', $category) }}" class="product-card bg-white rounded-2xl p-4 text-center border border-gray-100 flex flex-col items-center justify-center h-36 sm:h-40" style="animation-delay: {{ $loop->index * 0.05 }}s">
-                        <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full category-icon flex items-center justify-center mb-3 overflow-hidden">
-                            <img src="{{ $category->image ? asset('storage/'.$category->image) : 'https://loremflickr.com/80/80/'.urlencode($category->name).'?random='.$category->id }}"
-                                 alt="{{ $category->name }}" class="w-full h-full object-cover rounded-full"
-                                 onerror="this.onerror=null; this.src='https://placehold.co/80x80/7c3aed/white?text={{ urlencode($category->name) }}';">
-                        </div>
-                        <span class="text-xs sm:text-sm font-medium text-gray-700">{{ $category->name }}</span>
-                    </a>
-                @endforeach
+            @foreach($categories as $category)
+            <a href="{{ route('categories.show', $category) }}" class="product-card bg-white rounded-2xl p-4 text-center border border-gray-100 flex flex-col items-center justify-center h-36 sm:h-40" style="animation-delay: {{ $loop->index * 0.05 }}s">
+                <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full category-icon flex items-center justify-center mb-3 overflow-hidden">
+                    <img src="{{ $category->image ? asset('storage/'.$category->image) : 'https://loremflickr.com/80/80/'.urlencode($category->name).'?random='.$category->id }}"
+                        alt="{{ $category->name }}" class="w-full h-full object-cover rounded-full"
+                        onerror="this.onerror=null; this.src='https://placehold.co/80x80/7c3aed/white?text={{ urlencode($category->name) }}';">
+                </div>
+                <span class="text-xs sm:text-sm font-medium text-gray-700">{{ $category->name }}</span>
+            </a>
+            @endforeach
             @else
-                @php
-                $dummyCategories = [
-                    'Electronics', 'Fashion', 'Home & Living', 'Sports',
-                    'Books', 'Toys', 'Beauty', 'Groceries'
-                ];
-                @endphp
-                @foreach($dummyCategories as $i => $cat)
-                <a href="#" class="product-card bg-white rounded-2xl p-4 text-center border border-gray-100 flex flex-col items-center justify-center h-36 sm:h-40" style="animation-delay: {{ $i * 0.05 }}s">
-                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full category-icon flex items-center justify-center mb-3 overflow-hidden">
-                        <img src="https://loremflickr.com/80/80/{{ urlencode($cat) }}?random={{ $i+50 }}"
-                             alt="{{ $cat }}" class="w-full h-full object-cover rounded-full"
-                             onerror="this.onerror=null; this.src='https://placehold.co/80x80/7c3aed/white?text={{ urlencode($cat) }}';">
-                    </div>
-                    <span class="text-xs sm:text-sm font-medium text-gray-700">{{ $cat }}</span>
-                </a>
-                @endforeach
+            @php
+            $dummyCategories = [
+            'Electronics', 'Fashion', 'Home & Living', 'Sports',
+            'Books', 'Toys', 'Beauty', 'Groceries'
+            ];
+            @endphp
+            @foreach($dummyCategories as $i => $cat)
+            <a href="#" class="product-card bg-white rounded-2xl p-4 text-center border border-gray-100 flex flex-col items-center justify-center h-36 sm:h-40" style="animation-delay: {{ $i * 0.05 }}s">
+                <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full category-icon flex items-center justify-center mb-3 overflow-hidden">
+                    <img src="https://loremflickr.com/80/80/{{ urlencode($cat) }}?random={{ $i+50 }}"
+                        alt="{{ $cat }}" class="w-full h-full object-cover rounded-full"
+                        onerror="this.onerror=null; this.src='https://placehold.co/80x80/7c3aed/white?text={{ urlencode($cat) }}';">
+                </div>
+                <span class="text-xs sm:text-sm font-medium text-gray-700">{{ $cat }}</span>
+            </a>
+            @endforeach
             @endif
         </div>
     </div>
@@ -357,48 +417,48 @@
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5 md:gap-6">
             @if(isset($topStores) && $topStores->count())
-                @foreach($topStores as $store)
-                    <div class="product-card bg-white rounded-2xl p-5 text-center border border-gray-100" style="animation-delay: {{ $loop->index * 0.1 }}s">
-                        <div class="w-20 h-20 mx-auto rounded-full store-icon flex items-center justify-center text-2xl mb-4 overflow-hidden shadow-sm">
-                            @if($store->shop_logo)
-                                <img src="{{ Storage::url($store->shop_logo) }}" alt="{{ $store->shop_name }}" class="w-full h-full object-cover rounded-full"
-                                     onerror="this.onerror=null; this.innerHTML='<i class=\'fas fa-store text-purple-600\'></i>';">
-                            @else
-                                <img src="https://loremflickr.com/80/80/store?random={{ $store->id }}" alt="{{ $store->shop_name }}" class="w-full h-full object-cover rounded-full"
-                                     onerror="this.onerror=null; this.innerHTML='<i class=\'fas fa-store text-purple-600\'></i>';">
-                            @endif
-                        </div>
-                        <h4 class="font-bold text-gray-800 text-base mb-1">{{ $store->shop_name }}</h4>
-                        <p class="text-xs text-gray-400 mb-4 flex items-center justify-center gap-1">
-                            <i class="fas fa-check-circle text-green-500"></i> Verified Seller
-                        </p>
-                        <a href="#" class="inline-block w-full py-2.5 text-sm font-semibold text-purple-700 bg-purple-50 rounded-xl hover:bg-purple-100 transition">
-                            Visit Store
-                        </a>
-                    </div>
-                @endforeach
-            @else
-                @php
-                $dummyStores = [
-                    'TechNepal', 'FashionHub', 'HomeEssentials', 'SportsWorld',
-                    'BookNook', 'ToysGalore'
-                ];
-                @endphp
-                @foreach($dummyStores as $i => $storeName)
-                <div class="product-card bg-white rounded-2xl p-5 text-center border border-gray-100" style="animation-delay: {{ $i * 0.1 }}s">
-                    <div class="w-20 h-20 mx-auto rounded-full store-icon flex items-center justify-center text-2xl mb-4 overflow-hidden shadow-sm">
-                        <img src="https://loremflickr.com/80/80/store?random={{ $i+20 }}" alt="{{ $storeName }}" class="w-full h-full object-cover rounded-full"
-                             onerror="this.onerror=null; this.innerHTML='<i class=\'fas fa-store text-purple-600\'></i>';">
-                    </div>
-                    <h4 class="font-bold text-gray-800 text-base mb-1">{{ $storeName }}</h4>
-                    <p class="text-xs text-gray-400 mb-4 flex items-center justify-center gap-1">
-                        <i class="fas fa-check-circle text-green-500"></i> Verified Seller
-                    </p>
-                    <a href="#" class="inline-block w-full py-2.5 text-sm font-semibold text-purple-700 bg-purple-50 rounded-xl hover:bg-purple-100 transition">
-                        Visit Store
-                    </a>
+            @foreach($topStores as $store)
+            <div class="product-card bg-white rounded-2xl p-5 text-center border border-gray-100" style="animation-delay: {{ $loop->index * 0.1 }}s">
+                <div class="w-20 h-20 mx-auto rounded-full store-icon flex items-center justify-center text-2xl mb-4 overflow-hidden shadow-sm">
+                    @if($store->shop_logo)
+                    <img src="{{ Storage::url($store->shop_logo) }}" alt="{{ $store->shop_name }}" class="w-full h-full object-cover rounded-full"
+                        onerror="this.onerror=null; this.innerHTML='<i class=\'fas fa-store text-purple-600\'></i>';">
+                    @else
+                    <img src="https://loremflickr.com/80/80/store?random={{ $store->id }}" alt="{{ $store->shop_name }}" class="w-full h-full object-cover rounded-full"
+                        onerror="this.onerror=null; this.innerHTML='<i class=\'fas fa-store text-purple-600\'></i>';">
+                    @endif
                 </div>
-                @endforeach
+                <h4 class="font-bold text-gray-800 text-base mb-1">{{ $store->shop_name }}</h4>
+                <p class="text-xs text-gray-400 mb-4 flex items-center justify-center gap-1">
+                    <i class="fas fa-check-circle text-green-500"></i> Verified Seller
+                </p>
+                <a href="#" class="inline-block w-full py-2.5 text-sm font-semibold text-purple-700 bg-purple-50 rounded-xl hover:bg-purple-100 transition">
+                    Visit Store
+                </a>
+            </div>
+            @endforeach
+            @else
+            @php
+            $dummyStores = [
+            'TechNepal', 'FashionHub', 'HomeEssentials', 'SportsWorld',
+            'BookNook', 'ToysGalore'
+            ];
+            @endphp
+            @foreach($dummyStores as $i => $storeName)
+            <div class="product-card bg-white rounded-2xl p-5 text-center border border-gray-100" style="animation-delay: {{ $i * 0.1 }}s">
+                <div class="w-20 h-20 mx-auto rounded-full store-icon flex items-center justify-center text-2xl mb-4 overflow-hidden shadow-sm">
+                    <img src="https://loremflickr.com/80/80/store?random={{ $i+20 }}" alt="{{ $storeName }}" class="w-full h-full object-cover rounded-full"
+                        onerror="this.onerror=null; this.innerHTML='<i class=\'fas fa-store text-purple-600\'></i>';">
+                </div>
+                <h4 class="font-bold text-gray-800 text-base mb-1">{{ $storeName }}</h4>
+                <p class="text-xs text-gray-400 mb-4 flex items-center justify-center gap-1">
+                    <i class="fas fa-check-circle text-green-500"></i> Verified Seller
+                </p>
+                <a href="#" class="inline-block w-full py-2.5 text-sm font-semibold text-purple-700 bg-purple-50 rounded-xl hover:bg-purple-100 transition">
+                    Visit Store
+                </a>
+            </div>
+            @endforeach
             @endif
         </div>
     </div>
@@ -427,20 +487,42 @@
 <script>
     var swiper = new Swiper(".mySwiper", {
         loop: true,
-        autoplay: { delay: 4000, disableOnInteraction: false },
-        pagination: { el: ".swiper-pagination", clickable: true },
-        navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
+        autoplay: {
+            delay: 4000,
+            disableOnInteraction: false
+        },
+        pagination: {
+            el: ".swiper-pagination",
+            clickable: true
+        },
+        navigation: {
+            nextEl: ".swiper-button-next",
+            prevEl: ".swiper-button-prev"
+        },
         breakpoints: {
-            320: { spaceBetween: 10, height: 250 },
-            640: { spaceBetween: 20, height: 350 },
-            768: { spaceBetween: 30, height: 420 },
+            320: {
+                spaceBetween: 10,
+                height: 250
+            },
+            640: {
+                spaceBetween: 20,
+                height: 350
+            },
+            768: {
+                spaceBetween: 30,
+                height: 420
+            },
         },
     });
 
     document.addEventListener('alpine:init', () => {
         Alpine.data('flashCountdown', (endDate) => ({
             end: new Date(endDate).getTime(),
-            time: { hours: '00', minutes: '00', seconds: '00' },
+            time: {
+                hours: '00',
+                minutes: '00',
+                seconds: '00'
+            },
             init() {
                 this.updateTime();
                 setInterval(() => this.updateTime(), 1000);
@@ -449,7 +531,11 @@
                 const now = Date.now();
                 let diff = this.end - now;
                 if (diff <= 0) {
-                    this.time = { hours: '00', minutes: '00', seconds: '00' };
+                    this.time = {
+                        hours: '00',
+                        minutes: '00',
+                        seconds: '00'
+                    };
                     return;
                 }
                 this.time.hours = Math.floor(diff / (1000 * 60 * 60)).toString().padStart(2, '0');

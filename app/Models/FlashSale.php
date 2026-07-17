@@ -17,96 +17,99 @@ class FlashSale extends Model
     ];
 
     protected $casts = [
-        'start_date'   => 'datetime',
-        'end_date'     => 'datetime',
-        'is_active'    => 'boolean',
-        'flash_price'  => 'decimal:2',
+        'flash_price' => 'decimal:2',
+        'start_date'  => 'datetime',
+        'end_date'    => 'datetime',
+        'is_active'   => 'boolean',
     ];
 
-    // ------------------------------------------------------------------
-    // Relationships
-    // ------------------------------------------------------------------
+    /*
+    |--------------------------------------------------------------------------
+    | Relationships
+    |--------------------------------------------------------------------------
+    */
 
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
     }
 
-    // ------------------------------------------------------------------
-    // Scopes
-    // ------------------------------------------------------------------
+    /*
+    |--------------------------------------------------------------------------
+    | Query Scopes
+    |--------------------------------------------------------------------------
+    */
 
     /**
-     * Scope to get only currently active flash sales.
+     * Currently active flash sales.
      */
     public function scopeActive($query)
     {
-        return $query->where('is_active', true)
-                     ->where('start_date', '<=', now())
-                     ->where('end_date', '>=', now());
+        return $query
+            ->where('is_active', true)
+            ->where('start_date', '<=', now())
+            ->where('end_date', '>=', now());
     }
 
     /**
-     * Scope to get upcoming flash sales (not yet started).
+     * Upcoming flash sales.
      */
     public function scopeUpcoming($query)
     {
-        return $query->where('is_active', true)
-                     ->where('start_date', '>', now());
+        return $query
+            ->where('is_active', true)
+            ->where('start_date', '>', now());
     }
 
     /**
-     * Scope to get expired flash sales (ended).
+     * Expired flash sales.
      */
     public function scopeExpired($query)
     {
-        return $query->where('end_date', '<', now());
+        return $query
+            ->where('end_date', '<', now());
     }
 
-    // ------------------------------------------------------------------
-    // Accessors & Helpers
-    // ------------------------------------------------------------------
+    /*
+    |--------------------------------------------------------------------------
+    | Helpers
+    |--------------------------------------------------------------------------
+    */
 
-    /**
-     * Check if this flash sale is currently active.
-     * Useful for individual checks without using the scope.
-     */
     public function isActive(): bool
     {
         return $this->is_active
-            && $this->start_date <= now()
-            && $this->end_date >= now();
+            && now()->between($this->start_date, $this->end_date);
     }
 
-    /**
-     * Get the discount percentage based on the original product price.
-     */
-    public function getDiscountPercentAttribute(): float
+    public function getDiscountPercentAttribute(): int
     {
-        $product = $this->product;
-        if (! $product || $product->price <= 0) {
+        if (! $this->product || $this->product->price <= 0) {
             return 0;
         }
-        return round((($product->price - $this->flash_price) / $product->price) * 100);
+
+        return (int) round(
+            (($this->product->price - $this->flash_price) / $this->product->price) * 100
+        );
     }
 
-    /**
-     * Get the formatted discount percentage (e.g., "25%").
-     */
     public function getDiscountPercentFormattedAttribute(): string
     {
         return $this->discount_percent . '%';
     }
 
-    /**
-     * Get the remaining time as a human‑readable string (for countdowns).
-     * Example: "2 hours 15 minutes"
-     */
-    public function getRemainingTimeAttribute(): string
+    public function getRemainingTimeAttribute(): ?string
     {
         if (! $this->isActive()) {
-            return 'Expired';
+            return null;
         }
-        return $this->end_date->diffForHumans(now(), ['parts' => 2, 'join' => ', ']);
+
+        return now()->diffForHumans(
+            $this->end_date,
+            [
+                'parts' => 3,
+                'short' => true,
+            ]
+        );
     }
 }
