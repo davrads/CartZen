@@ -28,7 +28,14 @@ public function index()
             'images',
             'variants',
             'category',
+            'flashSale'
         ]);
-        return view('products.show', compact('product'));
+
+        $relatedProducts = Product::where('category_id', $product->category_id)
+            ->where('id', '!=', $product->id)
+            ->where('status', 'available')
+            ->limit(6)
+            ->get();
+        return view('products.show', compact('product', 'relatedProducts'));
     }
 }

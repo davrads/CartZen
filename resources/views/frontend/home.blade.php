@@ -224,58 +224,39 @@
     </div>
 </div>
 
-{{-- ===== FLASH SALE ===== --}}
-<section class="max-w-7xl mx-auto px-4 pb-8 min-h-[30px]">
-    <div class="mb-8">
-        <h2 class="section-heading text-2xl md:text-3xl text-gray-800 font-bold">Flash Sale</h2>
+{{-- ===== FLASH SALE SECTION ===== --}}
+<section class="max-w-7xl mx-auto px-4 py-8">
+    <div class="mb-6 flex items-center justify-between">
+        <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <span class="w-1 h-6 bg-red-600 rounded-full"></span>
+            Flash Sale
+        </h2>
+        <a href="#" class="text-sm text-violet-600 font-medium hover:underline">View All</a>
     </div>
-    
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
 
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
         @if(isset($flashSales) && $flashSales->count())
             @foreach($flashSales as $flashSale)
-                @php
-                    $product = $flashSale->product;
-                    // Ensure the product object has the flag
-                    if (!$product->is_flash_sale) {
-                        $product->is_flash_sale = true;
-                    }
-                @endphp
-                @continue(!$product)
-                
-                {{-- 
-                   FIX: REMOVED THE WRAPPER DIV. 
-                   The <x-product-card /> is now the direct child of the grid.
-                   It handles its own styling (bg-white, rounded-2xl, border, shadow).
-                --}}
-                <x-product-card :product="$product" />
+                {{-- Pass the entire flashSale object, not just the product --}}
+                <x-flash-product-card :flashSale="$flashSale" />
             @endforeach
         @else
-            {{-- Dummy Products (Keep the wrapper here ONLY for dummy data if the component isn't rendered) --}}
+            {{-- Fallback Dummy Data --}}
             @php
-                $dummyFlash = [
-                    ['name' => 'Wireless Earbuds', 'price' => 1299, 'old' => 3999],
-                    ['name' => 'Running Shoes', 'price' => 2499, 'old' => 5990],
-                    ['name' => 'Smart Watch', 'price' => 4999, 'old' => 12999],
-                    ['name' => 'Cotton T-Shirt', 'price' => 599, 'old' => 1499],
-                    ['name' => 'Power Bank', 'price' => 1799, 'old' => 3499],
-                    ['name' => 'Backpack', 'price' => 1599, 'old' => 3200],
+                // Create a dummy object structure to test layout if DB is empty
+                $dummyFlash = (object)[
+                    'product' => (object)['name' => 'Sample Product', 'price' => 5000, 'thumbnail' => ''],
+                    'flash_price' => 3500,
+                    'start_date' => now()->subHours(1),
+                    'end_date' => now()->addHours(2),
+                    'is_active' => true
                 ];
             @endphp
-
-            @foreach($dummyFlash as $i => $item)
-                <x-product-card :product="(object)[
-                    'name' => $item['name'], 
-                    'price' => $item['price'], 
-                    'discounted_price' => $item['price'] * 0.8, // Example discount
-                    'thumbnail' => 'https://loremflickr.com/400/300/' . urlencode($item['name']) . '?random=' . $i,
-                    'featured' => false,
-                    'is_flash_sale' => true,
-                    'brand' => 'CartZen'
-                ]" />
-            @endforeach
+            <x-flash-product-card :flashSale="$dummyFlash" />
+            <x-flash-product-card :flashSale="$dummyFlash" />
+            <x-flash-product-card :flashSale="$dummyFlash" />
+            <x-flash-product-card :flashSale="$dummyFlash" />
         @endif
-
     </div>
 </section>
 

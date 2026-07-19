@@ -4,13 +4,8 @@
     <a href="{{ route('products.show', $product) }}" class="block flex flex-col h-full">
 
         <div class="relative">
-            {{-- Flash Sale Badge (Red) --}}
-            @if($product->is_flash_sale ?? $product->flashSale)
-                <div class="absolute top-3 right-3 bg-red-600 text-white text-xs font-bold px-2.5 py-1 rounded-md z-20 shadow-sm animate-pulse">
-                    Flash Sale
-                </div>
-            @elseif($product->featured)
-                {{-- Featured Badge (Purple) --}}
+            {{-- Featured Badge (Only if NOT a flash sale) --}}
+            @if(!($product->is_flash_sale ?? false) && $product->featured)
                 <div class="absolute top-3 right-3 bg-violet-600 text-white text-xs font-bold px-2.5 py-1 rounded-md z-20 shadow-sm">
                     Featured
                 </div>
@@ -33,22 +28,19 @@
             </h3>
 
             <div class="mt-auto flex items-center gap-2 flex-wrap">
-                {{-- 
-                   LOGIC: 
-                   1. Check if 'sale_price' exists and is > 0.
-                   2. If not, check if 'discounted_price' exists and is > 0.
-                   3. If neither, just show 'price'.
-                --}}
                 @php
-                    // Determine the effective price
+                    // Logic: Check sale_price first, then discounted_price, then price
                     $displayPrice = $product->price ?? 0;
                     $originalPrice = $product->price ?? 0;
                     $hasDiscount = false;
 
+                    // 1. Check sale_price (Your new attribute)
                     if (isset($product->sale_price) && $product->sale_price > 0 && $product->sale_price < $originalPrice) {
                         $displayPrice = $product->sale_price;
                         $hasDiscount = true;
-                    } elseif (isset($product->discounted_price) && $product->discounted_price > 0 && $product->discounted_price < $originalPrice) {
+                    } 
+                    // 2. Fallback to discounted_price
+                    elseif (isset($product->discounted_price) && $product->discounted_price > 0 && $product->discounted_price < $originalPrice) {
                         $displayPrice = $product->discounted_price;
                         $hasDiscount = true;
                     }

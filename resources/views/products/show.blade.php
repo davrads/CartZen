@@ -47,9 +47,7 @@
                 <div class="flex lg:flex-col gap-3 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 scrollbar-hide w-auto lg:w-24 flex-shrink-0">
                     @php
                     $images = $product->images ?? collect();
-                    // Add thumbnail if no images exist or prepend it
                     if($product->thumbnail && $images->count() > 0) {
-                    // Ensure thumbnail is the first item if not already
                     if($images->first()->product_image !== $product->thumbnail) {
                     $images = collect([$product->thumbnail])->merge($images);
                     }
@@ -78,10 +76,22 @@
                 {{-- Main Image --}}
                 <div class="flex-1">
                     <div class="aspect-square w-full rounded-3xl overflow-hidden shadow-xl border border-gray-100 bg-white relative group">
-                        {{-- Flash Sale Badge (if applicable) --}}
-                        @if($product->is_flash_sale ?? $product->flashSale)
-                        <div class="absolute top-4 left-4 bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-full z-10 shadow-md animate-pulse">
-                            Flash Sale
+
+                        {{-- Badges --}}
+                        @php
+                        $isFlash = $product->flashSale ?? null;
+                        $now = now();
+                        $flashEnd = $isFlash ? \Carbon\Carbon::parse($isFlash->end_date) : null;
+                        @endphp
+
+                        @if($isFlash && $flashEnd && $now->isBefore($flashEnd))
+                        <div class="absolute top-4 left-4 z-20 flex flex-col gap-1">
+                            <div class="bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md animate-pulse">
+                                Flash Sale
+                            </div>
+                            <div class="bg-black/70 text-white text-[10px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm">
+                                Ends: {{ $flashEnd->format('M d, H:i') }}
+                            </div>
                         </div>
                         @elseif($product->featured)
                         <div class="absolute top-4 left-4 bg-violet-600 text-white text-xs font-bold px-3 py-1.5 rounded-full z-10 shadow-md">
@@ -124,143 +134,179 @@
                 </div>
             </div>
 
-            {{-- Price --}}
-            <div class="flex items-end gap-3 sm:gap-4 flex-wrap bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                @if($product->discounted_price)
-                <span class="text-3xl sm:text-4xl font-bold text-violet-600">
-                    Rs. {{ number_format($product->discounted_price, 2) }}
-                </span>
-                <span class="text-lg sm:text-xl text-gray-400 line-through mb-1">
-                    Rs. {{ number_format($product->price, 2) }}
-                </span>
-                <span class="bg-red-100 text-red-600 text-xs font-bold px-2.5 py-1 rounded-full mb-1">
-                    SAVE {{ number_format((($product->price - $product->discounted_price) / $product->price) * 100, 0) }}%
-                </span>
-                @else
-                <span class="text-3xl sm:text-4xl font-bold text-violet-600">
-                    Rs. {{ number_format($product->price, 2) }}
-                </span>
-                @endif
-            </div>
+            {{-- Price Section (Dynamic Logic) --}}
+            @php
+            $currentPrice = $product->price;
+            $originalPrice = $product->price;
+            $hasDiscount = false;
+            $discountPercent = 0;
 
-            {{-- Meta Info --}}
-            <div class="text-sm text-gray-600 space-y-1">
-                @if($product->brand)
-                <p><span class="font-semibold text-gray-800">Brand:</span> {{ $product->brand }}</p>
-                @endif
-                <p><span class="font-semibold text-gray-800">SKU:</span> {{ $product->sku }}</p>
-                @if($product->stock > 0)
-                <p class="flex items-center gap-1.5 text-green-700 font-medium">
-                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                    In Stock ({{ $product->stock }} available)
-                </p>
-                @else
-                <p class="flex items-center gap-1.5 text-red-700 font-medium">
-                    <span class="w-2 h-2 rounded-full bg-red-500"></span>
-                    Out of Stock
-                </p>
-                @endif
-            </div>
+            // 1. Check Flash Sale (Highest Priority)
+            if($isFlash && $flashEnd && $now->isBefore($flashEnd)) {
+            $currentPrice = $isFlash->flash_price;
+            $hasDiscount = true;
+            $discountPercent = round((($originalPrice - $currentPrice) / $originalPrice) * 100);
+            }
+            // 2. Check sale_price attribute
+            elseif (isset($product->sale_price) && $product->sale_price > 0 && $product->sale_price < $originalPrice) {
+                $currentPrice=$product->sale_price;
+                $hasDiscount = true;
+                $discountPercent = round((($originalPrice - $currentPrice) / $originalPrice) * 100);
+                }
+                // 3. Check discounted_price attribute
+                elseif (isset($product->discounted_price) && $product->discounted_price > 0 && $product->discounted_price < $originalPrice) {
+                    $currentPrice=$product->discounted_price;
+                    $hasDiscount = true;
+                    $discountPercent = round((($originalPrice - $currentPrice) / $originalPrice) * 100);
+                    }
+                    @endphp
 
-            <hr class="border-gray-100">
+                    <div class="flex items-end gap-3 sm:gap-4 flex-wrap bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                        <span class="text-3xl sm:text-4xl font-bold text-violet-600">
+                            Rs. {{ number_format($currentPrice, 2) }}
+                        </span>
 
-            {{-- Form --}}
-            @if($product->stock > 0)
-            <form action="{{ route('cart.add') }}" method="POST" class="space-y-6">
-                @csrf
-                <input type="hidden" name="product_id" value="{{ $product->id }}">
-                <input type="hidden" name="price" id="selectedPrice" value="{{ $product->price }}">
+                        @if($hasDiscount)
+                        <span class="text-lg sm:text-xl text-gray-400 line-through mb-1">
+                            Rs. {{ number_format($originalPrice, 2) }}
+                        </span>
+                        <span class="bg-red-100 text-red-600 text-xs font-bold px-2.5 py-1 rounded-full mb-1">
+                            SAVE {{ $discountPercent }}%
+                        </span>
+                        @endif
+                    </div>
 
-                {{-- Variants --}}
-                @if($product->variants && $product->variants->count() > 0)
-                <div>
-                    <h3 class="text-sm font-semibold text-gray-800 mb-3">Select Variant</h3>
-                    <div class="relative">
-                        <select name="product_variant_id"
-                            id="variantSelect"
-                            class="w-full appearance-none border border-gray-300 rounded-xl p-4 pr-10 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-shadow cursor-pointer text-base">
-                            <option value="">-- Select Option --</option>
-                            @foreach($product->variants as $variant)
-                            <option value="{{ $variant->id }}"
-                                data-price="{{ $variant->price }}"
-                                data-stock="{{ $variant->stock ?? $product->stock }}">
-                                {{ $variant->color ?? 'Default' }} - {{ $variant->size ?? 'One Size' }} - Rs. {{ number_format($variant->price, 2) }}
-                            </option>
-                            @endforeach
-                        </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                            </svg>
+                    {{-- Meta Info --}}
+                    <div class="text-sm text-gray-600 space-y-1">
+                        @if($product->brand)
+                        <p><span class="font-semibold text-gray-800">Brand:</span> {{ $product->brand }}</p>
+                        @endif
+                        <p><span class="font-semibold text-gray-800">SKU:</span> {{ $product->sku }}</p>
+                        @if($product->stock > 0)
+                        <p class="flex items-center gap-1.5 text-green-700 font-medium">
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                            In Stock ({{ $product->stock }} available)
+                        </p>
+                        @else
+                        <p class="flex items-center gap-1.5 text-red-700 font-medium">
+                            <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                            Out of Stock
+                        </p>
+                        @endif
+                    </div>
+
+                    <hr class="border-gray-100">
+
+                    {{-- Form --}}
+                    @if($product->stock > 0)
+                    <form action="{{ route('cart.add') }}" method="POST" class="space-y-6">
+                        @csrf
+                        <input type="hidden" name="product_id" value="{{ $product->id }}">
+                        {{-- Default price is the calculated current price (Flash or Sale or Original) --}}
+                        <input type="hidden" name="price" id="selectedPrice" value="{{ $currentPrice }}">
+
+                        {{-- Variants --}}
+                        @if($product->variants && $product->variants->count() > 0)
+                        <div>
+                            <h3 class="text-sm font-semibold text-gray-800 mb-3">Select Variant</h3>
+                            <div class="relative">
+                                <select name="product_variant_id"
+                                    id="variantSelect"
+                                    class="w-full appearance-none border border-gray-300 rounded-xl p-4 pr-10 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-shadow cursor-pointer text-base">
+                                    <option value="">-- Select Option --</option>
+                                    @foreach($product->variants as $variant)
+                                    <option value="{{ $variant->id }}"
+                                        data-price="{{ $variant->price }}"
+                                        data-stock="{{ $variant->stock ?? $product->stock }}">
+                                        {{ $variant->color ?? 'Default' }} - {{ $variant->size ?? 'One Size' }} - Rs. {{ number_format($variant->price, 2) }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <p id="variantPrice" class="mt-2 text-sm font-semibold text-violet-600 hidden">Selected Price: Rs. 0.00</p>
+                            @else
+                            <input type="hidden" name="product_variant_id" value="">
+                            @endif
+                        </div>
+
+                        {{-- Quantity --}}
+                        <div>
+                            <h3 class="text-sm font-semibold text-gray-800 mb-3">Quantity</h3>
+                            <div class="flex items-center w-full sm:w-48 border border-gray-300 rounded-2xl overflow-hidden bg-white">
+                                <button type="button" onclick="decreaseQuantity()" class="w-12 h-12 flex items-center justify-center text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-colors text-xl font-bold">-</button>
+                                <input id="quantity" type="number" name="quantity" value="1" min="1" max="{{ $product->stock }}" class="w-full h-12 text-center text-lg font-semibold text-gray-900 focus:outline-none">
+                                <button type="button" onclick="increaseQuantity()" class="w-12 h-12 flex items-center justify-center text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-colors text-xl font-bold">+</button>
+                            </div>
+                        </div>
+
+                        {{-- Actions --}}
+                        <div class="flex flex-col sm:flex-row gap-4 pt-2">
+                            <button type="submit" class="flex-1 bg-violet-600 hover:bg-violet-700 text-white font-semibold py-4 px-6 rounded-2xl transition-all shadow-lg hover:shadow-violet-500/30 active:scale-95 flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                                </svg>
+                                Add to Cart
+                            </button>
+                            <button type="submit" name="buy_now" value="1" class="flex-1 bg-gray-900 hover:bg-black text-white font-semibold py-4 px-6 rounded-2xl transition-all shadow-lg hover:shadow-gray-500/30 active:scale-95">
+                                Buy Now
+                            </button>
+                        </div>
+                    </form>
+                    @else
+                    <div class="text-center py-8 bg-gray-50 rounded-2xl border border-gray-200">
+                        <p class="text-gray-600 font-medium">This product is currently out of stock.</p>
+                        <button class="mt-4 text-violet-600 font-semibold hover:underline">Notify Me When Available</button>
+                    </div>
+                    @endif
+
+                    {{-- Short Description --}}
+                    @if($product->description)
+                    <div class="mt-4 border-t border-gray-100 pt-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Description</h3>
+                        <div class="prose prose-sm max-w-none text-gray-600 leading-relaxed">
+                            {!! nl2br(e($product->description)) !!}
                         </div>
                     </div>
-                    <p id="variantPrice" class="mt-2 text-sm font-semibold text-violet-600 hidden">Selected Price: Rs. 0.00</p>
-                    @else
-                    <input type="hidden" name="product_variant_id" value="">
                     @endif
-                </div>
 
-                {{-- Quantity --}}
-                <div>
-                    <h3 class="text-sm font-semibold text-gray-800 mb-3">Quantity</h3>
-                    <div class="flex items-center w-full sm:w-48 border border-gray-300 rounded-2xl overflow-hidden bg-white">
-                        <button type="button" onclick="decreaseQuantity()" class="w-12 h-12 flex items-center justify-center text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-colors text-xl font-bold">-</button>
-                        <input id="quantity" type="number" name="quantity" value="1" min="1" max="{{ $product->stock }}" class="w-full h-12 text-center text-lg font-semibold text-gray-900 focus:outline-none">
-                        <button type="button" onclick="increaseQuantity()" class="w-12 h-12 flex items-center justify-center text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-colors text-xl font-bold">+</button>
+                    {{-- Features/Benefits --}}
+                    @if($product->features)
+                    <div class="mt-4">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Key Features</h3>
+                        <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-600">
+                            @foreach(explode(',', $product->features) as $feature)
+                            <li class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                                {{ trim($feature) }}
+                            </li>
+                            @endforeach
+                        </ul>
                     </div>
-                </div>
-
-                {{-- Actions --}}
-                <div class="flex flex-col sm:flex-row gap-4 pt-2">
-                    <button type="submit" class="flex-1 bg-violet-600 hover:bg-violet-700 text-white font-semibold py-4 px-6 rounded-2xl transition-all shadow-lg hover:shadow-violet-500/30 active:scale-95 flex items-center justify-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-                        </svg>
-                        Add to Cart
-                    </button>
-                    <button type="submit" name="buy_now" value="1" class="flex-1 bg-gray-900 hover:bg-black text-white font-semibold py-4 px-6 rounded-2xl transition-all shadow-lg hover:shadow-gray-500/30 active:scale-95">
-                        Buy Now
-                    </button>
-                </div>
-            </form>
-            @else
-            <div class="text-center py-8 bg-gray-50 rounded-2xl border border-gray-200">
-                <p class="text-gray-600 font-medium">This product is currently out of stock.</p>
-                <button class="mt-4 text-violet-600 font-semibold hover:underline">Notify Me When Available</button>
-            </div>
-            @endif
-
-            {{-- Short Description --}}
-            @if($product->description)
-            <div class="mt-4 border-t border-gray-100 pt-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-3">Description</h3>
-                <div class="prose prose-sm max-w-none text-gray-600 leading-relaxed">
-                    {!! nl2br(e($product->description)) !!}
-                </div>
-            </div>
-            @endif
-
-            {{-- Features/Benefits (Optional if you have a features column) --}}
-            @if($product->features)
-            <div class="mt-4">
-                <h3 class="text-lg font-semibold text-gray-900 mb-3">Key Features</h3>
-                <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-600">
-                    @foreach(explode(',', $product->features) as $feature)
-                    <li class="flex items-center gap-2">
-                        <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                        </svg>
-                        {{ trim($feature) }}
-                    </li>
-                    @endforeach
-                </ul>
-            </div>
-            @endif
+                    @endif
 
         </div>
     </div>
 
-    
+    {{-- Related Products Section --}}
+    @if($relatedProducts && $relatedProducts->count())
+    <div class="mt-16 lg:mt-24 border-t border-gray-200 pt-10">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">You May Also Like</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+            @foreach($relatedProducts as $related)
+            <div class="flex flex-col h-full">
+                <x-product-card :product="$related" />
+            </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
 
 </div>
 
@@ -269,10 +315,15 @@
     // --- Image Gallery Logic ---
     function updateMainImage(element, index) {
         const mainImage = document.getElementById('mainImage');
-        const thumbnails = document.querySelectorAll('.flex-shrink-0 img'); // Select all thumbnail images
+        const thumbnails = document.querySelectorAll('.flex-shrink-0 img');
 
-        // Update main image source
-        mainImage.src = element.src;
+        // Fade out effect
+        mainImage.style.opacity = '0.5';
+
+        setTimeout(() => {
+            mainImage.src = element.src;
+            mainImage.style.opacity = '1';
+        }, 150);
 
         // Update border styles for active state
         thumbnails.forEach((thumb, i) => {
@@ -308,21 +359,27 @@
     const variantPriceDisplay = document.getElementById('variantPrice');
     const selectedPriceInput = document.getElementById('selectedPrice');
 
+    // Get the base price calculated in the blade (Flash/Sale/Original)
+    const basePrice = @json($currentPrice);
+
     if (variantSelect) {
         variantSelect.addEventListener('change', function() {
             const selectedOption = this.options[this.selectedIndex];
-            const price = selectedOption.getAttribute('data-price');
+            const variantPrice = parseFloat(selectedOption.getAttribute('data-price'));
             const stock = selectedOption.getAttribute('data-stock');
 
-            if (price && price !== "null") {
-                // Update display
-                if (variantPriceDisplay) variantPriceDisplay.classList.remove('hidden');
-                if (variantPriceDisplay) variantPriceDisplay.textContent = `Selected Price: Rs. ${parseFloat(price).toFixed(2)}`;
+            if (!isNaN(variantPrice)) {
+                // If a variant is selected, use its price
+                const finalPrice = variantPrice;
 
-                // Update hidden input for form submission
-                if (selectedPriceInput) selectedPriceInput.value = price;
+                if (variantPriceDisplay) {
+                    variantPriceDisplay.classList.remove('hidden');
+                    variantPriceDisplay.textContent = `Selected Price: Rs. ${finalPrice.toFixed(2)}`;
+                }
 
-                // Update max quantity based on variant stock if available
+                if (selectedPriceInput) selectedPriceInput.value = finalPrice;
+
+                // Update max quantity based on variant stock
                 if (stock && stock !== "null" && quantityInput) {
                     quantityInput.max = stock;
                     if (parseInt(quantityInput.value) > parseInt(stock)) {
@@ -330,8 +387,9 @@
                     }
                 }
             } else {
+                // Fallback to base price if no valid variant price
                 if (variantPriceDisplay) variantPriceDisplay.classList.add('hidden');
-                if (selectedPriceInput) selectedPriceInput.value = @json($product -> price);
+                if (selectedPriceInput) selectedPriceInput.value = basePrice;
             }
         });
     }
@@ -376,7 +434,7 @@
 
     /* Image Transition */
     .main-image {
-        transition: opacity 0.3s ease-in-out;
+        transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
     }
 
     .main-image[src] {
