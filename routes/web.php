@@ -9,6 +9,7 @@ use App\Http\Controllers\FrontendController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Vendor\VendorRequestController;
 use App\Http\Controllers\WishlistController;
 use App\Models\Order;
@@ -102,15 +103,54 @@ Route::middleware('customer')->group(function () {
     return view('profile.user_profile', compact('orders',));
 })->name('profile');
 Route::get('/user_profile', function () {
+    $customerId = Auth::guard('customer')->user()->id;
+
     // अर्डरहरू तान्ने
-    $orders = \App\Models\Order::where('user_id', Auth::guard('customer')->user()->id)
+    $orders = \App\Models\Order::where('user_id', $customerId)
                    ->latest()
                    ->get();
 
     // सेसनबाट 'wishlist' तान्ने (नाम एकदमै मिल्नुपर्छ)
     $wishlistItems = session()->get('wishlist', []);
 
-    return view('profile.user_profile', compact('orders', 'wishlistItems'));
+    // यो customer ले पहिल्यै लेखेका reviews
+    $reviews = \App\Models\Review::where('user_id', $customerId)
+                   ->with('product')
+                   ->latest()
+                   ->get();
+
+    $reviewedOrderItemIds = $reviews->pluck('order_item_id')->filter()->all();
+
+    // Delivered भएका तर अझै review नलेखिएका order items (Review लेख्न मिल्ने)
+    $reviewableItems = \App\Models\OrderItem::whereHas('order', function ($q) use ($customerId) {
+            $q->where('user_id', $customerId)->where('status', 'delivered');
+        })
+        ->whereNotIn('id', $reviewedOrderItemIds)
+        ->with('product', 'order')
+        ->latest()
+        ->get();
+
+    // अर्डरको अवस्था (status) बाट Notifications बनाउने
+    $statusMessages = [
+        'pending'    => 'तपाईंको अर्डर प्राप्त भएको छ, प्रोसेस हुन बाँकी छ।',
+        'processing' => 'तपाईंको अर्डर प्रोसेस भइरहेको छ।',
+        'shipped'    => 'तपाईंको अर्डर पठाइएको छ।',
+        'delivered'  => 'तपाईंको अर्डर सफलतापूर्वक डेलिभर भइसक्यो।',
+        'cancelled'  => 'तपाईंको अर्डर रद्द गरिएको छ।',
+    ];
+
+    $notifications = $orders->map(function ($order) use ($statusMessages) {
+        return (object) [
+            'id'           => $order->id,
+            'order_number' => $order->order_number,
+            'status'       => $order->status,
+            'message'      => $statusMessages[$order->status] ?? 'तपाईंको अर्डरको स्थिति अपडेट भएको छ।',
+            'read_at'      => null,
+            'created_at'   => $order->updated_at,
+        ];
+    })->sortByDesc('created_at')->values();
+
+    return view('profile.user_profile', compact('orders', 'wishlistItems', 'reviews', 'reviewableItems', 'notifications'));
 })->name('profile');
 
     Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
@@ -126,6 +166,10 @@ Route::get('/user_profile', function () {
         Route::get('/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
         Route::post('/update', [App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
     });
+
+    Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
+    Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 
     Route::post('/logout', [CustomerAuthController::class, 'logout'])
         ->name('logout');

@@ -597,7 +597,66 @@
 
                 <div id="page-reviews" class="page">
                     <h1 class="text-xl font-bold text-gray-900 mb-6">Reviews</h1>
+
+                    @if(session('review_status'))
+                        <div class="max-w-2xl mb-4 bg-green-50 border border-green-200 text-green-700 text-sm rounded-xl px-4 py-3">
+                            {{ session('review_status') }}
+                        </div>
+                    @endif
+                    @if(session('review_error'))
+                        <div class="max-w-2xl mb-4 bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-3">
+                            {{ session('review_error') }}
+                        </div>
+                    @endif
+
                     <div class="max-w-2xl space-y-4">
+
+                        @if(isset($reviewableItems) && count($reviewableItems) > 0)
+                            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wide">Review लेख्न मिल्ने Orders</h2>
+                            @foreach($reviewableItems as $item)
+                                <div class="bg-white rounded-2xl shadow-sm border border-violet-100 p-5">
+                                    <div class="flex items-start gap-4">
+                                        <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
+                                            @if(!empty($item->product->image ?? null))
+                                                <img src="{{ asset('storage/' . $item->product->image) }}" alt="Product" class="object-cover w-full h-full">
+                                            @else
+                                                <svg width="24" height="24" fill="none" stroke="#9CA3AF" stroke-width="1" viewBox="0 0 24 24">
+                                                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                                                    <circle cx="8.5" cy="8.5" r="1.5" />
+                                                    <polyline points="21 15 16 10 5 21" />
+                                                </svg>
+                                            @endif
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-center justify-between flex-wrap gap-2">
+                                                <p class="font-semibold text-gray-800 text-sm">{{ $item->product->name ?? 'Product' }}</p>
+                                                <span class="order-id text-xs text-gray-400">Order #{{ $item->order->order_number ?? '' }}</span>
+                                            </div>
+                                            <p class="text-xs text-gray-400 mt-0.5">Delivered · Quantity: {{ $item->quantity }}</p>
+
+                                            <form method="POST" action="{{ route('reviews.store') }}" class="mt-3 space-y-2">
+                                                @csrf
+                                                <input type="hidden" name="product_id" value="{{ $item->product_id }}">
+                                                <input type="hidden" name="order_item_id" value="{{ $item->id }}">
+                                                <input type="hidden" name="rating" id="new-rating-{{ $item->id }}" value="5">
+                                                <div class="flex gap-0.5">
+                                                    @for ($i = 1; $i <= 5; $i++)
+                                                        <span class="star text-xl cursor-pointer" onclick="setRating(this, 'new-rating-{{ $item->id }}', {{ $i }})">★</span>
+                                                    @endfor
+                                                </div>
+                                                <textarea name="comment" rows="2" maxlength="1000" placeholder="आफ्नो अनुभव लेख्नुहोस्..." class="w-full text-sm border border-gray-200 rounded-lg p-2 focus:border-violet-400 focus:ring-1 focus:ring-violet-200"></textarea>
+                                                <button type="submit" class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition">Submit Review</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @endif
+
+                        @if(isset($reviewableItems) && count($reviewableItems) > 0 && isset($reviews) && count($reviews) > 0)
+                            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wide pt-2">तपाईंका Reviews</h2>
+                        @endif
+
                         @forelse($reviews ?? [] as $review)
                             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
                                 <div class="flex items-start gap-4">
@@ -624,20 +683,40 @@
                                         </div>
                                         <p class="text-sm text-gray-600">{{ $review->comment }}</p>
                                         <div class="flex gap-3 mt-3">
-                                            <button onclick="editReview({{ $review->id }})" class="text-xs text-violet-600 hover:underline font-medium">Edit</button>
+                                            <button type="button" onclick="toggleEditReview({{ $review->id }})" class="text-xs text-violet-600 hover:underline font-medium">Edit</button>
                                             <form method="POST" action="{{ route('reviews.destroy', $review->id) }}" onsubmit="return confirm('Are you sure you want to delete this review?')" class="inline">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="text-xs text-red-400 hover:underline font-medium">Delete</button>
                                             </form>
                                         </div>
+
+                                        <div id="edit-review-{{ $review->id }}" class="hidden mt-3 pt-3 border-t border-gray-100 space-y-2">
+                                            <form method="POST" action="{{ route('reviews.update', $review->id) }}">
+                                                @csrf
+                                                @method('PUT')
+                                                <input type="hidden" name="rating" id="edit-rating-{{ $review->id }}" value="{{ $review->rating }}">
+                                                <div class="flex gap-0.5">
+                                                    @for ($i = 1; $i <= 5; $i++)
+                                                        <span class="star text-xl cursor-pointer {{ $i <= $review->rating ? '' : 'empty' }}" onclick="setRating(this, 'edit-rating-{{ $review->id }}', {{ $i }})">★</span>
+                                                    @endfor
+                                                </div>
+                                                <textarea name="comment" rows="2" maxlength="1000" class="w-full text-sm border border-gray-200 rounded-lg p-2 focus:border-violet-400 focus:ring-1 focus:ring-violet-200">{{ $review->comment }}</textarea>
+                                                <div class="flex gap-2">
+                                                    <button type="submit" class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition">Update</button>
+                                                    <button type="button" onclick="toggleEditReview({{ $review->id }})" class="text-xs text-gray-500 font-medium px-4 py-2">Cancel</button>
+                                                </div>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         @empty
-                            <div class="text-center py-12 text-gray-400 bg-white rounded-2xl border border-gray-100">
-                                <p class="text-sm">तपाईंले अहिलेसम्म कुनै पनि Review लेख्नुभएको छैन।</p>
-                            </div>
+                            @if(!isset($reviewableItems) || count($reviewableItems) == 0)
+                                <div class="text-center py-12 text-gray-400 bg-white rounded-2xl border border-gray-100">
+                                    <p class="text-sm">तपाईंले अहिलेसम्म कुनै पनि Review लेख्नुभएको छैन।</p>
+                                </div>
+                            @endif
                         @endforelse
                     </div>
                 </div>
@@ -647,24 +726,15 @@
                     <div class="max-w-2xl space-y-3">
                         @forelse($notifications ?? [] as $notification)
                             <div class="bg-violet-50 border border-violet-100 rounded-2xl p-4 flex items-start gap-3 relative">
-                                @if(is_null($notification->read_at))
-                                    <span class="notif-dot mt-1.5 shrink-0"></span>
-                                @endif
+                                <span class="notif-dot mt-1.5 shrink-0"></span>
                                 <div class="flex-1 min-w-0">
-                                    <p class="text-sm font-semibold text-gray-800">{{ $notification->data['title'] ?? 'Notification' }}</p>
-                                    <p class="text-xs text-gray-500 mt-0.5">{{ $notification->data['message'] ?? '' }}</p>
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <p class="text-sm font-semibold text-gray-800">Order #{{ $notification->order_number }}</p>
+                                        <span class="badge badge-{{ $notification->status }}">{{ ucfirst($notification->status) }}</span>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-0.5">{{ $notification->message }}</p>
                                     <p class="text-xs text-violet-400 mt-1.5 font-medium">{{ $notification->created_at->diffForHumans() }}</p>
                                 </div>
-                                <form method="POST" action="{{ route('notifications.destroy', $notification->id) }}">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-gray-400 hover:text-gray-600 transition shrink-0">
-                                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                            <line x1="18" y1="6" x2="6" y2="18" />
-                                            <line x1="6" y1="6" x2="18" y2="18" />
-                                        </svg>
-                                    </button>
-                                </form>
                             </div>
                         @empty
                             <div class="text-center py-12 text-gray-400 bg-white rounded-2xl border border-gray-100">
@@ -698,6 +768,23 @@
 </div>
 
 <script>
+    function setRating(el, hiddenId, value) {
+        document.getElementById(hiddenId).value = value;
+        const stars = el.parentElement.querySelectorAll('.star');
+        stars.forEach((s, idx) => {
+            if (idx < value) {
+                s.classList.remove('empty');
+            } else {
+                s.classList.add('empty');
+            }
+        });
+    }
+
+    function toggleEditReview(id) {
+        const panel = document.getElementById(`edit-review-${id}`);
+        if (panel) panel.classList.toggle('hidden');
+    }
+
     function navigate(pageId) {
         document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
         const targetPage = document.getElementById(`page-${pageId}`);
