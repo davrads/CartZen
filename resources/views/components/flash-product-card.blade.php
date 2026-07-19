@@ -20,6 +20,12 @@
     
     // Check if sale is active
     $isActive = $now->between($startTime, $endTime) && $flashSale->is_active;
+
+    // Safe product URL: only real Eloquent Product models can generate a route
+    // (dummy/fallback data is a plain stdClass and would break route() calls)
+    $productUrl = ($product instanceof \App\Models\Product)
+        ? route('products.show', $product)
+        : '#';
 @endphp
 
 @if($isActive)
@@ -54,18 +60,18 @@
                 <span class="text-[10px] text-gray-200">Sec</span>
             </div>
         </div>
-        <a href="{{ route('products.show', $product) }}" class="mt-3 bg-white text-red-600 text-xs font-bold px-4 py-2 rounded-full hover:bg-red-50 transition-colors">
+        <a href="{{ $productUrl }}" class="mt-3 bg-white text-red-600 text-xs font-bold px-4 py-2 rounded-full hover:bg-red-50 transition-colors">
             View Deal
         </a>
     </div>
 
-    <a href="{{ route('products.show', $product) }}" class="block flex flex-col h-full">
+    <a href="{{ $productUrl }}" class="block flex flex-col h-full">
         
         {{-- Image Container (Square Aspect Ratio) --}}
         <div class="relative w-full aspect-square overflow-hidden bg-gray-50">
             <img
-                src="{{ $product->thumbnail ? asset('storage/' . $product->thumbnail) : asset('images/no-image.png') }}"
-                alt="{{ $product->name }}"
+                src="{{ ($product->thumbnail ?? null) ? asset('storage/' . $product->thumbnail) : asset('images/no-image.png') }}"
+                alt="{{ $product->name ?? 'Product' }}"
                 class="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500"
                 loading="lazy"
             >
@@ -74,7 +80,7 @@
         {{-- Content --}}
         <div class="p-4 flex flex-col flex-grow">
             <h3 class="font-medium text-base text-gray-800 line-clamp-2 min-h-[2.8rem]">
-                {{ $product->name }}
+                {{ $product->name ?? 'Product' }}
             </h3>
 
             <div class="mt-3 flex items-baseline gap-2 flex-wrap">
@@ -90,12 +96,13 @@
             </div>
 
             {{-- Stock Bar (Optional Visual) --}}
-            @if($product->stock > 0)
+            @php $productStock = $product->stock ?? 0; @endphp
+            @if($productStock > 0)
                 <div class="mt-3 w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
-                    <div class="bg-red-500 h-1.5 rounded-full" style="width: {{ min(100, ($product->stock / 10) * 100) }}%"></div>
+                    <div class="bg-red-500 h-1.5 rounded-full" style="width: {{ min(100, ($productStock / 10) * 100) }}%"></div>
                 </div>
                 <p class="text-[10px] text-gray-500 mt-1 text-right">
-                    {{ $product->stock }} left
+                    {{ $productStock }} left
                 </p>
             @else
                 <p class="mt-2 text-xs text-red-500 font-semibold">Sold Out</p>

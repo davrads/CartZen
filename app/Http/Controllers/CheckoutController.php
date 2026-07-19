@@ -10,6 +10,7 @@ use App\Models\Address;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class CheckoutController extends Controller
@@ -86,10 +87,20 @@ class CheckoutController extends Controller
             return redirect()->route('login')->with('error', 'Please login to place order.');
         }
 
-        $request->validate([
+        // ✅ FIX: validate() ले fail हुँदा default back() जान्थ्यो, जुन प्रायः cart page मा
+        // पुग्थ्यो (browser को अघिल्लो URL त्यही भएकोले)। अब explicit रूपमा checkout मा नै
+        // errors सहित पठाइन्छ, ताकि user लाई किन order place भएन भन्ने देखियोस्।
+        $validator = Validator::make($request->all(), [
             'address_id'     => 'required|exists:addresses,id',
             'payment_method' => 'required|in:cod,khalti',
         ]);
+
+        if ($validator->fails()) {
+            return redirect()->route('checkout')
+                ->withErrors($validator)
+                ->withInput()
+                ->with('error', 'कृपया ठेगाना र पेमेन्ट विधि सही रूपमा छान्नुहोस्।');
+        }
 
         $cart = Cart::with(['items.product'])
             ->where('user_id', $user->id)
@@ -159,34 +170,53 @@ class CheckoutController extends Controller
                 $product->decrement('stock', $item->quantity);
             }
 
-            $cart->items()->delete();
+            // ✅ FIX: Khalti भएमा cart delete/commit गर्नु अघि पहिले payment initiate गर्ने।
+            // पहिले जस्तो cart delete + commit गरेपछि Khalti fail भए, order/stock/commit
+            // भइसकेको हुन्थ्यो तर cart फर्किंदैनथ्यो — permanent data loss हुन्थ्यो।
+            if ($request->payment_method === 'khalti') {
+                $khaltiResponse = $this->getKhaltiPaymentUrl($order);
 
+                if (!$khaltiResponse) {
+                    DB::rollBack();
+                    return redirect()->route('checkout')->with('error', 'Khalti initiation failed. Please try again or choose COD.');
+                }
+
+                $cart->items()->delete();
+                DB::commit();
+
+                return redirect()->away($khaltiResponse);
+            }
+
+            $cart->items()->delete();
             DB::commit();
 
             if ($request->payment_method === 'cod') {
                 return redirect()->route('home')->with('success', 'Order placed successfully! You will pay on delivery.');
             }
 
-            if ($request->payment_method === 'khalti') {
-                return $this->initiateKhaltiPayment($order);
-            }
-
             return redirect()->route('home')->with('success', 'Order placed!');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Something went wrong: ' . $e->getMessage());
+            // ✅ FIX: back() को साटो checkout मा नै error देखाउने
+            return redirect()->route('checkout')->with('error', 'Something went wrong: ' . $e->getMessage());
         }
     }
 
-    private function initiateKhaltiPayment($order)
+    /**
+     * Khalti payment initiate गरेर payment_url फर्काउँछ, fail भए null फर्काउँछ।
+     * यसले $order मा khalti_pidx save गर्छ तर DB commit गर्दैन — त्यो placeOrder() मा हुन्छ।
+     */
+    private function getKhaltiPaymentUrl($order)
     {
         $khaltiSecret = config('services.khalti.secret_key');
         $url = 'https://a.khalti.com/api/v2/epayment/initiate/';
 
         $response = Http::withHeaders([
             'Authorization' => 'Key ' . $khaltiSecret,
-        ])->post($url, [
+        ])
+            ->when(app()->environment('local'), fn($http) => $http->withoutVerifying())
+            ->post($url, [
             'return_url' => route('khalti.verify'),
             'website_url' => url('/'),
             'amount' => $order->total_amount * 100,
@@ -203,10 +233,11 @@ class CheckoutController extends Controller
             $data = $response->json();
             $order->khalti_pidx = $data['pidx'];
             $order->save();
-            return redirect($data['payment_url']);
+            return $data['payment_url'];
         }
 
-        return back()->with('error', 'Khalti initiation failed. Please try again or choose COD.');
+        \Illuminate\Support\Facades\Log::error('Khalti initiation failed: ' . $response->body());
+        return null;
     }
 
     public function verifyKhalti(Request $request)
@@ -221,7 +252,9 @@ class CheckoutController extends Controller
 
         $response = Http::withHeaders([
             'Authorization' => 'Key ' . $khaltiSecret,
-        ])->post($url, [
+        ])
+            ->when(app()->environment('local'), fn($http) => $http->withoutVerifying())
+            ->post($url, [
             'pidx' => $pidx,
         ]);
 
@@ -240,57 +273,3 @@ class CheckoutController extends Controller
         return redirect()->route('home')->with('error', 'Payment verification failed.');
     }
 }
-
-
-// namespace App\Http\Controllers;
-
-// use App\Models\Order;
-// use App\Models\OrderItem;
-// use App\Models\Product;
-// use Illuminate\Http\Request;
-
-// class CheckoutController extends Controller
-// {
-//     public function index()
-//     {
-//         $cart = session()->get('cart', []);
-//         return view('frontend.checkout', compact('cart'));
-//     }
-
-//     public function placeOrder(Request $request)
-//     {
-//         $cart = session()->get('cart', []);
-//         if (empty($cart)) {
-//             return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
-//         }
-
-//         $total = 0;
-//         foreach ($cart as $item) {
-//             $total += $item['price'] * $item['quantity'];
-//         }
-
-//         // $order = Order::create([
-//         //     'user_id' => auth()->id(),
-//         //     'total_amount' => $total,
-//         //     'status' => 'pending',
-//         //     'payment_status' => 'unpaid',
-//         // ]);
-
-//         // foreach ($cart as $id => $item) {
-//         //     OrderItem::create([
-//         //         'order_id' => $order->id,
-//         //         'product_id' => $id,
-//         //         'quantity' => $item['quantity'],
-//         //         'price' => $item['price'],
-//         //     ]);
-
-// //             // Reduce stock
-// //             $product = Product::find($id);
-// //             $product->decrement('stock', $item['quantity']);
-// //         }
-
-// //         session()->forget('cart');
-// //         return redirect()->route('home')->with('success', 'Order placed successfully!');
-// //     }
-//     }
-// }

@@ -245,7 +245,7 @@
             @php
                 // Create a dummy object structure to test layout if DB is empty
                 $dummyFlash = (object)[
-                    'product' => (object)['name' => 'Sample Product', 'price' => 5000, 'thumbnail' => ''],
+                    'product' => (object)['name' => 'Sample Product', 'price' => 5000, 'thumbnail' => '', 'stock' => 10],
                     'flash_price' => 3500,
                     'start_date' => now()->subHours(1),
                     'end_date' => now()->addHours(2),
