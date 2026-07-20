@@ -42,7 +42,7 @@ class FrontendController extends Controller
             ->get();
 
         // Approved Vendors
-        $topStores = VendorProfile::where('status', 'approved')
+        $stores = VendorProfile::latest()
             ->take(6)
             ->get();
 
@@ -50,7 +50,7 @@ class FrontendController extends Controller
             'flashSales',
             'featuredProducts',
             'categories',
-            'topStores',
+            'stores',
             'justForYouProducts'
         ));
     }

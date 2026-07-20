@@ -24,8 +24,7 @@ class VendorProfileForm
                             ->maxLength(255),
 
                         TextInput::make('shop_slug')
-                            ->label('Shop Slug')
-                            ->disabled(),
+                            ->label('Shop Slug'),
 
                         Textarea::make('description')
                             ->label('Store Description')

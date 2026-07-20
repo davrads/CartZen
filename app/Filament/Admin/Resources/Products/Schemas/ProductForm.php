@@ -60,10 +60,6 @@ class ProductForm
                             ->required()
                             ->prefix('Rs.'),
 
-                        TextInput::make('discounted_price')
-                            ->numeric()
-                            ->prefix('Rs.')
-                            ->label('Discounted Price'),
 
                         TextInput::make('stock')
                             ->numeric()
@@ -85,24 +81,24 @@ class ProductForm
                     ])
                     ->columns(2),
 
-                Section::make('Marketing')
-                    ->schema([
+                // Section::make('Marketing')
+                //     ->schema([
 
-                        Toggle::make('featured')
-                            ->label('Featured Product')
-                            ->default(false),
+                //         Toggle::make('featured')
+                //             ->label('Featured Product')
+                //             ->default(false),
 
-                        Toggle::make('is_flash_deal')
-                            ->label('Flash Deal')
-                            ->live(),
+                //         Toggle::make('is_flash_deal')
+                //             ->label('Flash Deal')
+                //             ->live(),
 
-                        DateTimePicker::make('flash_deal_ends_at')
-                            ->label('Flash Deal Ends At')
-                            ->visible(fn ($get) => $get('is_flash_deal'))
-                            ->required(fn ($get) => $get('is_flash_deal')),
+                //         DateTimePicker::make('flash_deal_ends_at')
+                //             ->label('Flash Deal Ends At')
+                //             ->visible(fn ($get) => $get('is_flash_deal'))
+                //             ->required(fn ($get) => $get('is_flash_deal')),
 
-                    ])
-                    ->columns(2),
+                //     ])
+                //     ->columns(2),
 
                 Section::make('Product Gallery')
                     ->schema([

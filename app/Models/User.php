@@ -51,7 +51,6 @@ class User extends Authenticatable implements FilamentUser
 
 
 
-
     public function products()
     {
         return $this->hasMany(Product::class, 'vendor_id');

@@ -4,8 +4,27 @@
     <a href="{{ route('products.show', $product) }}" class="block flex flex-col h-full">
 
         <div class="relative">
-            {{-- Featured Badge (Only if NOT a flash sale) --}}
-            @if(!($product->is_flash_sale ?? false) && $product->featured)
+            
+            @php
+                // Check for Active Flash Sale
+                $hasActiveFlash = false;
+                $flashPrice = 0;
+                
+                if ($product->relationLoaded('flashSale') && $product->flashSale) {
+                    $now = now();
+                    if ($now->between($product->flashSale->start_date, $product->flashSale->end_date)) {
+                        $hasActiveFlash = true;
+                        $flashPrice = $product->flashSale->flash_price;
+                    }
+                }
+            @endphp
+
+            {{-- Badges: Flash Sale takes priority over Featured --}}
+            @if($hasActiveFlash)
+                <div class="absolute top-3 right-3 bg-red-600 text-white text-xs font-bold px-2.5 py-1 rounded-md z-20 shadow-sm animate-pulse">
+                    Flash Sale
+                </div>
+            @elseif($product->featured)
                 <div class="absolute top-3 right-3 bg-violet-600 text-white text-xs font-bold px-2.5 py-1 rounded-md z-20 shadow-sm">
                     Featured
                 </div>
@@ -29,17 +48,21 @@
 
             <div class="mt-auto flex items-center gap-2 flex-wrap">
                 @php
-                    // Logic: Check sale_price first, then discounted_price, then price
                     $displayPrice = $product->price ?? 0;
                     $originalPrice = $product->price ?? 0;
                     $hasDiscount = false;
 
-                    // 1. Check sale_price (Your new attribute)
-                    if (isset($product->sale_price) && $product->sale_price > 0 && $product->sale_price < $originalPrice) {
+                    // Priority 1: Active Flash Sale
+                    if ($hasActiveFlash) {
+                        $displayPrice = $flashPrice;
+                        $hasDiscount = true;
+                    }
+                    // Priority 2: sale_price attribute
+                    elseif (isset($product->sale_price) && $product->sale_price > 0 && $product->sale_price < $originalPrice) {
                         $displayPrice = $product->sale_price;
                         $hasDiscount = true;
-                    } 
-                    // 2. Fallback to discounted_price
+                    }
+                    // Priority 3: discounted_price attribute (legacy)
                     elseif (isset($product->discounted_price) && $product->discounted_price > 0 && $product->discounted_price < $originalPrice) {
                         $displayPrice = $product->discounted_price;
                         $hasDiscount = true;

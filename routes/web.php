@@ -10,6 +10,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\StoreController;
 use App\Http\Controllers\Vendor\VendorRequestController;
 use App\Http\Controllers\WishlistController;
 use App\Models\Order;
@@ -20,9 +21,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [FrontendController::class, 'home'])->name('home');
 Route::get('/shop', [FrontendController::class, 'shop'])->name('shop');
-Route::get('/vendor-store', function () {
-    return view('frontend.vendor-store');
-});
 
 
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
@@ -34,6 +32,13 @@ Route::prefix('categories')->group(function () {
         ->name('categories.index');
     Route::get('/{category}', [CategoryController::class, 'show'])
         ->name('categories.show');
+});
+
+Route::prefix('stores')->group(function () {
+    Route::get('/', [StoreController::class, 'index'])
+        ->name('stores.index');
+    Route::get('/{vendorProfile}', [StoreController::class, 'show'])
+        ->name('stores.show');
 });
 
 

@@ -237,11 +237,9 @@
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
         @if(isset($flashSales) && $flashSales->count())
             @foreach($flashSales as $flashSale)
-                {{-- Pass the entire flashSale object, not just the product --}}
                 <x-flash-product-card :flashSale="$flashSale" />
             @endforeach
         @else
-            {{-- Fallback Dummy Data --}}
             @php
                 // Create a dummy object structure to test layout if DB is empty
                 $dummyFlash = (object)[
@@ -397,8 +395,8 @@
             <p class="text-gray-500 mt-2">Handpicked verified sellers for you</p>
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5 md:gap-6">
-            @if(isset($topStores) && $topStores->count())
-            @foreach($topStores as $store)
+            @if(isset($stores) && $stores->count())
+            @foreach($stores as $store)
             <div class="product-card bg-white rounded-2xl p-5 text-center border border-gray-100" style="animation-delay: {{ $loop->index * 0.1 }}s">
                 <div class="w-20 h-20 mx-auto rounded-full store-icon flex items-center justify-center text-2xl mb-4 overflow-hidden shadow-sm">
                     @if($store->shop_logo)
@@ -413,34 +411,12 @@
                 <p class="text-xs text-gray-400 mb-4 flex items-center justify-center gap-1">
                     <i class="fas fa-check-circle text-green-500"></i> Verified Seller
                 </p>
-                <a href="#" class="inline-block w-full py-2.5 text-sm font-semibold text-purple-700 bg-purple-50 rounded-xl hover:bg-purple-100 transition">
+                <a href="{{ route('stores.show',$store) }}" class="inline-block w-full py-2.5 text-sm font-semibold text-purple-700 bg-purple-50 rounded-xl hover:bg-purple-100 transition">
                     Visit Store
                 </a>
             </div>
             @endforeach
-            @else
-            @php
-            $dummyStores = [
-            'TechNepal', 'FashionHub', 'HomeEssentials', 'SportsWorld',
-            'BookNook', 'ToysGalore'
-            ];
-            @endphp
-            @foreach($dummyStores as $i => $storeName)
-            <div class="product-card bg-white rounded-2xl p-5 text-center border border-gray-100" style="animation-delay: {{ $i * 0.1 }}s">
-                <div class="w-20 h-20 mx-auto rounded-full store-icon flex items-center justify-center text-2xl mb-4 overflow-hidden shadow-sm">
-                    <img src="https://loremflickr.com/80/80/store?random={{ $i+20 }}" alt="{{ $storeName }}" class="w-full h-full object-cover rounded-full"
-                        onerror="this.onerror=null; this.innerHTML='<i class=\'fas fa-store text-purple-600\'></i>';">
-                </div>
-                <h4 class="font-bold text-gray-800 text-base mb-1">{{ $storeName }}</h4>
-                <p class="text-xs text-gray-400 mb-4 flex items-center justify-center gap-1">
-                    <i class="fas fa-check-circle text-green-500"></i> Verified Seller
-                </p>
-                <a href="#" class="inline-block w-full py-2.5 text-sm font-semibold text-purple-700 bg-purple-50 rounded-xl hover:bg-purple-100 transition">
-                    Visit Store
-                </a>
-            </div>
-            @endforeach
-            @endif
+           @endif
         </div>
     </div>
 </section>

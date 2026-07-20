@@ -22,8 +22,6 @@ class Product extends Model
         'sku',
         'price',
         'sale_price',
-        'discounted_price',
-        'compare_at_price',
         'stock',
         'stock_quantity',
         'thumbnail',
@@ -37,8 +35,6 @@ class Product extends Model
     protected $casts = [
         'price' => 'decimal:2',
         'sale_price' => 'decimal:2',
-        'discounted_price' => 'decimal:2',
-        'compare_at_price' => 'decimal:2',
         'featured' => 'boolean',
         'is_active' => 'boolean',
         'is_featured' => 'boolean',

@@ -274,7 +274,6 @@
                     </div>
                     @endif
 
-                    {{-- Features/Benefits --}}
                     @if($product->features)
                     <div class="mt-4">
                         <h3 class="text-lg font-semibold text-gray-900 mb-3">Key Features</h3>
@@ -294,7 +293,6 @@
         </div>
     </div>
 
-    {{-- Related Products Section --}}
     @if($relatedProducts && $relatedProducts->count())
     <div class="mt-16 lg:mt-24 border-t border-gray-200 pt-10">
         <h2 class="text-2xl font-bold text-gray-900 mb-6">You May Also Like</h2>
@@ -310,14 +308,11 @@
 
 </div>
 
-{{-- Scripts --}}
 <script>
-    // --- Image Gallery Logic ---
     function updateMainImage(element, index) {
         const mainImage = document.getElementById('mainImage');
         const thumbnails = document.querySelectorAll('.flex-shrink-0 img');
 
-        // Fade out effect
         mainImage.style.opacity = '0.5';
 
         setTimeout(() => {
@@ -325,7 +320,6 @@
             mainImage.style.opacity = '1';
         }, 150);
 
-        // Update border styles for active state
         thumbnails.forEach((thumb, i) => {
             const parent = thumb.parentElement;
             if (i === index) {
@@ -338,7 +332,6 @@
         });
     }
 
-    // --- Quantity Logic ---
     const quantityInput = document.getElementById('quantity');
     const maxStockInput = quantityInput ? parseInt(quantityInput.max) : 1;
 
@@ -359,7 +352,6 @@
     const variantPriceDisplay = document.getElementById('variantPrice');
     const selectedPriceInput = document.getElementById('selectedPrice');
 
-    // Get the base price calculated in the blade (Flash/Sale/Original)
     const basePrice = @json($currentPrice);
 
     if (variantSelect) {
@@ -369,7 +361,6 @@
             const stock = selectedOption.getAttribute('data-stock');
 
             if (!isNaN(variantPrice)) {
-                // If a variant is selected, use its price
                 const finalPrice = variantPrice;
 
                 if (variantPriceDisplay) {
@@ -379,7 +370,6 @@
 
                 if (selectedPriceInput) selectedPriceInput.value = finalPrice;
 
-                // Update max quantity based on variant stock
                 if (stock && stock !== "null" && quantityInput) {
                     quantityInput.max = stock;
                     if (parseInt(quantityInput.value) > parseInt(stock)) {
@@ -387,14 +377,12 @@
                     }
                 }
             } else {
-                // Fallback to base price if no valid variant price
                 if (variantPriceDisplay) variantPriceDisplay.classList.add('hidden');
                 if (selectedPriceInput) selectedPriceInput.value = basePrice;
             }
         });
     }
 
-    // --- Auto-hide Success Alert ---
     const successAlert = document.getElementById('success-alert');
     if (successAlert) {
         setTimeout(() => {
@@ -405,7 +393,6 @@
 </script>
 
 <style>
-    /* Custom Scrollbar Hide for Thumbnails */
     .scrollbar-hide::-webkit-scrollbar {
         display: none;
     }
@@ -415,7 +402,6 @@
         scrollbar-width: none;
     }
 
-    /* Smooth Fade In Animation */
     @keyframes fadeIn {
         from {
             opacity: 0;
@@ -432,7 +418,6 @@
         animation: fadeIn 0.4s ease-out forwards;
     }
 
-    /* Image Transition */
     .main-image {
         transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
     }

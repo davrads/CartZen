@@ -47,10 +47,6 @@ class ProductForm
                             ->required()
                             ->prefix('Rs.'),
 
-                        TextInput::make('discounted_price')
-                            ->numeric()
-                            ->prefix('Rs.'),
-
                         TextInput::make('stock')
                             ->numeric()
                             ->required(),

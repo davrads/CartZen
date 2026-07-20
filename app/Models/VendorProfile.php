@@ -29,4 +29,9 @@ class VendorProfile extends Model
     {
         return $this->hasMany(Product::class, 'vendor_id');
     }
+
+    public function getRouteKeyName()
+    {
+        return 'shop_slug';
+    }
 }

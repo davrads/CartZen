@@ -1,12 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
-{{-- Animated full‑screen background --}}
 <div class="fixed inset-0 -z-10 overflow-hidden">
-    {{-- Color shifting gradient --}}
     <div class="absolute inset-0 bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 animate-gradient-shift"></div>
 
-    {{-- Floating product silhouettes --}}
     <div class="absolute inset-0 opacity-10">
         <img src="https://loremflickr.com/80/80/headphones?random=1" class="floating-item w-16 h-16 absolute top-20 left-[10%]" alt="">
         <img src="https://loremflickr.com/80/80/shoe?random=2" class="floating-item w-20 h-20 absolute top-40 right-[15%]" alt="">
@@ -42,9 +39,7 @@
     .floating-item:nth-child(even) { animation-duration: 5s; }
 </style>
 
-{{-- Page content (no solid background) --}}
 <div class="min-h-screen">
-    {{-- Breadcrumb --}}
     @if(isset($category))
     <div class="max-w-7xl mx-auto px-4 pt-4 pb-2 text-sm text-gray-200">
         <a href="{{ url('/') }}" class="hover:text-white transition">Home</a>
@@ -57,9 +52,7 @@
 
     <div class="max-w-7xl mx-auto px-4 py-6">
         <div class="flex flex-col lg:flex-row gap-6">
-            {{-- Sidebar --}}
             <div class="lg:w-64 flex-shrink-0 space-y-4">
-                {{-- Categories List --}}
                 <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm p-5">
                     <h2 class="text-lg font-bold text-gray-800 mb-4">All Categories</h2>
                     <div class="space-y-0.5">
@@ -75,15 +68,15 @@
                     </div>
                 </div>
 
-                {{-- Brand Filter --}}
+                {{-- Price Filter --}}
                 <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm p-5">
-                    <h2 class="text-lg font-bold text-gray-800 mb-4">Brand</h2>
+                    <h2 class="text-lg font-bold text-gray-800 mb-4">Price</h2>
                     <div class="space-y-3">
-                        @php $brands = ['Samsung', 'Apple', 'Xiaomi', 'OnePlus', 'Realme', 'Vivo']; @endphp
-                        @foreach($brands as $brand)
+                        @php $prices = ['0-10K', '10-20K', '20-30K', '30-40K', '40-50K', 'Above 50K']; @endphp
+                        @foreach($prices as $price)
                             <label class="flex items-center gap-3 cursor-pointer text-sm text-gray-700 hover:text-violet-600 transition">
                                 <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500">
-                                {{ $brand }}
+                                {{ $price }}
                             </label>
                         @endforeach
                     </div>
