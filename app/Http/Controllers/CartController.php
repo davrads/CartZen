@@ -6,13 +6,12 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\FlashSale; // FlashSale Model थपियो
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
-
 class CartController extends Controller
 {
-
     private function getOrCreateUserCart()
     {
         return Cart::firstOrCreate([
@@ -20,7 +19,6 @@ class CartController extends Controller
         ]);
     }
 
-   
     public function index()
     {
         if (!Auth::guard('customer')->check()) {
@@ -29,7 +27,6 @@ class CartController extends Controller
 
         $cartHeader = $this->getOrCreateUserCart();
         
-       
         $cartItems = CartItem::where('cart_id', $cartHeader->id)->with('product')->get();
 
         $subtotal = 0;
@@ -40,22 +37,24 @@ class CartController extends Controller
             $product = $item->product;
             if (!$product) continue;
 
-           
             $price = $product->price;
-            $discountedPrice = $product->discounted_price;
+            
+            // यदि CartItem मा आफ्नो छुट्टै price छ भने (जस्तै Flash Sale price), त्यही प्रयोग गर्ने
+            $itemPrice = $item->price ?? ($product->discounted_price ?? $product->price);
             $qty = $item->quantity;
 
             $subtotal += $price * $qty;
-            if ($discountedPrice) {
-                $discount += ($price - $discountedPrice) * $qty;
+            
+            // Original Price र actual Cart Price बिचको फरकलाई Discount मान्ने
+            if ($price > $itemPrice) {
+                $discount += ($price - $itemPrice) * $qty;
             }
 
-          
             $cart[$item->id] = [
                 'name' => $product->name,
                 'quantity' => $qty,
                 'price' => $price,
-                'discounted_price' => $discountedPrice,
+                'discounted_price' => $itemPrice < $price ? $itemPrice : null,
                 'thumbnail' => $product->thumbnail,
                 'brand' => $product->brand ?? 'Official Store',
             ];
@@ -66,7 +65,6 @@ class CartController extends Controller
         return view('frontend.cart', compact('cart', 'subtotal', 'discount', 'total'));
     }
 
-   
     public function add(Request $request)
     {
         if (!Auth::guard('customer')->check()) {
@@ -75,6 +73,7 @@ class CartController extends Controller
 
         $request->validate([
             'product_id' => 'required|exists:products,id',
+            'flash_sale_id' => 'nullable|exists:flash_sales,id', // Flash sale validation थपियो
             'quantity' => 'nullable|integer|min:1',
             'product_variant_id' => 'nullable|exists:product_variants,id'
         ]);
@@ -83,10 +82,23 @@ class CartController extends Controller
         $userCart = $this->getOrCreateUserCart();
         
         $quantity = $request->quantity ?? 1;
-       
+        
+        // Default Final Price (Normal Discounted Price or Regular Price)
         $finalPrice = $product->discounted_price ?? $product->price;
 
-    
+        // यदि Flash Sale ID पठाएको छ भने Flash Sale active छ कि छैन भनेर चेक गर्ने
+        if ($request->filled('flash_sale_id')) {
+            $flashSale = FlashSale::where('id', $request->flash_sale_id)
+                ->where('is_active', true)
+                ->where('start_date', '<=', now())
+                ->where('end_date', '>=', now())
+                ->first();
+
+            if ($flashSale) {
+                $finalPrice = $flashSale->flash_price; // Flash Price ले Price Override गर्छ
+            }
+        }
+
         $existingItem = CartItem::where('cart_id', $userCart->id)
             ->where('product_id', $product->id)
             ->where('product_variant_id', $request->product_variant_id)
@@ -94,8 +106,11 @@ class CartController extends Controller
 
         if ($existingItem) {
             $existingItem->increment('quantity', $quantity);
+            // यदि Flash Sale बाट आएको छ भने price update गर्ने
+            if ($request->filled('flash_sale_id')) {
+                $existingItem->update(['price' => $finalPrice]);
+            }
         } else {
-        
             CartItem::create([
                 'cart_id' => $userCart->id,
                 'product_id' => $product->id,
@@ -111,6 +126,7 @@ class CartController extends Controller
 
         return redirect()->back()->with('success', 'Product added to database cart successfully!');
     }
+
     public function update(Request $request)
     {
         if (!Auth::guard('customer')->check()) {
@@ -152,6 +168,7 @@ class CartController extends Controller
 
         return redirect()->back()->with('success', 'Item removed from cart!');
     }
+
     public function moveToWishlist($id)
     {
         if (!Auth::guard('customer')->check()) {
@@ -167,7 +184,6 @@ class CartController extends Controller
         if ($cartItem && $cartItem->product) {
             $product = $cartItem->product;
             
-           
             $wishlist = session()->get('wishlist', []);
             $wishlist[$product->id] = [
                 'name'     => $product->name,
@@ -176,7 +192,6 @@ class CartController extends Controller
                 'image'    => $product->thumbnail ?? $product->image ?? null
             ];
             
-           
             session()->put('wishlist', $wishlist);
             $cartItem->delete();
             session()->save(); 
@@ -187,26 +202,22 @@ class CartController extends Controller
         return redirect()->back()->with('error', 'सामान कार्टमा फेला परेन।');
     }
 
-    
     public function wishlistToCart($id)
     {
         if (!Auth::guard('customer')->check()) {
             return redirect()->route('login')->with('error', 'Please login to perform this action');
         }
 
-       
         $wishlist = session()->get('wishlist', []);
 
-        
         if (isset($wishlist[$id])) {
             $userCart = $this->getOrCreateUserCart();
             $product = Product::find($id);
 
             if ($product) {
-                $finalPrice = $product->discounted_price ?? $product->price;
+                $finalPrice = $wishlist[$id]['price'] ?? ($product->discounted_price ?? $product->price);
                 $quantity = $wishlist[$id]['quantity'] ?? 1;
 
-                
                 $existingItem = CartItem::where('cart_id', $userCart->id)
                     ->where('product_id', $product->id)
                     ->first();
@@ -222,7 +233,6 @@ class CartController extends Controller
                     ]);
                 }
 
-               
                 unset($wishlist[$id]);
                 session()->put('wishlist', $wishlist);
                 session()->save();
@@ -234,26 +244,23 @@ class CartController extends Controller
         return redirect()->back()->with('error', 'सामान विसलिस्टमा फेला परेन।');
     }
 
-   public function removeFromWishlist($id)
+    public function removeFromWishlist($id)
     {
         if (!Auth::guard('customer')->check()) {
             return redirect()->route('login');
         }
 
-       
         $wishlist = session()->get('wishlist', []);
 
         if (isset($wishlist[$id])) {
-            unset($wishlist[$id]); // 
+            unset($wishlist[$id]); 
             
             session()->put('wishlist', $wishlist); 
-            session()->save(); // 
+            session()->save(); 
 
             return redirect()->back()->with('success', 'सामान विसलिस्टबाट सफलतापूर्वक हटाइयो।');
         }
 
         return redirect()->back()->with('error', 'सामान विसलिस्टमा फेला परेन।');
     }
-
-    
 }

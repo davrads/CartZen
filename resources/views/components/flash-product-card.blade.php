@@ -65,50 +65,78 @@
         </a>
     </div>
 
-    <a href="{{ $productUrl }}" class="block flex flex-col h-full">
-        
-        {{-- Image Container (Square Aspect Ratio) --}}
-        <div class="relative w-full aspect-square overflow-hidden bg-gray-50">
-            <img
-                src="{{ ($product->thumbnail ?? null) ? asset('storage/' . $product->thumbnail) : asset('images/no-image.png') }}"
-                alt="{{ $product->name ?? 'Product' }}"
-                class="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500"
-                loading="lazy"
-            >
-        </div>
-
-        {{-- Content --}}
-        <div class="p-4 flex flex-col flex-grow">
-            <h3 class="font-medium text-base text-gray-800 line-clamp-2 min-h-[2.8rem]">
-                {{ $product->name ?? 'Product' }}
-            </h3>
-
-            <div class="mt-3 flex items-baseline gap-2 flex-wrap">
-                {{-- Flash Price --}}
-                <span class="text-xl font-bold text-red-600">
-                    Rs. {{ number_format($flashSale->flash_price, 2) }}
-                </span>
-                
-                {{-- Original Price (Strikethrough) --}}
-                <span class="text-sm text-gray-400 line-through">
-                    Rs. {{ number_format($product->price, 2) }}
-                </span>
+    <div class="flex flex-col h-full justify-between">
+        <a href="{{ $productUrl }}" class="block flex flex-col">
+            
+            {{-- Image Container (Square Aspect Ratio) --}}
+            <div class="relative w-full aspect-square overflow-hidden bg-gray-50">
+                <img
+                    src="{{ ($product->thumbnail ?? null) ? asset('storage/' . $product->thumbnail) : asset('images/no-image.png') }}"
+                    alt="{{ $product->name ?? 'Product' }}"
+                    class="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                >
             </div>
 
-            {{-- Stock Bar (Optional Visual) --}}
-            @php $productStock = $product->stock ?? 0; @endphp
-            @if($productStock > 0)
-                <div class="mt-3 w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
-                    <div class="bg-red-500 h-1.5 rounded-full" style="width: {{ min(100, ($productStock / 10) * 100) }}%"></div>
+            {{-- Content --}}
+            <div class="p-4 pb-0 flex flex-col flex-grow">
+                <h3 class="font-medium text-base text-gray-800 line-clamp-2 min-h-[2.8rem]">
+                    {{ $product->name ?? 'Product' }}
+                </h3>
+
+                <div class="mt-3 flex items-baseline gap-2 flex-wrap">
+                    {{-- Flash Price --}}
+                    <span class="text-xl font-bold text-red-600">
+                        Rs. {{ number_format($flashSale->flash_price, 2) }}
+                    </span>
+                    
+                    {{-- Original Price (Strikethrough) --}}
+                    <span class="text-sm text-gray-400 line-through">
+                        Rs. {{ number_format($product->price, 2) }}
+                    </span>
                 </div>
-                <p class="text-[10px] text-gray-500 mt-1 text-right">
-                    {{ $productStock }} left
-                </p>
+
+                {{-- Stock Bar (Optional Visual) --}}
+                @php $productStock = $product->stock ?? 0; @endphp
+                @if($productStock > 0)
+                    <div class="mt-3 w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                        <div class="bg-red-500 h-1.5 rounded-full" style="width: {{ min(100, ($productStock / 10) * 100) }}%"></div>
+                    </div>
+                    <p class="text-[10px] text-gray-500 mt-1 text-right">
+                        {{ $productStock }} left
+                    </p>
+                @else
+                    <p class="mt-2 text-xs text-red-500 font-semibold">Sold Out</p>
+                @endif
+            </div>
+        </a>
+
+        {{-- Add to Cart Form Section (थपिएको भाग) --}}
+        <div class="p-4 pt-3 z-20 relative">
+            @if(($product->stock ?? 1) > 0)
+                <form action="{{ route('cart.add') }}" method="POST">
+                    @csrf
+                    <!-- Normal Product ID -->
+                    <input type="hidden" name="product_id" value="{{ $product->id ?? '' }}">
+                    
+                    <!-- Flash Sale ID (सधैं Flash price तान्नको लागि) -->
+                    <input type="hidden" name="flash_sale_id" value="{{ $flashSale->id ?? '' }}">
+                    <input type="hidden" name="quantity" value="1">
+
+                    <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2.5 px-4 rounded-xl shadow-md transition-colors duration-200 flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"></path>
+                        </svg>
+                        Add To Cart
+                    </button>
+                </form>
             @else
-                <p class="mt-2 text-xs text-red-500 font-semibold">Sold Out</p>
+                <button disabled class="w-full bg-gray-300 text-gray-500 text-xs font-bold py-2.5 px-4 rounded-xl cursor-not-allowed">
+                    Out of Stock
+                </button>
             @endif
         </div>
-    </a>
+    </div>
 </div>
 @endif
 

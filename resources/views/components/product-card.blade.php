@@ -1,7 +1,7 @@
 @props(['product'])
 
-<div class="product-card bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
-    <a href="{{ route('products.show', $product) }}" class="block flex flex-col h-full">
+<div class="product-card bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow duration-300 flex flex-col h-full justify-between">
+    <a href="{{ route('products.show', $product) }}" class="block flex flex-col">
 
         <div class="relative">
             
@@ -9,12 +9,14 @@
                 // Check for Active Flash Sale
                 $hasActiveFlash = false;
                 $flashPrice = 0;
+                $flashSaleId = null;
                 
                 if ($product->relationLoaded('flashSale') && $product->flashSale) {
                     $now = now();
-                    if ($now->between($product->flashSale->start_date, $product->flashSale->end_date)) {
+                    if ($now->between($product->flashSale->start_date, $product->flashSale->end_date) && $product->flashSale->is_active) {
                         $hasActiveFlash = true;
                         $flashPrice = $product->flashSale->flash_price;
+                        $flashSaleId = $product->flashSale->id;
                     }
                 }
             @endphp
@@ -90,4 +92,31 @@
             @endif
         </div>
     </a>
+
+    {{-- Add to Cart Form Section --}}
+    <div class="p-4 md:p-5 pt-0 z-20 relative">
+        @if(($product->stock ?? 1) > 0)
+            <form action="{{ route('cart.add') }}" method="POST">
+                @csrf
+                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                <input type="hidden" name="quantity" value="1">
+                
+                {{-- Flash Sale Active छ भने Flash Sale ID पनि जान्छ --}}
+                @if($hasActiveFlash && $flashSaleId)
+                    <input type="hidden" name="flash_sale_id" value="{{ $flashSaleId }}">
+                @endif
+
+                <button type="submit" class="w-full bg-violet-600 hover:bg-violet-700 text-white text-xs md:text-sm font-bold py-2.5 px-4 rounded-xl shadow-sm transition-colors duration-200 flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"></path>
+                    </svg>
+                    Add To Cart
+                </button>
+            </form>
+        @else
+            <button disabled class="w-full bg-gray-200 text-gray-400 text-xs md:text-sm font-bold py-2.5 px-4 rounded-xl cursor-not-allowed">
+                Out of Stock
+            </button>
+        @endif
+    </div>
 </div>

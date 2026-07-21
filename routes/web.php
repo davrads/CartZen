@@ -19,6 +19,8 @@ use Illuminate\Support\Facades\Route;
 
 
 
+
+
 Route::get('/', [FrontendController::class, 'home'])->name('home');
 Route::get('/shop', [FrontendController::class, 'shop'])->name('shop');
 
@@ -184,5 +186,5 @@ Route::prefix('wishlist')->group(function () {
     Route::get('/wishlist/add/{id}', [CartController::class, 'moveToWishlist'])->name('wishlist.add');
     Route::get('/wishlist/to-cart/{id}', [CartController::class, 'wishlistToCart'])->name('wishlist.toCart');
     Route::get('/wishlist/remove/{id}', [CartController::class, 'removeFromWishlist'])->name('wishlist.remove');
-
+    Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
 });
