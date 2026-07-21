@@ -51,81 +51,100 @@
     @endif
 
     <div class="max-w-7xl mx-auto px-4 py-6">
-        <div class="flex flex-col lg:flex-row gap-6">
-            <div class="lg:w-64 flex-shrink-0 space-y-4">
-                <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm p-5">
-                    <h2 class="text-lg font-bold text-gray-800 mb-4">All Categories</h2>
-                    <div class="space-y-0.5">
-                        @foreach($categories as $cat)
-                            <a href="{{ route('categories.show', $cat) }}"
-                               class="block px-3 py-2 text-sm font-medium rounded-lg transition
-                                      {{ $cat->id === $category->id
-                                          ? 'bg-violet-50 text-violet-700'
-                                          : 'text-gray-600 hover:bg-gray-50 hover:text-violet-600' }}">
-                                {{ $cat->name }}
-                            </a>
-                        @endforeach
+        <form id="filter-form" action="{{ route('categories.show', $category) }}" method="GET">
+            <div class="flex flex-col lg:flex-row gap-6">
+                <div class="lg:w-64 flex-shrink-0 space-y-4">
+                    <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm p-5">
+                        <h2 class="text-lg font-bold text-gray-800 mb-4">All Categories</h2>
+                        <div class="space-y-0.5">
+                            @foreach($categories as $cat)
+                                <a href="{{ route('categories.show', $cat) }}"
+                                   class="block px-3 py-2 text-sm font-medium rounded-lg transition
+                                          {{ $cat->id === $category->id
+                                              ? 'bg-violet-50 text-violet-700'
+                                              : 'text-gray-600 hover:bg-gray-50 hover:text-violet-600' }}">
+                                    {{ $cat->name }}
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- Price Filter --}}
+                    <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm p-5">
+                        <h2 class="text-lg font-bold text-gray-800 mb-4">Price</h2>
+                        <div class="space-y-3">
+                            @php 
+                                $prices = [
+                                    '0-10000' => '0-10K', 
+                                    '10000-20000' => '10-20K', 
+                                    '20000-30000' => '20-30K', 
+                                    '30000-40000' => '30-40K', 
+                                    '40000-50000' => '40-50K', 
+                                    '50000-above' => 'Above 50K'
+                                ]; 
+                                $selectedPrices = (array) request('prices', []);
+                            @endphp
+                            @foreach($prices as $key => $label)
+                                <label class="flex items-center gap-3 cursor-pointer text-sm text-gray-700 hover:text-violet-600 transition">
+                                    <input type="checkbox" 
+                                           name="prices[]" 
+                                           value="{{ $key }}" 
+                                           class="price-checkbox w-4 h-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500"
+                                           {{ in_array($key, $selectedPrices) ? 'checked' : '' }}
+                                           onchange="document.getElementById('filter-form').submit()">
+                                    {{ $label }}
+                                </label>
+                            @endforeach
+                        </div>
                     </div>
                 </div>
 
-                {{-- Price Filter --}}
-                <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm p-5">
-                    <h2 class="text-lg font-bold text-gray-800 mb-4">Price</h2>
-                    <div class="space-y-3">
-                        @php $prices = ['0-10K', '10-20K', '20-30K', '30-40K', '40-50K', 'Above 50K']; @endphp
-                        @foreach($prices as $price)
-                            <label class="flex items-center gap-3 cursor-pointer text-sm text-gray-700 hover:text-violet-600 transition">
-                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500">
-                                {{ $price }}
-                            </label>
-                        @endforeach
+                {{-- Main Product Area --}}
+                <div class="flex-1 min-w-0">
+                    <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm overflow-hidden">
+                        {{-- Header --}}
+                        <div class="px-6 py-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-100">
+                            <div>
+                                <h1 class="text-2xl font-extrabold text-gray-800">{{ $category->name }}</h1>
+                                <p class="text-sm text-gray-500 mt-1">
+                                    Showing {{ $products->firstItem() ?? 0 }} – {{ $products->lastItem() ?? 0 }} of {{ $products->total() }} products
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm text-gray-500">Sort by:</span>
+                                <select name="sort" 
+                                        onchange="document.getElementById('filter-form').submit()" 
+                                        class="border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500">
+                                    <option value="popular" {{ request('sort') == 'popular' ? 'selected' : '' }}>Popular</option>
+                                    <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price: Low to High</option>
+                                    <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price: High to Low</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        {{-- Product Grid --}}
+                        <div class="p-6">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                @forelse($products as $product)
+                                    <x-product-card :product="$product" />
+                                @empty
+                                    <div class="col-span-full py-16 text-center text-gray-400">
+                                        <i class="fas fa-box-open text-4xl mb-3"></i>
+                                        <p class="text-lg">No products found in this category.</p>
+                                    </div>
+                                @endforelse
+                            </div>
+
+                            @if($products->hasPages())
+                            <div class="mt-8 flex justify-center">
+                                {{ $products->appends(request()->query())->links() }}
+                            </div>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
-
-            {{-- Main Product Area --}}
-            <div class="flex-1 min-w-0">
-                <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm overflow-hidden">
-                    {{-- Header --}}
-                    <div class="px-6 py-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-100">
-                        <div>
-                            <h1 class="text-2xl font-extrabold text-gray-800">{{ $category->name }}</h1>
-                            <p class="text-sm text-gray-500 mt-1">
-                                Showing {{ $products->firstItem() }} – {{ $products->lastItem() }} of {{ $products->total() }} products
-                            </p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-sm text-gray-500">Sort by:</span>
-                            <select class="border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500">
-                                <option>Popular</option>
-                                <option>Price: Low to High</option>
-                                <option>Price: High to Low</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    {{-- Product Grid --}}
-                    <div class="p-6">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            @forelse($products as $product)
-                                <x-product-card :product="$product" />
-                            @empty
-                                <div class="col-span-full py-16 text-center text-gray-400">
-                                    <i class="fas fa-box-open text-4xl mb-3"></i>
-                                    <p class="text-lg">No products found in this category.</p>
-                                </div>
-                            @endforelse
-                        </div>
-
-                        @if($products->hasPages())
-                        <div class="mt-8 flex justify-center">
-                            {{ $products->links() }}
-                        </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
-        </div>
+        </form>
     </div>
 </div>
 @endsection
