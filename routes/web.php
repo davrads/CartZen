@@ -188,3 +188,5 @@ Route::prefix('wishlist')->group(function () {
     Route::get('/wishlist/remove/{id}', [CartController::class, 'removeFromWishlist'])->name('wishlist.remove');
     Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
 });
+
+Route::get('/search', [ProductController::class, 'search'])->name('search');

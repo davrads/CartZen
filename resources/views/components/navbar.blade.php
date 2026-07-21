@@ -10,21 +10,23 @@
                 </a>
             </div>
 
+            {{-- Desktop Search Form --}}
             <div class="flex-1 max-w-2xl mx-4 hidden sm:block">
-                <div class="relative group w-full">
-                    <div class="flex shadow-sm border border-gray-300 rounded-lg overflow-hidden bg-white">
-                        <input type="text" placeholder="Search in CartZen..." class="flex-1 px-4 py-2.5 outline-none text-sm text-gray-700 placeholder-gray-400">
-                        <button class="bg-primary text-white px-6 py-2.5 hover:opacity-90 transition flex items-center justify-center">
+                <form action="{{ route('search') }}" method="GET" class="relative group w-full">
+                    <div class="flex shadow-sm border border-gray-300 rounded-lg overflow-hidden bg-white focus-within:border-violet-500 focus-within:ring-1 focus-within:ring-violet-500 transition">
+                        <input type="text" 
+                               name="query" 
+                               value="{{ request('query') }}" 
+                               placeholder="Search in CartZen..." 
+                               required
+                               class="flex-1 px-4 py-2.5 outline-none text-sm text-gray-700 placeholder-gray-400">
+                        <button type="submit" class="bg-violet-600 text-white px-6 py-2.5 hover:bg-violet-700 transition flex items-center justify-center">
                             <i class="fas fa-search"></i>
                         </button>
                     </div>
-                </div>
+                </form>
             </div>
-            
 
-
-
-            
             <div class="flex items-center gap-4 md:gap-6">
                 <a href="/user_profile" class="text-gray-700 hover:text-purple-600 flex items-center gap-2 text-sm font-medium transition">
                     <i class="fas fa-user-circle text-xl"></i>
@@ -34,24 +36,37 @@
                 <a href="{{ route('cart.index') }}" class="text-gray-700 hover:text-purple-600 flex items-center gap-2 text-sm font-medium relative transition">
                     <i class="fas fa-shopping-cart text-xl"></i>
                     @php
-                            $cartCount = 0;
-                            if (auth()->guard('customer')->check()) {
-                                $cart = App\Models\Cart::where('user_id', auth()->guard('customer')->id())->first();
-                                if ($cart) {
-                                    $cartCount = $cart->items->sum('quantity');
-                                }
+                        $cartCount = 0;
+                        if (auth()->guard('customer')->check()) {
+                            $cart = App\Models\Cart::where('user_id', auth()->guard('customer')->id())->first();
+                            if ($cart) {
+                                $cartCount = $cart->items->sum('quantity');
                             }
-                        @endphp
-                        <span class="absolute -top-1 -right-1 bg-violet-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                            {{ $cartCount }}
-                        </span>
-                    
-                    {{-- <span class="absolute -top-2 -right-3 bg-purple-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center border-2 border-white">
-                        {{ $cartCount ?? 0 }}
-                    </span> --}}
+                        }
+                    @endphp
+                    <span class="absolute -top-1 -right-1 bg-violet-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                        {{ $cartCount }}
+                    </span>
                     <span class="hidden sm:inline">Cart</span>
                 </a>
             </div>
+        </div>
+
+        {{-- Mobile Search Form (Mobile मा देखिने गरी) --}}
+        <div class="block sm:hidden pb-3">
+            <form action="{{ route('search') }}" method="GET" class="relative w-full">
+                <div class="flex border border-gray-300 rounded-lg overflow-hidden bg-white">
+                    <input type="text" 
+                           name="query" 
+                           value="{{ request('query') }}" 
+                           placeholder="Search in CartZen..." 
+                           required
+                           class="flex-1 px-3 py-2 outline-none text-sm text-gray-700 placeholder-gray-400">
+                    <button type="submit" class="bg-violet-600 text-white px-4 py-2 hover:bg-violet-700 transition flex items-center justify-center">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
         </div>
 
         <div class="hidden md:flex items-center justify-between py-2 border-t border-gray-100 text-sm">
