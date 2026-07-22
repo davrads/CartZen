@@ -22,8 +22,13 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::get('/', [FrontendController::class, 'home'])->name('home');
-Route::get('/shop', [FrontendController::class, 'shop'])->name('shop');
 
+Route::prefix('shop')->group(function () {;
+    Route::get('/', [FrontendController::class, 'shopOnSale'])
+        ->name('shop-on-sale');
+    Route::get('/{product}', [FrontendController::class, 'productShow'])
+        ->name('product.show');
+});                     
 
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/products/{product}', [ProductController::class, 'show'])

@@ -4,22 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title') - Cartzen</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
     <style>
         .primary-purple { color: #7C3AED; }
         .bg-primary { background-color: #7C3AED; }
+        .bg-primary:hover{
+          background-color: #6D28D9;
+        }
         .hero-bg {
-            background: linear-gradient(135deg, #6B46C1 0%, #7C3AED 100%);
+            background: linear-gradient(135deg, #6D28D9 0%, #8B5CF6 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
         }
         .card-hover:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 25px -5px rgb(124 58 237 / 0.15);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px  rgba(124 58 237 / 0.12);
         }
 /* cagetory page css */
         .category-main-block{
-            width: 1240px;
+            max-width: 1240px;
+            width: 100%;
             margin: 0 auto;
             /* background-color: #922fe5; */
             padding: 25px;
@@ -27,8 +33,9 @@
 
         .filter-sidebar {
       max-width: 280px;
-      background: white;
-      border-right: 1px solid #e5e7eb;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
       height: 100vh;
       overflow-y: auto;
     }
@@ -38,7 +45,7 @@
       justify-content: space-between;
       align-items: center;
       padding: 16px 20px;
-      border-bottom: 1px solid #f3f4f6;
+      border-bottom: 1px solid #e5e7eb;
       font-weight: 600;
       color: #111827;
     }
@@ -58,13 +65,14 @@
     }
 
     .list-item:hover {
-      background: #f9fafb;
+      background: #f5f3ff;
+      color:#7C3AED;
     }
 
     .list-item.active {
-      background: #f3f4f6;
-      font-weight: 500;
-      color: #111827;
+      background: #ede9fe;
+      font-weight: 600;
+      color: #7C3AED;
     }
 
     .checkbox-label {

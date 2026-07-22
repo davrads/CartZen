@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    public function index(Category $category, Request $request)
+    public function index(Request $request)
     {
         $categories = Category::all();
 
@@ -46,7 +46,6 @@ class CategoryController extends Controller
         $products = $query->paginate(9);
 
         return view('categories.index', compact(
-            'category',
             'categories',
             'products'
         ));
@@ -88,6 +87,6 @@ class CategoryController extends Controller
 
         $products = $query->paginate(9);
 
-        return view('categories.index', compact('category', 'categories', 'products'));
+        return view('categories.index', compact('categories', 'products'));
     }
 }

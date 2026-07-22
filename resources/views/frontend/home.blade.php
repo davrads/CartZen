@@ -20,21 +20,7 @@
     </button>
 </div>
 @endif
-{{-- ===== ANIMATED FULL-SCREEN BACKGROUND ===== --}}
-<div class="fixed inset-0 -z-10 overflow-hidden">
-    {{-- Color shifting gradient --}}
-    <div class="absolute inset-0 bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 animate-gradient-shift"></div>
-
-    {{-- Floating product silhouettes --}}
-    <div class="absolute inset-0 opacity-10">
-        <img src="https://loremflickr.com/80/80/headphones?random=1" class="floating-item w-16 h-16 absolute top-20 left-[10%]" alt="">
-        <img src="https://loremflickr.com/80/80/shoe?random=2" class="floating-item w-20 h-20 absolute top-40 right-[15%]" alt="">
-        <img src="https://loremflickr.com/80/80/watch?random=3" class="floating-item w-14 h-14 absolute bottom-32 left-[20%]" alt="">
-        <img src="https://loremflickr.com/80/80/laptop?random=4" class="floating-item w-24 h-24 absolute top-1/3 right-[25%]" alt="">
-        <img src="https://loremflickr.com/80/80/bag?random=5" class="floating-item w-16 h-16 absolute bottom-20 right-[10%]" alt="">
-        <img src="https://loremflickr.com/80/80/shirt?random=6" class="floating-item w-18 h-18 absolute top-2/3 left-[30%]" alt="">
-    </div>
-</div>
+>
 
 <style>
     :root {
@@ -93,32 +79,10 @@
         animation-duration: 5s;
     }
 
-    .section-card {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 1.5rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.03);
-        transition: box-shadow 0.2s;
-    }
 
-    .section-card:hover {
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04), 0 10px 24px rgba(0, 0, 0, 0.06);
-    }
 
-    .product-card {
-        transition: all 0.25s ease;
-        animation: fadeInUp 0.5s ease both;
-    }
 
-    .product-card:hover {
-        transform: translateY(-6px);
-        border-color: var(--primary);
-        box-shadow: 0 14px 28px -12px rgba(124, 58, 237, 0.2), 0 4px 12px -4px rgba(0, 0, 0, 0.08);
-    }
 
-    .product-card:hover .product-image {
-        transform: scale(1.07);
-    }
 
     .flash-badge {
         background: linear-gradient(135deg, #ef4444, #dc2626);
@@ -185,11 +149,13 @@
     }
 
     .category-icon {
-        background: linear-gradient(135deg, #faf5ff, #ede9fe);
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
     }
 
     .store-icon {
-        background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
     }
 
     @keyframes fadeInUp {
@@ -240,199 +206,195 @@
     </div>
 </div>
 
-{{-- ===== FLASH SALE SECTION ===== --}}
-<section class="max-w-7xl mx-auto px-4 py-8">
-    <div class="mb-6 flex items-center justify-between">
-        <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <span class="w-1 h-6 bg-red-600 rounded-full"></span>
-            Flash Sale
-        </h2>
-        <a href="#" class="text-sm text-violet-600 font-medium hover:underline">View All</a>
+{{-- FLASH SALE SECTION --}}
+<section class="max-w-7xl mx-auto px-4 py-10">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h2 class="flex items-center gap-2 text-3xl font-bold text-gray-900 ">
+                <i class="fa-solid fa-bolt text-orange-500"></i>
+                Flash Deals
+            </h2>
+            <p class="mt-1 text-sm text-gray-600">
+                Limited time offers. Grab them now!
+            </p>
+        </div>
+        <a href="{{ route('shop-on-sale') }}" class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 transition hover:border-violet-500 hover:text-violet-600 hover:shadow-sm">View All
+            <i class="fa-solid fa-arrow-right text-xs"></i>
+        </a>
+    </div>
+    <div class="rounded-2-xl bg-white p-6 shadow-sm border border-gray-100">
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+            @if(isset($flashSales) && $flashSales->count())
+            @foreach($flashSales as $flashSale)
+            <x-flash-product-card :flashSale="$flashSale" />
+            @endforeach
+            @else
+            <div>
+                <p class="text-gray-600">No flash sales available.</p>
+                @endif
+            </div>
+        </div>
     </div>
 
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-        @if(isset($flashSales) && $flashSales->count())
-            @foreach($flashSales as $flashSale)
-                <x-flash-product-card :flashSale="$flashSale" />
-            @endforeach
-        @else
-            @php
-                // Create a dummy object structure to test layout if DB is empty
-                $dummyFlash = (object)[
-                    'product' => (object)['name' => 'Sample Product', 'price' => 5000, 'thumbnail' => '', 'stock' => 10],
-                    'flash_price' => 3500,
-                    'start_date' => now()->subHours(1),
-                    'end_date' => now()->addHours(2),
-                    'is_active' => true
-                ];
-            @endphp
-            <x-flash-product-card :flashSale="$dummyFlash" />
-            <x-flash-product-card :flashSale="$dummyFlash" />
-            <x-flash-product-card :flashSale="$dummyFlash" />
-            <x-flash-product-card :flashSale="$dummyFlash" />
-        @endif
-    </div>
 </section>
 
-{{-- ===== FEATURED PRODUCTS ===== --}}
-<section class="max-w-7xl mx-auto px-4 pb-8 min-h-[30px]">
-    <div class="mb-8">
-        <h2 class="section-heading text-2xl md:text-3xl">Featured Products</h2>
+
+
+{{-- JUST FOR YOU (All Products)  --}}
+<section class="max-w-7xl mx-auto px-4 pb-10">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h2 class="flex items-center gap-2 text-3xl font-bold text-gray-900">
+                <i class="fas fa-cart-shopping text-black"></i>
+                Our Products
+            </h2>
+            <p class="mt-1 text-gray-500">Discover all our products.</p>
+        </div>
+
+        <a href="{{ route('products.index') }}" class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 transition hover:border-violet-500 hover:text-violet-600 hover:shadow-sm">
+            View All
+            <i class="fa-solid fa-arrow-right text-xs"></i>
+        </a>
     </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        @if(isset($featuredProducts) && $featuredProducts->count())
-        @foreach($featuredProducts as $product)
-        <div class="product-card bg-white rounded-2xl border border-gray-100 overflow-hidden" style="animation-delay: {{ $loop->index * 0.1 }}s">
+
+    <div class="bg-white border border-gray-200 p-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 md:gap-6">
+
+        @if(isset($justForYouProducts) && $justForYouProducts->count())
+        @foreach($justForYouProducts as $product)
+
+        <div class="flex flex-col h-full">
             <x-product-card :product="$product" />
         </div>
         @endforeach
         @else
-        @php
-        $dummyFeatured = [
-        ['name' => 'Nepali Dhaka Topi', 'price' => 850, 'old' => 1200],
-        ['name' => 'Organic Green Tea', 'price' => 450, 'old' => 750],
-        ['name' => 'Smart LED TV 32"', 'price' => 22999, 'old' => 29999],
-        ['name' => 'Laptop Cooling Pad', 'price' => 1299, 'old' => 1999],
-        ];
-        @endphp
-        @foreach($dummyFeatured as $i => $item)
-        <div class="product-card bg-white rounded-2xl border border-gray-100 overflow-hidden" style="animation-delay: {{ $i * 0.1 }}s">
-            <div class="relative overflow-hidden bg-gray-50">
-                <img src="https://loremflickr.com/400/300/{{ urlencode($item['name']) }}?random={{ $i }}"
-                    class="w-full h-48 object-cover" alt="{{ $item['name'] }}"
-                    onerror="this.onerror=null; this.src='https://placehold.co/400x300/7c3aed/white?text={{ urlencode($item['name']) }}';">
-            </div>
-            <div class="p-4">
-                <h3 class="font-semibold text-gray-800">{{ $item['name'] }}</h3>
-                <p class="text-sm text-gray-500 mt-1">Best Seller</p>
-                <div class="flex items-center justify-between mt-2">
-                    <span class="text-lg font-bold text-purple-600">रु {{ number_format($item['price']) }}</span>
-                    <span class="text-xs text-gray-400 line-through">रु {{ number_format($item['old']) }}</span>
-                </div>
-            </div>
+        {{-- Empty State --}}
+        <div class="col-span-full rounded-2xl border border-dashed border-gray-200 bg-white py-20 text-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+            <h3 class="text-lg font-medium text-gray-900">No products available</h3>
+            <p class="text-gray-500 mt-1">Check back later for new arrivals!</p>
         </div>
-        @endforeach
-        @endif
-    </div>
-</section>
-{{-- ===== JUST FOR YOU (All Products) ===== --}}
-<section class="max-w-7xl mx-auto px-4 pb-12">
-    <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-            <h2 class="section-heading text-2xl md:text-3xl text-white font-bold">Our Products</h2>
-            <p class="text-white mt-1 text-sm md:text-base">Discover our complete collection of products tailored for you.</p>
-        </div>
-        {{-- Optional: View All Link if using pagination --}}
-            <a href="{{ route('products.index') }}" class="text-white hover:text-white font-medium text-sm flex items-center gap-1 transition-colors">
-                View All Products
-            </a>
-    </div>
-
-    {{-- Grid Container --}}
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
-
-        @if(isset($justForYouProducts) && $justForYouProducts->count())
-            @foreach($justForYouProducts as $product)
-               
-                <div class="flex flex-col h-full">
-                    <x-product-card :product="$product" />
-                </div>
-            @endforeach
-        @else
-            {{-- Empty State --}}
-            <div class="col-span-full py-16 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                </svg>
-                <h3 class="text-lg font-medium text-gray-900">No products available</h3>
-                <p class="text-gray-500 mt-1">Check back later for new arrivals!</p>
-            </div>
         @endif
 
     </div>
 
     {{-- Pagination Links (Only if using Paginate) --}}
     @if(isset($justForYouProducts) && method_exists($justForYouProducts, 'links'))
-        <div class="mt-12 flex justify-center">
-            {{ $justForYouProducts->links() }}
-        </div>
+    <div class="mt-16 flex justify-center">
+        {{ $justForYouProducts->links() }}
+    </div>
     @endif
 
 </section>
-{{-- ===== SHOP BY CATEGORY ===== --}}
-<section class="max-w-7xl mx-auto px-4 pb-8 min-h-[30px]">
-    <div class="section-card p-6 md:p-8">
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-5 mb-8">
-            <h2 class="section-heading text-2xl md:text-3xl">Shop by Category</h2>
-            <a href="{{ route('categories.index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition shadow-md font-semibold text-sm">
-                <span>All Categories</span>
-                <i class="fas fa-arrow-right text-xs"></i>
-            </a>
+
+
+{{-- SHOP BY CATEGORY --}}
+<section class="max-w-7xl mx-auto px-4 py-12">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h2 class="flex items-center gap-2 text-2xl md:text-3xl font-bold text-gray-900">
+                <i class="fas fa-tags text-black"></i>
+                Shop by Category
+            </h2>
+
+            <p class="mt-1 text-sm text-gray-500">
+                Discover our complete collection.
+            </p>
         </div>
-        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 md:gap-5">
-            @if(isset($categories) && $categories->count())
-            @foreach($categories as $category)
-            <a href="{{ route('categories.show', $category) }}" class="product-card bg-white rounded-2xl p-4 text-center border border-gray-100 flex flex-col items-center justify-center h-36 sm:h-40" style="animation-delay: {{ $loop->index * 0.05 }}s">
-                <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full category-icon flex items-center justify-center mb-3 overflow-hidden">
-                    <img src="{{ $category->image ? asset('storage/'.$category->image) : 'https://loremflickr.com/80/80/'.urlencode($category->name).'?random='.$category->id }}"
-                        alt="{{ $category->name }}" class="w-full h-full object-cover rounded-full"
-                        onerror="this.onerror=null; this.src='https://placehold.co/80x80/7c3aed/white?text={{ urlencode($category->name) }}';">
-                </div>
-                <span class="text-xs sm:text-sm font-medium text-gray-700">{{ $category->name }}</span>
-            </a>
-            @endforeach
-            @else
-            @php
-            $dummyCategories = [
-            'Electronics', 'Fashion', 'Home & Living', 'Sports',
-            'Books', 'Toys', 'Beauty', 'Groceries'
-            ];
-            @endphp
-            @foreach($dummyCategories as $i => $cat)
-            <a href="#" class="product-card bg-white rounded-2xl p-4 text-center border border-gray-100 flex flex-col items-center justify-center h-36 sm:h-40" style="animation-delay: {{ $i * 0.05 }}s">
-                <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full category-icon flex items-center justify-center mb-3 overflow-hidden">
-                    <img src="https://loremflickr.com/80/80/{{ urlencode($cat) }}?random={{ $i+50 }}"
-                        alt="{{ $cat }}" class="w-full h-full object-cover rounded-full"
-                        onerror="this.onerror=null; this.src='https://placehold.co/80x80/7c3aed/white?text={{ urlencode($cat) }}';">
-                </div>
-                <span class="text-xs sm:text-sm font-medium text-gray-700">{{ $cat }}</span>
-            </a>
-            @endforeach
-            @endif
+        <a href="{{ route('categories.index') }}"
+            class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-all hover:border-violet-500 hover:text-violet-600 hover:shadow-sm">
+            View All
+            <i class="fas fa-arrow-right text-xs"></i>
+        </a>
+    </div>
+    <div class="grid grid-cols-2 bg-white border border-gray-200 p-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-5">
+
+        @forelse($categories as $category)
+
+        <a href="{{ route('categories.show', $category) }}"
+            class="group bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 hover:border-violet-300 transition-all duration-300 p-5 flex flex-col items-center justify-center text-center">
+            <div class="w-16 h-16 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center overflow-hidden transition-transform duration-300 group-hover:scale-105">
+                <img
+                    src="{{ $category->image ? asset('storage/'.$category->image) : 'https://loremflickr.com/80/80/'.urlencode($category->name).'?random='.$category->id }}"
+                    alt="{{ $category->name }}"
+                    class="w-full h-full object-cover rounded-full"
+                    onerror="this.onerror=null;this.src='https://placehold.co/80x80/F3F4F6/7C3AED?text={{ urlencode(substr($category->name,0,1)) }}';">
+
+            </div>
+            <h3 class="mt-4 text-sm font-semibold text-gray-800 line-clamp-2 group-hover:text-violet-600 transition-colors">
+                {{ $category->name }}
+            </h3>
+        </a>
+        @empty
+        <div class="col-span-full rounded-2xl border border-dashed border-gray-200 py-16 text-center">
+            <i class="fas fa-tags text-5xl text-gray-300 mb-4"></i>
+            <h3 class="text-lg font-semibold text-gray-900">
+                No Categories Available
+            </h3>
+            <p class="text-gray-500 mt-2">
+                Categories will appear here once they are added.
+            </p>
         </div>
+        @endforelse
     </div>
 </section>
 
-{{-- ===== TOP STORES ===== --}}
-<section class="max-w-7xl mx-auto px-4 pb-8 min-h-[30px]">
-    <div class="section-card p-6 md:p-8 bg-purple-50/30 border-purple-100">
-        <div class="text-center mb-10">
-            <h2 class="text-2xl md:text-3xl font-extrabold text-gray-800">Top Stores on CartZen</h2>
-            <p class="text-gray-500 mt-2">Handpicked verified sellers for you</p>
+{{-- TOP STORES --}}
+<section class="max-w-7xl mx-auto px-4 py-10">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h2 class="flex items-center gap-2 text-3xl font-bold text-gray-900">
+                <i class="fas fa-store text-black"></i>
+                Top Stores
+            </h2>
+            <p class="mt-1 text-gray-500">
+                Discover trusted and verified stores on CartZen.
+            </p>
         </div>
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5 md:gap-6">
-            @if(isset($stores) && $stores->count())
+
+        <a href="{{ route('stores.index') }}"
+            class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 transition hover:border-violet-500 hover:text-violet-600 hover:shadow-sm">
+            View All
+            <i class="fas fa-arrow-right text-xs"></i>
+        </a>
+    </div>
+    <div class="bg-white border border-gray-200  shadow-sm p-6">
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5">
             @foreach($stores as $store)
-            <div class="product-card bg-white rounded-2xl p-5 text-center border border-gray-100" style="animation-delay: {{ $loop->index * 0.1 }}s">
-                <div class="w-20 h-20 mx-auto rounded-full store-icon flex items-center justify-center text-2xl mb-4 overflow-hidden shadow-sm">
+
+            <div
+                class="rounded-2xl border border-gray-200 bg-white p-5 text-center transition-all duration-300 hover:-translate-y-1 hover:border-violet-300 hover:shadow-md">
+                <div class="w-20 h-20 mx-auto rounded-full overflow-hidden border border-gray-200 bg-gray-50">
                     @if($store->shop_logo)
-                    <img src="{{ Storage::url($store->shop_logo) }}" alt="{{ $store->shop_name }}" class="w-full h-full object-cover rounded-full"
-                        onerror="this.onerror=null; this.innerHTML='<i class=\'fas fa-store text-purple-600\'></i>';">
+                    <img
+                        src="{{ Storage::url($store->shop_logo) }}"
+                        alt="{{ $store->shop_name }}"
+                        class="w-full h-full object-cover">
                     @else
-                    <img src="https://loremflickr.com/80/80/store?random={{ $store->id }}" alt="{{ $store->shop_name }}" class="w-full h-full object-cover rounded-full"
-                        onerror="this.onerror=null; this.innerHTML='<i class=\'fas fa-store text-purple-600\'></i>';">
+                    <img
+                        src="https://loremflickr.com/80/80/store?random={{ $store->id }}"
+                        alt="{{ $store->shop_name }}"
+                        class="w-full h-full object-cover">
                     @endif
                 </div>
-                <h4 class="font-bold text-gray-800 text-base mb-1">{{ $store->shop_name }}</h4>
-                <p class="text-xs text-gray-400 mb-4 flex items-center justify-center gap-1">
-                    <i class="fas fa-check-circle text-green-500"></i> Verified Seller
+                <h3 class="mt-4 font-semibold text-gray-900 line-clamp-1">
+                    {{ $store->shop_name }}
+                </h3>
+                <p class="mt-1 text-xs text-gray-500">
+                    {{ $store->user->products()->count() }} Products
                 </p>
-                <a href="{{ route('stores.show',$store) }}" class="inline-block w-full py-2.5 text-sm font-semibold text-purple-700 bg-purple-50 rounded-xl hover:bg-purple-100 transition">
+                <div class="mt-2 flex items-center justify-center gap-1 text-xs text-green-600">
+                    <i class="fas fa-check-circle"></i>
+                    Verified Seller
+                </div>
+                <a href="{{ route('stores.show', $store) }}"
+                    class="mt-4 inline-flex items-center justify-center w-full rounded-lg bg-violet-50 px-4 py-2 text-sm font-medium text-violet-700 transition hover:bg-violet-100">
                     Visit Store
                 </a>
             </div>
             @endforeach
-           @endif
         </div>
     </div>
 </section>

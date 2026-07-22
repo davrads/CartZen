@@ -12,7 +12,11 @@ class StoreController extends Controller
      */
     public function index()
     {
-        $stores = VendorProfile::paginate(6);
+        $stores = VendorProfile::where('status', 'approved')
+            ->withCount('products')
+            ->latest()
+            ->paginate(12);
+
         return view('stores.index', compact('stores'));
     }
 
@@ -39,12 +43,13 @@ class StoreController extends Controller
     {
 
 
-
         $stores = VendorProfile::all();
         $query = $vendorProfile
             ->user
             ->products()
             ->latest();
+
+
 
         //Brand Request Filtering
         if ($request->filled('brand')) {
@@ -104,7 +109,7 @@ class StoreController extends Controller
             ->values();
 
         $products = $query
-            ->paginate(6)
+            ->paginate(12)
             ->withQueryString();
 
         $productCount = $vendorProfile->user->products()->count();
@@ -121,12 +126,18 @@ class StoreController extends Controller
 
         $flashCount = $vendorProfile->user
             ->products()
-            ->whereHas('flashSale',function ($query) {
-                $query->where('is_active',true)
-                    ->where('start_date','<=',now())
-                    ->where('end_date','>=',now());
+            ->whereHas('flashSale', function ($query) {
+                $query->where('is_active', true)
+                    ->where('start_date', '<=', now())
+                    ->where('end_date', '>=', now());
             })
             ->count();
+
+        $recommendedStores = VendorProfile::where('id', '!=', $vendorProfile->id)
+            ->where('status', 'approved')
+            ->inRandomOrder()
+            ->take(6)
+            ->get();
 
 
         return view('stores.show', [
@@ -138,7 +149,8 @@ class StoreController extends Controller
             'productCount' => $productCount,
             'brandCount' => $brandCount,
             'featuredCount' => $featuredCount,
-            'flashCount' => $flashCount
+            'flashCount' => $flashCount,
+            'recommendedStores' => $recommendedStores
         ]);
     }
 

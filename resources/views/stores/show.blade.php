@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'All Products - CartZen')
+
 @section('content')
 
 <style>
@@ -33,7 +35,7 @@
         background-color: #4f46e5;
     }
 
-    /* Mobile drawer state classes */
+    /* Mobile drawer transitions */
     .drawer-closed {
         transform: translateX(100%);
         pointer-events: none;
@@ -44,13 +46,11 @@
         pointer-events: auto;
     }
 
-    /* Backdrop transition */
-    #mobile-filter-backdrop {
+    #mobileFilterBackdrop {
         transition: opacity 0.3s ease-in-out;
     }
 
-    /* Drawer transition */
-    #mobile-filter-drawer>div:last-child {
+    #mobile-filter-drawer>iv:last-child {
         transition: transform 0.3s ease-in-out;
     }
 </style>
@@ -120,7 +120,7 @@
         <div class="flex flex-col lg:flex-row gap-6">
 
             <!-- Desktop Sidebar (Hidden on Mobile) -->
-            <aside class="hidden lg:block w-72 shrink-0 bg-white border border-gray-200 rounded-xl p-6 h-fit shadow-sm">
+            <aside class="hidden lg:block w-72 shrink-0 sticky top-24 self-start bg-white border border-gray-200 rounded-xl p-6 shadow-sm max-h-[calc(100vh-7rem)] overflow-y-auto">
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-lg font-bold text-gray-900">Filters</h2>
                     <a href="{{ route('stores.show', $vendorProfile) }}" class="text-xs text-violet-600 hover:text-violet-800 font-medium">Reset</a>
@@ -221,6 +221,83 @@
                     </div>
                     @endforelse
                 </div>
+
+                <!-- Store Recommendation -->
+
+                @if($recommendedStores->isNotEmpty())
+                <section class="mt-20">
+
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900">
+                                Explore Other Stores
+                            </h2>
+                            <p class="text-sm text-gray-500 mt-1">
+                                Discover more trusted sellers on CartZen
+                            </p>
+                        </div>
+
+                        <a href="{{ route('stores.index') }}"
+                            class="text-violet-600 hover:text-violet-700 font-medium flex items-center gap-2">
+                            View All
+                            <i class="fas fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5">
+
+                        @foreach($recommendedStores as $store)
+                        <a href="{{ route('stores.show',$store) }}"
+                            class="bg-white rounded-2xl border border-gray-200 p-5 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-lg group">
+
+                            <div class="w-20 h-20 mx-auto rounded-full overflow-hidden bg-gray-100 mb-4">
+                                <img
+                                    src="{{ $store->shop_logo ? asset('storage/'.$store->shop_logo) : asset('images/no-store.png') }}"
+                                    class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                            </div>
+
+                            <h3 class="font-semibold text-gray-900 line-clamp-1">
+                                {{ $store->shop_name }}
+                            </h3>
+
+                            <p class="text-xs text-gray-500 mt-1">
+                                {{ $store->user->products()->count() }} Products
+                            </p>
+                        </a>
+                        @endforeach
+
+                    </div>
+
+                </section>
+                @else
+
+                <section class="mt-20">
+
+                    <div class="text-center bg-gray-50 rounded-2xl border border-dashed border-gray-200 py-16 px-6">
+
+                        <div class="w-20 h-20 mx-auto rounded-full bg-violet-100 flex items-center justify-center mb-5">
+                            <i class="fas fa-store text-3xl text-violet-600"></i>
+                        </div>
+
+                        <h3 class="text-xl font-semibold text-gray-900">
+                            No Other Stores Available
+                        </h3>
+
+                        <p class="text-gray-500 mt-2 max-w-md mx-auto">
+                            You're currently browsing one of the available stores. More verified stores will appear here as they join CartZen.
+                        </p>
+
+                        <a href="{{ route('products.index') }}"
+                            class="inline-flex items-center gap-2 mt-6 bg-violet-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-violet-700 transition">
+                            <i class="fas fa-shopping-bag"></i>
+                            Continue Shopping
+                        </a>
+
+                    </div>
+
+                </section>
+
+                @endif
             </main>
         </div>
     </div>
@@ -325,7 +402,6 @@
         const isOpen = !drawer.classList.contains('drawer-closed');
 
         if (isOpen) {
-            // Close
             drawer.classList.remove('drawer-open');
             drawer.classList.add('drawer-closed');
             drawerContent.classList.remove('translate-x-0');
@@ -357,7 +433,6 @@
         }
     };
 
-    // Optional: Add keyboard support (Escape key to close)
     document.addEventListener('keydown', function(event) {
         if (event.key === "Escape") {
             const drawer = document.getElementById('mobile-filter-drawer');
@@ -367,5 +442,4 @@
         }
     });
 </script>
-
 @endsection

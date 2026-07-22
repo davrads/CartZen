@@ -2,26 +2,84 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\FlashSale;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $flashSales = FlashSale::with('product')->latest()->limit(6)->get();
+        // dd($request->all());
+        $flashSales = FlashSale::with('product')->latest()->get();
 
-        $allProducts = Product::where('status', 'available')
-            ->with(['category', 'flashSale'])
-            ->latest()
-            ->paginate(12);
+        $query = Product::where('status', 'available')
+            ->with(['category', 'flashSale']);
 
-        return view('products.index', compact('allProducts', 'flashSales'));
+        $brandQuery = Product::where('status', 'available')
+            ->whereNotNull('brand');
+
+        //Category Filtering
+        if ($request->filled('category')) {
+            $query->whereIn('category_id', (array) $request->category);
+        }
+
+        //Brand Filtering
+        if ($request->filled('brand')) {
+            $query->whereIn('brand', (array) $request->brand);
+        }
+
+        //Price Filtering
+        if ($request->filled('min_price')) {
+            $query->whereRaw('COALESCE(sale_price, price) >= ?', [$request->min_price]);
+        }
+
+        if ($request->filled('max_price')) {
+            $query->whereRaw('COALESCE(sale_price, price) <= ?', [$request->max_price]);
+        }
+
+        $categories = Category::orderBy(
+            'name',
+            'asc'
+        )
+            ->get();
+
+        $brands = collect();
+
+        if ($request->filled('category')) {
+            $brands = Product::where('status', 'available')
+                ->whereIn('category_id', (array) $request->category)
+                ->whereNotNull('brand')
+                ->select('brand')
+                ->distinct()
+                ->orderBy('brand')
+                ->pluck('brand');
+        }
+
+        if ($request->boolean('on_sale')) {
+            $query->whereHas('flashSale', function ($q) {
+
+                $q->where('is_active', true)
+                    ->where('start_date', '<=', now())
+                    ->where('end_date', '>=', now());
+            });
+        }
+
+        $allProducts = $query->paginate(12)
+            ->withQueryString();
+
+        return view('products.index', compact(
+            'allProducts',
+            'flashSales',
+            'categories',
+            'brands'
+        ));
     }
 
     public function show(Product $product)
     {
+
         $product->load([
             'images',
             'variants',
@@ -32,7 +90,9 @@ class ProductController extends Controller
         $relatedProducts = Product::where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
             ->where('status', 'available')
-            ->limit(6)
+            ->with('flashSale')
+            ->inRandomOrder()
+            ->take(5)
             ->get();
 
         return view('products.show', compact('product', 'relatedProducts'));
@@ -52,8 +112,8 @@ class ProductController extends Controller
         $products = Product::where('status', 'available')
             ->where(function ($q) use ($query) {
                 $q->where('name', 'LIKE', "%{$query}%")
-                  ->orWhere('description', 'LIKE', "%{$query}%")
-                  ->orWhere('brand', 'LIKE', "%{$query}%");
+                    ->orWhere('description', 'LIKE', "%{$query}%")
+                    ->orWhere('brand', 'LIKE', "%{$query}%");
             })
             ->with(['category', 'flashSale']) // Eager Loading (N+1 Problem रोक्न)
             ->latest()

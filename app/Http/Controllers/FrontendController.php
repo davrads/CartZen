@@ -23,17 +23,17 @@ class FrontendController extends Controller
             ->take(6)
             ->get();
 
-       
+
 
         // Featured Products
-        $featuredProducts = Product::featured()
-            ->where('status', 'available')
-            ->take(8)
-            ->get();
+        // $featuredProducts = Product::featured()
+        //     ->where('status', 'available')
+        //     ->take(8)
+        //     ->get();
 
         $justForYouProducts = Product::where('status', 'available')
             ->latest()
-            ->take(12)
+            ->take(18)
             ->get();
 
         // Categories
@@ -48,30 +48,27 @@ class FrontendController extends Controller
 
         return view('frontend.home', compact(
             'flashSales',
-            'featuredProducts',
+            // 'featuredProducts',
             'categories',
             'stores',
             'justForYouProducts'
         ));
     }
 
-    public function shop(Request $request)
+    public function shopOnSale(Request $request)
     {
-        $query = Product::query();
-
-        // Optional: only products currently in flash sale
-        if ($request->boolean('flash')) {
-            $query->whereHas('flashSale', function ($q) {
-                $q->active();
-            });
-        }
-
-        $products = $query->paginate(12);
+        $flashSales = FlashSale::with([
+            'product.category',
+            'product.flashSale',
+        ])
+            ->active()          // Local scope on FlashSale model
+            ->latest()
+            ->paginate(12);
 
         $categories = Category::all();
 
         return view('frontend.shop', compact(
-            'products',
+            'flashSales',
             'categories'
         ));
     }
