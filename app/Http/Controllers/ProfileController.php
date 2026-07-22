@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileUpdateRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use App\Models\Order;
-
 
 class ProfileController extends Controller
 {
@@ -26,17 +26,64 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(Request $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        // Guard बाट customer तान्ने
+        $user = Auth::guard('customer')->user() ?? $request->user();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        // Validation Rules
+        $request->validate([
+            'name'  => ['required', 'string', 'max:255'],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('users')->ignore($user->id), // Table name यदि 'customers' हो भने 'customers' राख्नुहोस्
+            ],
+            'phone' => ['nullable', 'string', 'max:20'],
+        ]);
+
+        $user->fill([
+            'name'  => $request->name,
+            'email' => $request->email,
+        ]);
+
+        // Database मा phone column छ भने मात्र fill गर्ने
+        if (\Schema::hasColumn($user->getTable(), 'phone')) {
+            $user->phone = $request->phone;
         }
 
-        $request->user()->save();
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        $user->save();
+
+        return Redirect::back()->with('status', 'profile-updated')->with('success', 'Profile updated successfully!');
+    }
+
+    /**
+     * Update the user's password.
+     */
+    public function passwordUpdate(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'current_password' => ['required'],
+            'password'         => ['required', 'min:8', 'confirmed'],
+        ]);
+
+        $user = Auth::guard('customer')->user() ?? $request->user();
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return Redirect::back()->withErrors(['current_password' => 'The provided current password does not match.']);
+        }
+
+        $user->update([
+            'password' => Hash::make($request->password),
+        ]);
+
+        return Redirect::back()->with('success', 'Password updated successfully!');
     }
 
     /**
@@ -60,15 +107,18 @@ class ProfileController extends Controller
         return Redirect::to('/');
     }
     
+    /**
+     * Display customer order profile page
+     */
     public function profile()
-{
-    // लगइन भएको customer को मात्र अर्डरहरू तान्न (user_id को आधारमा)
-    // यहाँ Auth::guard('customer')->user()->id को प्रयोग गरिएको छ
-    $orders = Order::where('user_id', Auth::guard('customer')->user()->id)
-                   ->latest()
-                   ->get();
+    {
+        // लगइन भएको customer को मात्र अर्डरहरू तान्न (user_id को आधारमा)
+        // यहाँ Auth::guard('customer')->user()->id को प्रयोग गरिएको छ
+        $orders = Order::where('user_id', Auth::guard('customer')->user()->id)
+                       ->latest()
+                       ->get();
 
-    // compact('orders') गरेर डाटा भ्युमा पठाउने
-    return view('user_profile', compact('orders'));
-}
+        // compact('orders') गरेर डाटा भ्युमा पठाउने
+        return view('user_profile', compact('orders'));
+    }
 }

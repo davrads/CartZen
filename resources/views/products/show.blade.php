@@ -24,19 +24,6 @@
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
 
-    <!-- {{-- Breadcrumb --}}
-    <nav class="text-sm text-gray-500 flex items-center gap-2 mb-6" aria-label="Breadcrumb">
-        <a href="{{ route('home') }}" class="hover:text-violet-600 transition-colors">Home</a>
-        <span class="text-gray-400">/</span>
-        @if($product->category)
-        <a href="{{ route('categories.show', $product->category) }}" class="hover:text-violet-600 transition-colors">
-            {{ $product->category->name }}
-        </a>
-        <span class="text-gray-400">/</span>
-        @endif
-        <span class="font-medium text-gray-900 truncate">{{ $product->name }}</span>
-    </nav> -->
-
     <div class="flex flex-col lg:flex-row gap-8 lg:gap-12">
 
         {{-- Left: Image Gallery --}}
@@ -48,11 +35,11 @@
                     @php
                     $images = $product->images ?? collect();
                     if($product->thumbnail && $images->count() > 0) {
-                    if($images->first()->product_image !== $product->thumbnail) {
-                    $images = collect([$product->thumbnail])->merge($images);
-                    }
+                        if($images->first()->product_image !== $product->thumbnail) {
+                            $images = collect([$product->thumbnail])->merge($images);
+                        }
                     } elseif ($product->thumbnail) {
-                    $images = collect([$product->thumbnail]);
+                        $images = collect([$product->thumbnail]);
                     }
                     @endphp
 
@@ -85,13 +72,13 @@
                         $flashEnd = null;
 
                         if ($product->relationLoaded('flashSale') && $product->flashSale) {
-                        $now = now();
-                        $flashEnd = \Carbon\Carbon::parse($product->flashSale->end_date);
-                        if ($now->between($product->flashSale->start_date, $product->flashSale->end_date)) {
-                        $hasActiveFlash = true;
-                        $flashPrice = $product->flashSale->flash_price;
-                        $flashSaleId = $product->flashSale->id;
-                        }
+                            $now = now();
+                            $flashEnd = \Carbon\Carbon::parse($product->flashSale->end_date);
+                            if ($now->between($product->flashSale->start_date, $product->flashSale->end_date)) {
+                                $hasActiveFlash = true;
+                                $flashPrice = $product->flashSale->flash_price;
+                                $flashSaleId = $product->flashSale->id;
+                            }
                         }
                         @endphp
 
@@ -154,167 +141,164 @@
             $hasDiscount = false;
             $discountPercent = 0;
 
-            // 1. Priority 1: Flash Sale Price
             if($hasActiveFlash && $flashPrice > 0) {
-            $currentPrice = $flashPrice;
-            $hasDiscount = true;
-            $discountPercent = $originalPrice > 0 ? round((($originalPrice - $currentPrice) / $originalPrice) * 100) : 0;
+                $currentPrice = $flashPrice;
+                $hasDiscount = true;
+                $discountPercent = $originalPrice > 0 ? round((($originalPrice - $currentPrice) / $originalPrice) * 100) : 0;
             }
-            // 2. Priority 2: sale_price attribute
             elseif (isset($product->sale_price) && $product->sale_price > 0 && $product->sale_price < $originalPrice) {
-                $currentPrice=$product->sale_price;
+                $currentPrice = $product->sale_price;
                 $hasDiscount = true;
                 $discountPercent = round((($originalPrice - $currentPrice) / $originalPrice) * 100);
-                }
-                // 3. Priority 3: discounted_price attribute
-                elseif (isset($product->discounted_price) && $product->discounted_price > 0 && $product->discounted_price < $originalPrice) {
-                    $currentPrice=$product->discounted_price;
-                    $hasDiscount = true;
-                    $discountPercent = round((($originalPrice - $currentPrice) / $originalPrice) * 100);
-                    }
-                    @endphp
+            }
+            elseif (isset($product->discounted_price) && $product->discounted_price > 0 && $product->discounted_price < $originalPrice) {
+                $currentPrice = $product->discounted_price;
+                $hasDiscount = true;
+                $discountPercent = round((($originalPrice - $currentPrice) / $originalPrice) * 100);
+            }
+            @endphp
 
-                    <div class="flex items-end gap-3 sm:gap-4 flex-wrap bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                        <span class="text-3xl sm:text-4xl font-bold text-violet-600">
-                            Rs. {{ number_format($currentPrice, 2) }}
-                        </span>
+            <div class="flex items-end gap-3 sm:gap-4 flex-wrap bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                <span class="text-3xl sm:text-4xl font-bold text-violet-600">
+                    Rs. {{ number_format($currentPrice, 2) }}
+                </span>
 
-                        @if($hasDiscount)
-                        <span class="text-lg sm:text-xl text-gray-400 line-through mb-1">
-                            Rs. {{ number_format($originalPrice, 2) }}
-                        </span>
-                        <span class="bg-red-100 text-red-600 text-xs font-bold px-2.5 py-1 rounded-full mb-1">
-                            SAVE {{ $discountPercent }}%
-                        </span>
-                        @endif
-                    </div>
+                @if($hasDiscount)
+                <span class="text-lg sm:text-xl text-gray-400 line-through mb-1">
+                    Rs. {{ number_format($originalPrice, 2) }}
+                </span>
+                <span class="bg-red-100 text-red-600 text-xs font-bold px-2.5 py-1 rounded-full mb-1">
+                    SAVE {{ $discountPercent }}%
+                </span>
+                @endif
+            </div>
 
-                    {{-- Meta Info --}}
-                    <div class="text-sm text-gray-600 space-y-1">
-                        @if($product->brand)
-                        <p><span class="font-semibold text-gray-800">Brand:</span> {{ $product->brand }}</p>
-                        @endif
-                        <p><span class="font-semibold text-gray-800">SKU:</span> {{ $product->sku }}</p>
-                        @if($product->stock > 0)
-                        <p class="flex items-center gap-1.5 text-green-700 font-medium">
-                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                            In Stock ({{ $product->stock }} available)
-                        </p>
-                        @else
-                        <p class="flex items-center gap-1.5 text-red-700 font-medium">
-                            <span class="w-2 h-2 rounded-full bg-red-500"></span>
-                            Out of Stock
-                        </p>
-                        @endif
-                    </div>
+            {{-- Meta Info --}}
+            <div class="text-sm text-gray-600 space-y-1">
+                @if($product->brand)
+                <p><span class="font-semibold text-gray-800">Brand:</span> {{ $product->brand }}</p>
+                @endif
+                <p><span class="font-semibold text-gray-800">SKU:</span> {{ $product->sku }}</p>
+                @if($product->stock > 0)
+                <p class="flex items-center gap-1.5 text-green-700 font-medium">
+                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                    In Stock ({{ $product->stock }} available)
+                </p>
+                @else
+                <p class="flex items-center gap-1.5 text-red-700 font-medium">
+                    <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                    Out of Stock
+                </p>
+                @endif
+            </div>
 
-                    <hr class="border-gray-100">
+            <hr class="border-gray-100">
 
-                    {{-- Form --}}
-                    @if($product->stock > 0)
-                    <form action="{{ route('cart.add') }}" method="POST" class="space-y-6">
-                        @csrf
-                        <input type="hidden" name="product_id" value="{{ $product->id }}">
-                        <input type="hidden" name="price" id="selectedPrice" value="{{ $currentPrice }}">
+            {{-- Form --}}
+            @if($product->stock > 0)
+            <form action="{{ route('cart.add') }}" method="POST" class="space-y-6">
+                @csrf
+                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                <input type="hidden" name="price" id="selectedPrice" value="{{ $currentPrice }}">
 
-                        {{-- Flash Sale active हुँदा flash_sale_id पनि पठाइन्छ --}}
-                        @if($hasActiveFlash && $flashSaleId)
-                        <input type="hidden" name="flash_sale_id" value="{{ $flashSaleId }}">
-                        @endif
+                @if($hasActiveFlash && $flashSaleId)
+                <input type="hidden" name="flash_sale_id" value="{{ $flashSaleId }}">
+                @endif
 
-                        {{-- Variants --}}
-                        @if($product->variants && $product->variants->count() > 0)
-                        <div>
-                            <h3 class="text-sm font-semibold text-gray-800 mb-3">Select Variant</h3>
-                            <div class="relative">
-                                <select name="product_variant_id"
-                                    id="variantSelect"
-                                    class="w-full appearance-none border border-gray-300 rounded-xl p-4 pr-10 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-shadow cursor-pointer text-base">
-                                    <option value="">-- Select Option --</option>
-                                    @foreach($product->variants as $variant)
-                                    <option value="{{ $variant->id }}"
-                                        data-price="{{ $variant->price }}"
-                                        data-stock="{{ $variant->stock ?? $product->stock }}">
-                                        {{ $variant->color ?? 'Default' }} - {{ $variant->size ?? 'One Size' }} - Rs. {{ number_format($variant->price, 2) }}
-                                    </option>
-                                    @endforeach
-                                </select>
-                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
-                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                            <p id="variantPrice" class="mt-2 text-sm font-semibold text-violet-600 hidden">Selected Price: Rs. 0.00</p>
-                        </div>
-                        @else
-                        <input type="hidden" name="product_variant_id" value="">
-                        @endif
-
-                        {{-- Quantity --}}
-                        <div>
-                            <h3 class="text-sm font-semibold text-gray-800 mb-3">Quantity</h3>
-                            <div class="flex items-center w-full sm:w-48 border border-gray-300 rounded-2xl overflow-hidden bg-white">
-                                <button type="button" onclick="decreaseQuantity()" class="w-12 h-12 flex items-center justify-center text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-colors text-xl font-bold">-</button>
-                                <input id="quantity" type="number" name="quantity" value="1" min="1" max="{{ $product->stock }}" class="w-full h-12 text-center text-lg font-semibold text-gray-900 focus:outline-none">
-                                <button type="button" onclick="increaseQuantity()" class="w-12 h-12 flex items-center justify-center text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-colors text-xl font-bold">+</button>
-                            </div>
-                        </div>
-
-                        {{-- Actions --}}
-                        <div class="flex flex-col sm:flex-row gap-4 pt-2">
-                            <button type="submit" class="flex-1 bg-violet-600 hover:bg-violet-700 text-white font-semibold py-4 px-6 rounded-2xl transition-all shadow-lg hover:shadow-violet-500/30 active:scale-95 flex items-center justify-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-                                </svg>
-                                Add to Cart
-                            </button>
-                            <button type="submit" name="buy_now" value="1" class="flex-1 bg-gray-900 hover:bg-black text-white font-semibold py-4 px-6 rounded-2xl transition-all shadow-lg hover:shadow-gray-500/30 active:scale-95">
-                                Buy Now
-                            </button>
-                        </div>
-                    </form>
-                    @else
-                    <div class="text-center py-8 bg-gray-50 rounded-2xl border border-gray-200">
-                        <p class="text-gray-600 font-medium">This product is currently out of stock.</p>
-                        <button class="mt-4 text-violet-600 font-semibold hover:underline">Notify Me When Available</button>
-                    </div>
-                    @endif
-
-                    {{-- Short Description --}}
-                    @if($product->description)
-                    <div class="mt-4 border-t border-gray-100 pt-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Description</h3>
-                        <div class="prose prose-sm max-w-none text-gray-600 leading-relaxed">
-                            {!! nl2br(e($product->description)) !!}
-                        </div>
-                    </div>
-                    @endif
-
-                    @if($product->features)
-                    <div class="mt-4">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Key Features</h3>
-                        <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-600">
-                            @foreach(explode(',', $product->features) as $feature)
-                            <li class="flex items-center gap-2">
-                                <svg class="w-4 h-4 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                                </svg>
-                                {{ trim($feature) }}
-                            </li>
+                {{-- Variants --}}
+                @if($product->variants && $product->variants->count() > 0)
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-800 mb-3">Select Variant</h3>
+                    <div class="relative">
+                        <select name="product_variant_id"
+                            id="variantSelect"
+                            class="w-full appearance-none border border-gray-300 rounded-xl p-4 pr-10 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-shadow cursor-pointer text-base">
+                            <option value="">-- Select Option --</option>
+                            @foreach($product->variants as $variant)
+                            <option value="{{ $variant->id }}"
+                                data-price="{{ $variant->price }}"
+                                data-stock="{{ $variant->stock ?? $product->stock }}">
+                                {{ $variant->color ?? 'Default' }} - {{ $variant->size ?? 'One Size' }} - Rs. {{ number_format($variant->price, 2) }}
+                            </option>
                             @endforeach
-                        </ul>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
                     </div>
-                    @endif
+                    <p id="variantPrice" class="mt-2 text-sm font-semibold text-violet-600 hidden">Selected Price: Rs. 0.00</p>
+                </div>
+                @else
+                <input type="hidden" name="product_variant_id" value="">
+                @endif
+
+                {{-- Quantity --}}
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-800 mb-3">Quantity</h3>
+                    <div class="flex items-center w-full sm:w-48 border border-gray-300 rounded-2xl overflow-hidden bg-white">
+                        <button type="button" onclick="decreaseQuantity()" class="w-12 h-12 flex items-center justify-center text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-colors text-xl font-bold">-</button>
+                        <input id="quantity" type="number" name="quantity" value="1" min="1" max="{{ $product->stock }}" class="w-full h-12 text-center text-lg font-semibold text-gray-900 focus:outline-none">
+                        <button type="button" onclick="increaseQuantity()" class="w-12 h-12 flex items-center justify-center text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-colors text-xl font-bold">+</button>
+                    </div>
+                </div>
+
+                {{-- Actions --}}
+                <div class="flex flex-col sm:flex-row gap-4 pt-2">
+                    <button type="submit" class="flex-1 bg-violet-600 hover:bg-violet-700 text-white font-semibold py-4 px-6 rounded-2xl transition-all shadow-lg hover:shadow-violet-500/30 active:scale-95 flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                        </svg>
+                        Add to Cart
+                    </button>
+                    <button type="submit" name="buy_now" value="1" class="flex-1 bg-gray-900 hover:bg-black text-white font-semibold py-4 px-6 rounded-2xl transition-all shadow-lg hover:shadow-gray-500/30 active:scale-95">
+                        Buy Now
+                    </button>
+                </div>
+            </form>
+            @else
+            <div class="text-center py-8 bg-gray-50 rounded-2xl border border-gray-200">
+                <p class="text-gray-600 font-medium">This product is currently out of stock.</p>
+                <button class="mt-4 text-violet-600 font-semibold hover:underline">Notify Me When Available</button>
+            </div>
+            @endif
+
+            {{-- Short Description --}}
+            @if($product->description)
+            <div class="mt-4 border-t border-gray-100 pt-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Description</h3>
+                <div class="prose prose-sm max-w-none text-gray-600 leading-relaxed">
+                    {!! nl2br(e($product->description)) !!}
+                </div>
+            </div>
+            @endif
+
+            @if($product->features)
+            <div class="mt-4">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Key Features</h3>
+                <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-600">
+                    @foreach(explode(',', $product->features) as $feature)
+                    <li class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                        {{ trim($feature) }}
+                    </li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
 
         </div>
     </div>
 
-    @if($relatedProducts->isNotEmpty())
+    {{-- Related Products with Dynamic Filters, Price Range & Sort By --}}
+    @if(isset($relatedProducts))
     <section class="mt-16 lg:mt-24">
 
-        <!--Related Prodcuts Section Header -->
-        <div class="flex items-center justify-between mb-6">
+        <!-- Section Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b pb-4">
             <div>
                 <h2 class="text-2xl font-bold text-gray-900">
                     You May Also Like
@@ -324,19 +308,72 @@
                 </p>
             </div>
 
+            @if($product->category)
             <a href="{{ route('categories.show', $product->category) }}"
-                class="text-sm font-medium text-violet-600 hover:text-violet-700 flex items-center gap-2">
+                class="text-sm font-medium text-violet-600 hover:text-violet-700 flex items-center gap-2 self-start sm:self-auto">
                 View More
                 <i class="fas fa-arrow-right text-xs"></i>
             </a>
+            @endif
         </div>
 
-        <!-- Products -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
-            @foreach($relatedProducts as $related)
-            <x-product-card :product="$related" />
-            @endforeach
-        </div>
+        {{-- Dynamic Filter & Sort Controls --}}
+        <form method="GET" action="{{ url()->current() }}" id="filterForm" class="bg-gray-50 p-4 sm:p-6 rounded-2xl border border-gray-200 mb-8 space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+                
+                {{-- 1. Sort By Dropdown --}}
+                <div>
+                    <label for="sort_by" class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">Sort By</label>
+                    <select name="sort_by" id="sort_by" onchange="document.getElementById('filterForm').submit()" class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-violet-500">
+                        <option value="latest" {{ request('sort_by') == 'latest' ? 'selected' : '' }}>Latest Products</option>
+                        <option value="popular" {{ request('sort_by') == 'popular' ? 'selected' : '' }}>Most Popular</option>
+                        <option value="price_low_high" {{ request('sort_by') == 'price_low_high' ? 'selected' : '' }}>Price: Low to High</option>
+                        <option value="price_high_low" {{ request('sort_by') == 'price_high_low' ? 'selected' : '' }}>Price: High to Low</option>
+                    </select>
+                </div>
+
+                {{-- 2. Dynamic Price Range Slider --}}
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Max Price</label>
+                        <span class="text-sm font-bold text-violet-600">Rs. <span id="priceValue">{{ request('max_price', 50000) }}</span></span>
+                    </div>
+                    <input type="range" name="max_price" id="max_price" min="0" max="100000" step="500" value="{{ request('max_price', 50000) }}" 
+                        oninput="document.getElementById('priceValue').innerText = this.value"
+                        onchange="document.getElementById('filterForm').submit()"
+                        class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-violet-600">
+                </div>
+
+                {{-- 3. Stock Status Filter --}}
+                <div class="flex items-center gap-3">
+                    <label class="flex items-center gap-2 cursor-pointer bg-white px-4 py-2.5 rounded-xl border border-gray-300 w-full hover:bg-gray-100 transition-colors">
+                        <input type="checkbox" name="in_stock" value="1" {{ request('in_stock') ? 'checked' : '' }} onchange="document.getElementById('filterForm').submit()" class="rounded border-gray-300 text-violet-600 focus:ring-violet-500 w-4 h-4">
+                        <span class="text-sm font-medium text-gray-700">In Stock Only</span>
+                    </label>
+
+                    @if(request()->hasAny(['sort_by', 'max_price', 'in_stock']))
+                    <a href="{{ url()->current() }}" class="text-xs text-red-600 font-semibold underline hover:text-red-700 whitespace-nowrap">
+                        Reset Filters
+                    </a>
+                    @endif
+                </div>
+
+            </div>
+        </form>
+
+        <!-- Products Listing -->
+        @if($relatedProducts->isNotEmpty())
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+                @foreach($relatedProducts as $related)
+                <x-product-card :product="$related" />
+                @endforeach
+            </div>
+        @else
+            <div class="text-center py-10 bg-gray-50 rounded-2xl border border-dashed border-gray-300">
+                <p class="text-gray-500 font-medium">No products match your selected filters.</p>
+                <a href="{{ url()->current() }}" class="mt-2 inline-block text-violet-600 font-semibold text-sm hover:underline">Clear Filters</a>
+            </div>
+        @endif
 
     </section>
     @endif
