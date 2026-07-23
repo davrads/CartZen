@@ -325,9 +325,8 @@
                 <div>
                     <label for="sort_by" class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">Sort By</label>
                     <select name="sort_by" id="sort_by" onchange="document.getElementById('filterForm').submit()" class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-violet-500">
-                        <option value="latest" {{ request('sort_by') == 'latest' ? 'selected' : '' }}>Latest Products</option>
-                        <option value="popular" {{ request('sort_by') == 'popular' ? 'selected' : '' }}>Most Popular</option>
-                        <option value="price_low_high" {{ request('sort_by') == 'price_low_high' ? 'selected' : '' }}>Price: Low to High</option>
+                        <option value="latest" {{ request('sort_by') == 'latest' ? 'selected' : '' }}>Popular</option>
+                                                <option value="price_low_high" {{ request('sort_by') == 'price_low_high' ? 'selected' : '' }}>Price: Low to High</option>
                         <option value="price_high_low" {{ request('sort_by') == 'price_high_low' ? 'selected' : '' }}>Price: High to Low</option>
                     </select>
                 </div>
