@@ -18,6 +18,17 @@
             <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
         </svg>
     </button>
+
+    
+    <script>
+        setTimeout(() => {
+            const alert = document.getElementById('success-alert');
+            if(alert) {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            }
+        }, 5000);
+    </script>
 </div>
 @endif
 >
@@ -420,6 +431,15 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
+    // Auto Hide Success Alert after 5 seconds
+    setTimeout(function() {
+        let alertBox = document.getElementById('success-alert');
+        if (alertBox) {
+            alertBox.style.opacity = '0';
+            setTimeout(() => alertBox.remove(), 500); // Wait for transition animation
+        }
+    }, 5000); // 5000 milliseconds = 5 seconds
+
     var swiper = new Swiper(".mySwiper", {
         loop: true,
         autoplay: {
