@@ -10,10 +10,66 @@
                 </a>
             </div>
 
-            {{-- Desktop Search Form --}}
-            <div class="flex-1 max-w-3xl mx-6 hidden sm:block">
-                <form action="{{ route('search') }}" method="GET" class="relative group w-full">
-                    <div class="flex overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md focus-within:border-violet-500 focus-within:ring-2 focus-within:ring-violet-200 transition-all duration-300"> <input type="text"
+            {{-- Categories Dropdown + Desktop Search Form --}}
+            <div class="flex-1 max-w-4xl mx-4 hidden sm:flex items-center gap-3">
+                
+               
+                @php
+                   
+                    $navCategories = \App\Models\Category::whereNull('parent_id')
+                                        ->with('children')
+                                        ->take(8)
+                                        ->get();
+                @endphp
+
+                <div class="relative group">
+                    <button class="flex items-center gap-2 bg-gray-100 hover:bg-violet-50 text-gray-700 hover:text-violet-600 px-4 py-3 rounded-xl border border-gray-200 text-sm font-medium transition-all duration-200 whitespace-nowrap">
+                        <i class="fas fa-th-large text-violet-600"></i>
+                        <span>Categories</span>
+                        <i class="fas fa-chevron-down text-xs ml-1 transition-transform group-hover:rotate-180"></i>
+                    </button>
+
+                    {{-- Dropdown Menu Box --}}
+                    <div class="absolute left-0 top-full mt-2 w-64 bg-white border border-gray-100 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:invisible-none group-hover:visible transition-all duration-200 z-50 py-2">
+                        @forelse($navCategories as $cat)
+                            <div class="relative group/sub">
+                                <a href="{{ route('categories.show', $cat->slug ?? $cat->id) }}" class="flex items-center justify-between px-4 py-2.5 text-sm text-gray-700 hover:bg-violet-50 hover:text-violet-600 font-medium transition-colors">
+                                    <span>{{ $cat->name }}</span>
+                                    @if($cat->children && $cat->children->count() > 0)
+                                        <i class="fas fa-chevron-right text-xs text-gray-400"></i>
+                                    @endif
+                                </a>
+
+                               
+                                @if($cat->children && $cat->children->count() > 0)
+                                    <div class="absolute left-full top-0 ml-1 w-56 bg-white border border-gray-100 rounded-xl shadow-xl opacity-0 invisible group-hover/sub:opacity-100 group-hover/sub:visible transition-all duration-200 py-2">
+                                        @foreach($cat->children as $subCat)
+                                            <a href="{{ route('categories.show', $subCat->slug ?? $subCat->id) }}" class="block px-4 py-2 text-xs text-gray-600 hover:bg-violet-50 hover:text-violet-600">
+                                                {{ $subCat->name }}
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+                        @empty
+                            
+                            <a href="{{ route('categories.index') }}" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-violet-50 hover:text-violet-600">Electronics</a>
+                            <a href="{{ route('categories.index') }}" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-violet-50 hover:text-violet-600">Fashion & Clothing</a>
+                            <a href="{{ route('categories.index') }}" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-violet-50 hover:text-violet-600">Home & Kitchen</a>
+                            <a href="{{ route('categories.index') }}" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-violet-50 hover:text-violet-600">Beauty & Health</a>
+                        @endforelse
+
+                        <div class="border-t border-gray-100 my-1"></div>
+                        <a href="{{ route('categories.index') }}" class="block px-4 py-2 text-xs text-center font-semibold text-violet-600 hover:bg-violet-50">
+                            View All Categories &rarr;
+                        </a>
+                    </div>
+                </div>
+
+                {{-- Desktop Search Form --}}
+                <form action="{{ route('search') }}" method="GET" class="relative group flex-1">
+                    <div class="flex overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md focus-within:border-violet-500 focus-within:ring-2 focus-within:ring-violet-200 transition-all duration-300">
+                        <input type="text"
                             name="query"
                             value="{{ request('query') }}"
                             placeholder="Search any products in CartZen..."
@@ -53,7 +109,7 @@
             </div>
         </div>
 
-        {{-- Mobile Search Form (Mobile मा देखिने गरी) --}}
+       
         <div class="block sm:hidden pb-3">
             <form action="{{ route('search') }}" method="GET" class="relative w-full">
                 <div class="flex border border-gray-300 rounded-lg overflow-hidden bg-white">
@@ -70,6 +126,7 @@
             </form>
         </div>
 
+        {{-- Navigation Links --}}
         <div class="hidden md:flex items-center gap-8 py-3 border-t border-gray-100 text-sm">
 
             <a href="{{ route('shop-on-sale') }}"
@@ -94,17 +151,18 @@
 
         </div>
 
+        {{-- Mobile Drawer Menu --}}
         <div id="mobile-menu" class="hidden md:hidden pb-4 pt-2 border-t border-gray-100">
             <a href="{{ route('home') }}" class="block text-gray-700 hover:text-purple-600 font-medium px-3 py-2 rounded hover:bg-purple-50">Home</a>
             <a href="{{ route('shop-on-sale', ['slug' => 'mobiles-tablets']) }}" class="block text-gray-700 hover:text-purple-600 font-medium px-3 py-2 rounded hover:bg-purple-50">Shop</a>
-            <a href="/categories" class="block text-gray-700 hover:text-purple-600 font-medium px-3 py-2 rounded hover:bg-purple-50">Categories</a>
+            <a href="{{ route('categories.index') }}" class="block text-gray-700 hover:text-purple-600 font-medium px-3 py-2 rounded hover:bg-purple-50">Categories</a>
             <a href="{{ route('cart.index') }}" class="block text-gray-700 hover:text-purple-600 font-medium px-3 py-2 rounded hover:bg-purple-50">Cart</a>
         </div>
     </div>
 </nav>
 
 <script>
-    // मोबाइल मेनु खोल्ने र बन्द गर्ने सामान्य स्क्रिप्ट
+   
     const mobileMenuBtn = document.getElementById('mobile-menu-btn');
     const mobileMenu = document.getElementById('mobile-menu');
 
