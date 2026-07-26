@@ -44,3 +44,45 @@
         </div>
     </div>
 </footer>
+
+{{-- Floating Action Buttons (Bottom Right) --}}
+<div class="fixed bottom-5 right-5 z-50 flex flex-col gap-3 items-center">
+    {{-- WhatsApp Button --}}
+    {{-- Note: '9779825836433' को ठाउँमा  WhatsApp नम्बर राख्नुहोस् --}}
+    <a href="https://wa.me/9779825836433?text=Hello%20CartZen,%20I%20have%20a%20query." 
+       target="_blank" 
+       rel="noopener noreferrer"
+       class="bg-[#25D366] hover:bg-[#20ba5a] text-white p-3 rounded-full shadow-lg hover:scale-110 transition-all duration-300 flex items-center justify-center text-xl"
+       aria-label="Chat on WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    {{-- Back to Top Button (Initially Hidden) --}}
+    <button id="backToTopBtn" 
+            onclick="scrollToTop()"
+            class="hidden bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-full shadow-lg hover:scale-110 transition-all duration-300 flex items-center justify-center text-sm"
+            aria-label="Back to top">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+</div>
+
+{{-- Dynamic JavaScript --}}
+<script>
+    const backToTopBtn = document.getElementById('backToTopBtn');
+
+  
+    window.onscroll = function() {
+        if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+            backToTopBtn.classList.remove('hidden');
+        } else {
+            backToTopBtn.classList.add('hidden');
+        }
+    };
+
+    function scrollToTop() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
+</script>
