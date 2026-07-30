@@ -17,6 +17,7 @@ class OrderItem extends Model
         'price',
         'shipping_cost',
         'status',
+        'inventory_restored',
     ];
 
    

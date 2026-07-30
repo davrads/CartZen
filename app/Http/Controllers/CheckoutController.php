@@ -162,12 +162,24 @@ class CheckoutController extends Controller
                     'vendor_id'     => $item->product->vendor_id,
                     'quantity'      => $item->quantity,
                     'price'         => $item->price,
-                    'shipping_cost' => 0,
+                    'shipping_cost' => 100,
                     'status'       => 'pending',
                 ]);
 
-                $product = Product::find($item->product_id);
+                $product = $item->product;
+                if (! $product) {
+                    continue;
+                }
+                if ($product->stock < $item->quantity) {
+                    throw new \Exception("Insufficient stock for {$product->name}");
+                }
                 $product->decrement('stock', $item->quantity);
+
+                $product->status = $product->stock > 0
+                    ? 'available'
+                    : 'out_of_stock';
+
+                $product->save();
             }
 
             // ✅ FIX: Khalti भएमा cart delete/commit गर्नु अघि पहिले payment initiate गर्ने।
@@ -195,7 +207,6 @@ class CheckoutController extends Controller
             }
 
             return redirect()->route('home')->with('success', 'Order placed!');
-
         } catch (\Exception $e) {
             DB::rollBack();
             // ✅ FIX: back() को साटो checkout मा नै error देखाउने
@@ -217,17 +228,17 @@ class CheckoutController extends Controller
         ])
             ->when(app()->environment('local'), fn($http) => $http->withoutVerifying())
             ->post($url, [
-            'return_url' => route('khalti.verify'),
-            'website_url' => url('/'),
-            'amount' => $order->total_amount * 100,
-            'purchase_order_id' => $order->order_number,
-            'purchase_order_name' => 'Order #' . $order->order_number,
-            'customer_info' => [
-                'name'  => auth()->guard('customer')->user()->name,
-                'email' => auth()->guard('customer')->user()->email,
-                'phone' => auth()->guard('customer')->user()->phone ?? '9800000000',
-            ],
-        ]);
+                'return_url' => route('khalti.verify'),
+                'website_url' => url('/'),
+                'amount' => $order->total_amount * 100,
+                'purchase_order_id' => $order->order_number,
+                'purchase_order_name' => 'Order #' . $order->order_number,
+                'customer_info' => [
+                    'name'  => auth()->guard('customer')->user()->name,
+                    'email' => auth()->guard('customer')->user()->email,
+                    'phone' => auth()->guard('customer')->user()->phone ?? '9800000000',
+                ],
+            ]);
 
         if ($response->successful()) {
             $data = $response->json();
@@ -255,8 +266,8 @@ class CheckoutController extends Controller
         ])
             ->when(app()->environment('local'), fn($http) => $http->withoutVerifying())
             ->post($url, [
-            'pidx' => $pidx,
-        ]);
+                'pidx' => $pidx,
+            ]);
 
         if ($response->successful()) {
             $data = $response->json();

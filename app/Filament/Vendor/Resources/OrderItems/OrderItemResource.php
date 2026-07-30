@@ -24,7 +24,7 @@ class OrderItemResource extends Resource
     protected static ?string $model = OrderItem::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedShoppingBag;
-    protected static ?string $navigationLabel = 'Orders FulFillment';
+    protected static ?string $navigationLabel = 'Customer Orders';
 
     protected static string|UnitEnum|null $navigationGroup = 'Sales';
 

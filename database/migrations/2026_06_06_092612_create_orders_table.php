@@ -21,7 +21,7 @@ return new class extends Migration
             $table->decimal('tax', 10, 2);
             $table->decimal('discount', 10, 2);
             $table->decimal('total_amount', 10, 2);
-            $table->enum('status', ['pending', 'processing', 'shipped', 'delivered', 'cancelled'])->default('pending');
+            $table->enum('status', ['pending', 'processing','packed', 'shipped', 'delivered', 'cancelled'])->default('pending');
             $table->timestamps();
         });
     }
