@@ -42,7 +42,7 @@ class Product extends Model
         'stock_quantity' => 'integer',
     ];
 
-   
+
 
     public function vendor()
     {
@@ -74,10 +74,24 @@ class Product extends Model
         return $this->hasOne(FlashSale::class);
     }
 
-   public function getIsFlashSaleAttribute()
-{
-    return $this->flashSale()->exists();
-}
+    public function getIsFlashSaleAttribute()
+    {
+        return $this->flashSale()->exists();
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+    public function averageRating()
+    {
+        return $this->reviews()->avg('rating') ?? 0;
+    }
+
+    public function totalReviews()
+    {
+        return $this->reviews()->count();
+    }
 
     public function scopeFeatured($query)
     {
@@ -86,7 +100,7 @@ class Product extends Model
             ->where('status', 'available');
     }
 
- 
+
 
     public function getRouteKeyName()
     {

@@ -70,7 +70,12 @@ class User extends Authenticatable implements FilamentUser
     }
 
     public function vendorOrderItems()
-{
-    return $this->hasMany(OrderItem::class, 'vendor_id');
-}
+    {
+        return $this->hasMany(OrderItem::class, 'vendor_id');
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 }

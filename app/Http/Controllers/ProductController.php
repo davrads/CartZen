@@ -102,8 +102,29 @@ class ProductController extends Controller
             'images',
             'variants',
             'category',
-            'flashSale'
+            'flashSale',
+            'reviews.user',
         ]);
+
+        $reviews = $product->reviews()
+            ->latest()
+            ->get();
+
+        $averageRating = 0;
+        $totalReviews = $reviews->count();
+        $ratingBreakdown = [5=>0, 4=>0, 3=>0, 2=>0, 1=>0] ;
+
+        if ($totalReviews > 0) {
+            $averageRating = round($reviews->avg('rating'),1);
+        }
+        $ratingBreakdown = [
+            5 => $reviews->where('rating', 5)->count(),
+            4 => $reviews->where('rating', 4)->count(),
+            3 => $reviews->where('rating', 3)->count(),
+            2 => $reviews->where('rating', 2)->count(),
+            1 => $reviews->where('rating', 1)->count(),
+        ];
+
 
         // Related Products Query Construction
         $relatedQuery = Product::where('category_id', $product->category_id)
@@ -146,7 +167,7 @@ class ProductController extends Controller
 
         $relatedProducts = $relatedQuery->take(10)->get();
 
-        return view('products.show', compact('product', 'relatedProducts'));
+        return view('products.show', compact('product','reviews','averageRating','totalReviews','ratingBreakdown', 'relatedProducts'));
     }
 
     public function search(Request $request)

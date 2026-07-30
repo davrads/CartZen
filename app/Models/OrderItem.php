@@ -36,4 +36,8 @@ class OrderItem extends Model
     {
         return $this->belongsTo(User::class, 'vendor_id');
     }
+
+    public function review(){
+        return $this->hasOne(Review::class);
+    }
 }

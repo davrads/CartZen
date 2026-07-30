@@ -32,7 +32,7 @@ class CustomerProfileController extends Controller
         $user->email = $request->email;
 
         // यदि customer table मा phone column छ भने:
-        if (\Schema::hasColumn($user->getTable(), 'phone')) {
+        if (Schema::hasColumn($user->getTable(), 'phone')) {
             $user->phone = $request->phone;
         }
 
