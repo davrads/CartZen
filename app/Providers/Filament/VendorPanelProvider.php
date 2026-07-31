@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Vendor\Pages\SalesAnalytics;
 use App\Filament\Vendor\Widgets\VendorStatsOverview;
 use App\Filament\Vendor\Widgets\LatestProducts;
 use App\Filament\Vendor\Widgets\MonthlySalesChart;
@@ -45,6 +46,7 @@ class VendorPanelProvider extends PanelProvider
             )
             ->pages([
                 Dashboard::class,
+                SalesAnalytics::class
             ])
             ->discoverWidgets(
                 in: app_path('Filament/Widgets'),
