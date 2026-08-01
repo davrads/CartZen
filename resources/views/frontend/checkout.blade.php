@@ -338,6 +338,12 @@
                                     {{ number_format($cartSubtotal ?? 0) }}</span>
                             </div>
                             <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-500">Shipping Charge</span>
+                                <span class="mono text-sm text-gray-700 font-medium">
+                                    Rs. {{ number_format($shippingCharge ?? ($shipping_charge ?? 0)) }}
+                                </span>
+                            </div>
+                            <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500">Delivery Fee</span>
                                 <span class="mono text-sm font-bold text-green-500">Free</span>
                             </div>
@@ -347,7 +353,7 @@
                             class="flex justify-between items-center bg-violet-50 border border-violet-100 rounded-xl px-4 py-3.5 mt-4">
                             <span class="font-bold text-gray-900 text-base">Total Amount</span>
                             <span class="mono font-extrabold text-violet-600 text-lg">Rs.
-                                {{ number_format($cartSubtotal ?? 0) }}</span>
+                                {{ number_format(($cartSubtotal ?? 0) + ($shippingCharge ?? ($shipping_charge ?? 0))) }}</span>
                         </div>
 
                         <button type="submit" id="placeOrderBtn"

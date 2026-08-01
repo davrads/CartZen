@@ -39,7 +39,7 @@ class CheckoutController extends Controller
         $vendorsData = [];
         $cartSubtotal = 0;
         $totalDiscount = 0;
-        $totalShipping = 0;
+        $shippingCharge = 0; // $totalShipping को सट्टा $shippingCharge राखिएको छ
 
         foreach ($grouped as $vendorId => $items) {
             $vendor = $items->first()->product->vendor;
@@ -48,7 +48,7 @@ class CheckoutController extends Controller
             });
 
             $vendorDiscount = 0; // placeholder
-            $vendorShipping = optional($vendor->vendorProfile)->shipping_rate ?? 50;
+            $vendorShipping = optional($vendor->vendorProfile)->shipping_rate ?? 100;
 
             $vendorsData[] = [
                 'vendor_id'   => $vendorId,
@@ -60,23 +60,24 @@ class CheckoutController extends Controller
                 'total'       => $vendorSubtotal - $vendorDiscount + $vendorShipping,
             ];
 
-            $cartSubtotal  += $vendorSubtotal;
-            $totalDiscount += $vendorDiscount;
-            $totalShipping += $vendorShipping;
+            $cartSubtotal   += $vendorSubtotal;
+            $totalDiscount  += $vendorDiscount;
+            $shippingCharge += $vendorShipping;
         }
 
-        $grandTotal = $cartSubtotal - $totalDiscount + $totalShipping;
+        $grandTotal = $cartSubtotal - $totalDiscount + $shippingCharge;
 
         $addresses = Address::where('user_id', $user->id)->get();
 
+        // Blade ले चिन्ने भ्यारिएबलहरू ($shippingCharge, $shipping_charge) दुवै थपिएका छन्
         return view('frontend.checkout', compact(
             'vendorsData',
             'cartSubtotal',
             'totalDiscount',
-            'totalShipping',
+            'shippingCharge',
             'grandTotal',
             'addresses'
-        ));
+        ))->with('shipping_charge', $shippingCharge);
     }
 
     public function placeOrder(Request $request)
@@ -122,7 +123,7 @@ class CheckoutController extends Controller
         foreach ($grouped as $vendorId => $items) {
             $vendorSubtotal = $items->sum(fn($i) => $i->price * $i->quantity);
             $vendorDiscount = 0;
-            $vendorShipping = optional($items->first()->product->vendor->vendorProfile)->shipping_rate ?? 50;
+            $vendorShipping = optional($items->first()->product->vendor->vendorProfile)->shipping_rate ?? 100;
 
             $meta['vendors'][$vendorId] = [
                 'subtotal' => $vendorSubtotal,
@@ -163,7 +164,7 @@ class CheckoutController extends Controller
                     'quantity'      => $item->quantity,
                     'price'         => $item->price,
                     'shipping_cost' => 100,
-                    'status'       => 'pending',
+                    'status'        => 'pending',
                 ]);
 
                 $product = $item->product;
