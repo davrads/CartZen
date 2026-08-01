@@ -47,6 +47,7 @@ class StoreController extends Controller
         $query = $vendorProfile
             ->user
             ->products()
+            ->approved()
             ->latest();
 
 
@@ -66,6 +67,7 @@ class StoreController extends Controller
         }
 
         $brands = $vendorProfile->user->products()
+            ->approved()
             ->whereNotNull('brand')
             ->pluck('brand')
             ->unique();
@@ -80,6 +82,7 @@ class StoreController extends Controller
         }
 
         $colors = $vendorProfile->user->products()
+            ->approved()
             ->with('variants')
             ->get()
             ->pluck('variants')
@@ -99,6 +102,7 @@ class StoreController extends Controller
         }
 
         $sizes = $vendorProfile->user->products()
+            ->approved()
             ->with('variants')
             ->get()
             ->pluck('variants')
@@ -112,20 +116,27 @@ class StoreController extends Controller
             ->paginate(12)
             ->withQueryString();
 
-        $productCount = $vendorProfile->user->products()->count();
+        $productCount = $vendorProfile
+        ->user
+        ->products()
+        ->approved()
+        ->count();
 
         $brandCount = $vendorProfile->user
             ->products()
+            ->approved()
             ->distinct('brand')
             ->count('brand');
 
         $featuredCount = $vendorProfile->user
             ->products()
+            ->approved()
             ->where('featured', true)
             ->count();
 
         $flashCount = $vendorProfile->user
             ->products()
+            ->approved()
             ->whereHas('flashSale', function ($query) {
                 $query->where('is_active', true)
                     ->where('start_date', '<=', now())

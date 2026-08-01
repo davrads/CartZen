@@ -30,6 +30,10 @@ class Product extends Model
         'featured',
         'is_active',
         'is_featured',
+        'verification_status',
+        'verified_by',
+        'verified_at',
+        'rejection_reason',
     ];
 
     protected $casts = [
@@ -40,10 +44,15 @@ class Product extends Model
         'is_featured' => 'boolean',
         'stock' => 'integer',
         'stock_quantity' => 'integer',
+        'verified_at' => 'datetime',
     ];
 
 
-
+    public function verifier()
+    {
+        return $this->belongsTo(User::class, 'verified_by');
+    }
+    
     public function vendor()
     {
         return $this->belongsTo(User::class, 'vendor_id');
@@ -93,10 +102,10 @@ class Product extends Model
         return $this->reviews()->count();
     }
 
-    public function scopeFeatured($query)
+    public function scopeApproved($query)
     {
         return $query
-            ->where('featured', true)
+            ->where('verification_status','approved')
             ->where('status', 'available');
     }
 

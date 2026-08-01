@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources\Products\Schemas;
 
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -37,7 +38,8 @@ class ProductForm
                         TextInput::make('name')
                             ->required()
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn (string $operation, $state, $set) =>
+                            ->afterStateUpdated(
+                                fn(string $operation, $state, $set) =>
                                 $operation === 'create'
                                     ? $set('slug', Str::slug($state))
                                     : null
@@ -81,24 +83,7 @@ class ProductForm
                     ])
                     ->columns(2),
 
-                // Section::make('Marketing')
-                //     ->schema([
 
-                //         Toggle::make('featured')
-                //             ->label('Featured Product')
-                //             ->default(false),
-
-                //         Toggle::make('is_flash_deal')
-                //             ->label('Flash Deal')
-                //             ->live(),
-
-                //         DateTimePicker::make('flash_deal_ends_at')
-                //             ->label('Flash Deal Ends At')
-                //             ->visible(fn ($get) => $get('is_flash_deal'))
-                //             ->required(fn ($get) => $get('is_flash_deal')),
-
-                //     ])
-                //     ->columns(2),
 
                 Section::make('Product Gallery')
                     ->schema([
@@ -138,6 +123,44 @@ class ProductForm
 
                             ])
                             ->columns(2),
+
+                        Section::make('Product Verification')
+                            ->description('Marketplace verification details')
+                            ->icon('heroicon-o-shield-check')
+                            ->schema([
+
+                                Select::make('verification_status')
+                                    ->label('Verification Status')
+                                    ->options([
+                                        'pending' => 'Pending',
+                                        'approved' => 'Approved',
+                                        'rejected' => 'Rejected',
+                                    ])
+                                    ->required()
+                                    ->live(),
+
+                                Placeholder::make('verified_by_name')
+                                    ->label('Verified By')
+                                    ->content(fn($record) => $record?->verifier?->name ?? 'Not Verified'),
+
+                                Placeholder::make('verified_at_display')
+                                    ->label('Verified At')
+                                    ->content(
+                                        fn($record) =>
+                                        $record?->verified_at
+                                            ? $record->verified_at->format('M d, Y h:i A')
+                                            : 'Not Verified'
+                                    ),
+
+                                Textarea::make('rejection_reason')
+                                    ->label('Rejection Reason')
+                                    ->rows(4)
+                                    ->visible(fn($get) => $get('verification_status') === 'rejected')
+                                    ->required(fn($get) => $get('verification_status') === 'rejected'),
+
+                            ])
+                            ->columns(2)
+                            ->columnSpanFull(),
 
                     ]),
             ]);

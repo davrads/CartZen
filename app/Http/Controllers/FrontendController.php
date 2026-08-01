@@ -15,10 +15,15 @@ class FrontendController extends Controller
         // Active Flash Sales
         $flashSales = FlashSale::active()
             ->with([
-                'product',
+                'product' => function ($query) {
+                    $query->approved();
+                },
                 'product.category',
                 'product.vendor',
             ])
+            ->whereHas('product', function ($query) {
+                $query->approved();
+            })
             ->orderBy('end_date')
             ->take(6)
             ->get();
@@ -31,7 +36,7 @@ class FrontendController extends Controller
         //     ->take(8)
         //     ->get();
 
-        $justForYouProducts = Product::where('status', 'available')
+        $justForYouProducts = Product::approved()
             ->latest()
             ->take(18)
             ->get();
@@ -42,7 +47,8 @@ class FrontendController extends Controller
             ->get();
 
         // Approved Vendors
-        $stores = VendorProfile::latest()
+        $stores = VendorProfile::where('status', 'approved')
+            ->latest()
             ->take(6)
             ->get();
 
@@ -58,9 +64,15 @@ class FrontendController extends Controller
     public function shopOnSale(Request $request)
     {
         $flashSales = FlashSale::with([
+            'product' => function ($query) {
+                $query->approved();
+            },
             'product.category',
             'product.flashSale',
         ])
+            ->whereHas('product', function ($query) {
+                $query->approved();
+            })
             ->active()          // Local scope on FlashSale model
             ->latest()
             ->paginate(12);
@@ -75,7 +87,9 @@ class FrontendController extends Controller
 
     public function productShow($slug)
     {
-        $product = Product::where('slug', $slug)->firstOrFail();
+        $product = Product::approved()
+        ->where('slug', $slug)
+        ->firstOrFail();
 
         return view('frontend.product', compact('product'));
     }
@@ -84,7 +98,7 @@ class FrontendController extends Controller
     {
         $vendor = VendorProfile::findOrFail($id);
 
-        $products = Product::where('vendor_id', $vendor->user_id)
+        $products = Product::approved()->where('vendor_id', $vendor->user_id)
             ->paginate(12);
 
         return view('frontend.vendor-store', compact(

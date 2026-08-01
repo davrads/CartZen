@@ -13,7 +13,7 @@ class CategoryController extends Controller
         $categories = Category::all();
 
         // 1. Query builder तयार गर्ने
-        $query = Product::query();
+        $query = Product::approved();
 
         // Price Filter
         if ($request->has('prices') && is_array($request->prices)) {
@@ -56,7 +56,7 @@ class CategoryController extends Controller
         $categories = Category::all();
 
         // Category अनुसारको Product Query
-        $query = $category->products();
+        $query = $category->products()->approved();
 
         // Price Filter
         if ($request->has('prices') && is_array($request->prices)) {

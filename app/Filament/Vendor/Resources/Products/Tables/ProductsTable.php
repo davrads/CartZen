@@ -57,12 +57,27 @@ class ProductsTable
                         'danger' => 'out_of_stock',
                     ]),
 
-                IconColumn::make('featured')
-                    ->label('Featured')
-                    ->boolean(),
+                // IconColumn::make('featured')
+                //     ->label('Featured')
+                //     ->boolean(),
 
                 TextColumn::make('updated_at')
                     ->since(),
+
+                TextColumn::make('verification_status')
+                    ->label('Verification')
+                    ->badge()
+                    ->sortable()
+                    ->tooltip(fn ($record)=>
+                    $record->verification_status === 'rejected'
+                        ? $record->rejection_reason
+                        : null)
+                    ->color(fn(string $state): string => match ($state) {
+                        'approved' => 'success',
+                        'pending' => 'warning',
+                        'rejected' => 'danger',
+                        default => 'gray',
+                    }),
             ])
             ->filters([
                 SelectFilter::make('status')
@@ -78,6 +93,7 @@ class ProductsTable
             ])
             ->recordActions([
                 EditAction::make(),
+                
             ])
             // ->headerActions([
             //     CreateAction::make()

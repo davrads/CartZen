@@ -12,7 +12,10 @@ class CreateProduct extends CreateRecord
      protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['vendor_id'] = Auth::user()->id;
-
+        $data['verification_status'] = 'pending';
+        $data['verified_by'] = null;
+        $data['verified_at'] = null;
+        $data['rejection_reason'] = null;
         return $data;
     }
 }

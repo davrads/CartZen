@@ -78,7 +78,7 @@ class CartController extends Controller
             'product_variant_id' => 'nullable|exists:product_variants,id'
         ]);
 
-        $product = Product::findOrFail($request->product_id);
+        $product = Product::approved()->findOrFail($request->product_id);
         $userCart = $this->getOrCreateUserCart();
         
         $quantity = $request->quantity ?? 1;
@@ -212,7 +212,7 @@ class CartController extends Controller
 
         if (isset($wishlist[$id])) {
             $userCart = $this->getOrCreateUserCart();
-            $product = Product::find($id);
+            $product = Product::approved()->find($id);
 
             if ($product) {
                 $finalPrice = $wishlist[$id]['price'] ?? ($product->discounted_price ?? $product->price);

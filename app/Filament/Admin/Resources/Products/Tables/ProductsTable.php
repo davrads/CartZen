@@ -2,14 +2,18 @@
 
 namespace App\Filament\Admin\Resources\Products\Tables;
 
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class ProductsTable
 {
@@ -45,6 +49,23 @@ class ProductsTable
                 TextColumn::make('status')
                     ->badge(),
 
+                TextColumn::make('verification_status')
+                    ->label('Verification')
+                    ->badge()
+                    ->sortable()
+                    ->searchable()
+                    ->color(fn(string $state) => match ($state) {
+                        'approved' => 'success',
+                        'pending' => 'warning',
+                        'rejected' => 'danger',
+                        default => 'gray',
+                    }),
+
+                TextColumn::make('rejection_reason')
+                    ->limit(40)
+                    ->tooltip(fn($record) => $record->rejection_reason)
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 IconColumn::make('featured')
                     ->label('Featured')
                     ->boolean()
@@ -53,17 +74,19 @@ class ProductsTable
                     ->trueColor('warning')
                     ->falseColor('gray'),
 
-                IconColumn::make('is_flash_deal')
+                IconColumn::make('flash_sale')
                     ->label('Flash Deal')
+                    ->state(fn($record) => $record->flashSale()->exists())
                     ->boolean()
                     ->trueIcon('heroicon-o-bolt')
                     ->falseIcon('heroicon-o-x-mark')
                     ->trueColor('success')
-                    ->falseColor('danger'),
+                    ->falseColor('gray'),
 
-                TextColumn::make('flash_deal_ends_at')
+                TextColumn::make('flashSale.end_date')
                     ->label('Flash Ends')
-                    ->dateTime()
+                    ->dateTime('d M Y, h:i A')
+                    ->placeholder('-')
                     ->sortable(),
 
                 TextColumn::make('images_count')
@@ -80,13 +103,66 @@ class ProductsTable
                 TernaryFilter::make('featured')
                     ->label('Featured'),
 
-                TernaryFilter::make('is_flash_deal')
-                    ->label('Flash Deal'),
+                TernaryFilter::make('flash_sale')
+                    ->label('Flash Deal')
+                    ->queries(
+                        true: fn($query) => $query->whereHas('flashSale'),
+                        false: fn($query) => $query->whereDoesntHave('flashSale'),
+                        blank: fn($query) => $query,
+                    ),
+
+                SelectFilter::make('verification_status')
+                    ->options([
+                        'approved' => 'Approved',
+                        'pending' => 'Pending',
+                        'rejected' => 'Rejected',
+                    ]),
 
             ])
 
             ->recordActions([
                 EditAction::make(),
+                Action::make('approve')
+                    ->label('Approve')
+                    ->color('success')
+                    ->icon('heroicon-o-check-circle')
+
+                    ->visible(fn($record) => $record->verification_status !== 'approved')
+                    ->successNotificationTitle('Product approved successfully')
+                    ->requiresConfirmation()
+                    ->action(function ($record) {
+                        $record->update([
+                            'verification_status' => 'approved',
+                            'verified_by' => Auth::id(),
+                            'verified_at' => now(),
+                            'rejection_reason' => null,
+                        ]);
+                    }),
+
+                Action::make('reject')
+                    ->label('Reject')
+                    ->color('danger')
+                    ->icon('heroicon-o-x-circle')
+                    ->visible(
+                        fn($record) =>
+                        $record->verification_status !== 'rejected'
+                    )
+                    ->successNotificationTitle('Product rejected successfully')
+                    ->requiresConfirmation()
+                    ->form([
+                        Textarea::make('reason')
+                            ->label('Rejection Reason')
+                            ->required()
+                            ->rows(5),
+                    ])
+                    ->action(function ($record, array $data) {
+                        $record->update([
+                            'verification_status' => 'rejected',
+                            'verified_by' => Auth::id(),
+                            'verified_at' => now(),
+                            'rejection_reason' => $data['reason'],
+                        ]);
+                    }),
             ])
 
             ->toolbarActions([
