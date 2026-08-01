@@ -57,8 +57,6 @@ class VendorPanelProvider extends PanelProvider
                 RecentOrders::class,
                 VendorStatsOverview::class,
                 LatestProducts::class,
-                AccountWidget::class,
-                FilamentInfoWidget::class,
                 MonthlySalesChart::class
             ])
             ->middleware([

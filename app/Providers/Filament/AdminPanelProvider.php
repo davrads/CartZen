@@ -2,6 +2,12 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Admin\Widgets\AdminStatsOverview;
+use App\Filament\Admin\Widgets\LowStockProducts;
+use App\Filament\Admin\Widgets\MonthlyRevenueChart;
+use App\Filament\Admin\Widgets\OrderStatusChart;
+use App\Filament\Admin\Widgets\PendingProducts;
+use App\Filament\Admin\Widgets\RecentOrders;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -24,10 +30,11 @@ class AdminPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
-        ->default()
+            ->default()
             ->id('admin')
             ->path('admin')
-            ->authGuard('admin')         
+            ->authGuard('admin')
+            ->profile()
             ->login()
             ->colors([
                 'primary' => Color::Amber,
@@ -46,7 +53,17 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
                 AccountWidget::class,
-                FilamentInfoWidget::class,
+                AdminStatsOverview::class,
+
+                OrderStatusChart::class,
+                MonthlyRevenueChart::class,
+                PendingProducts::class,
+                LowStockProducts::class,
+                RecentOrders::class,
+                // FlashSaleOverviewWidget::class,
+                // TopVendorsWidget::class,
+                // QuickActionsWidget::class,
+
             ])
             ->middleware([
                 EncryptCookies::class,
