@@ -51,6 +51,8 @@ The project is being developed as a team-based Laravel application following the
 - Order Placement
 - Make Payment
 - Order Tracking
+- Create Wishlist
+- Give Reviews & Ratings
 
 ### Administration
 - Vendor Management
@@ -76,6 +78,8 @@ The project is being developed as a team-based Laravel application following the
 ### Customer
 - Browse Products
 - Manage Cart
+- Manage Wishlists
+- Product Reviews 
 - Place Orders
 - Track Orders
 - Make Payments
@@ -121,8 +125,6 @@ MySQL Database
 CartZen will provide a complete multi-vendor e-commerce solution where vendors can efficiently manage products and customers can seamlessly browse, purchase and track products through a modern web interface.
 
 ## Future Additions
-- Product reviews and ratings
-- Wishlist functionality
 - Advanced analytics and reporting
 - Email and SMS notifications
 - Mobile application support
