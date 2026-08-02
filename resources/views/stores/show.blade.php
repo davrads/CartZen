@@ -58,51 +58,74 @@
 <div class="bg-gray-50 min-h-screen">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
-        <!-- STORE HEADER -->
-        <header class="bg-gradient-to-r from-violet-700 via-violet-600 to-indigo-700 rounded-xl shadow-sm border border-gray-200 p-6 mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-4 w-full md:w-auto">
-                <div class="w-24 h-24 bg-violet-100 rounded-2xl shadow-lg flex items-center justify-center shrink-0 overflow-hidden  border-4 border-white">
-                    <img src="{{ asset('storage/'.$vendorProfile->shop_logo ) }}" alt="{{ $vendorProfile->shop_name }}" class="w-full h-full object-cover">
-                </div>
-                <div>
-                    <h1 class="text-3xl font-bold text-white">{{ $vendorProfile->shop_name }}</h1>
-                    @if($vendorProfile->status == 'approved')
-                    <span class="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                        ✓ Verified Seller
-                    </span>
-                    @endif
-                    <p class=" text-violet-100 max-w-md mt-2 leading-relaxed">
-                        {{ $vendorProfile->description }}
-                    </p>
-                    <div class="flex items-center gap-2 text-xs text-violet-100 mt-1">
-                        <i class="fas fa-map-marker-alt text-gray-400"></i>
-                        {{ $vendorProfile->address }}
-                    </div>
-                </div>
+       <!-- STORE HEADER -->
+<header class="bg-gradient-to-r from-violet-700 via-violet-600 to-indigo-700 rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-6 flex flex-col md:flex-row items-center md:items-start justify-between gap-4 md:gap-6">
+    
+    <!-- Left Side: Logo & Info -->
+    <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 w-full">
+        
+        <!-- Logo: Smaller on mobile (w-16), larger on desktop (w-24) -->
+        <div class="w-16 h-16 sm:w-24 sm:h-24 bg-violet-100 rounded-2xl shadow-lg flex items-center justify-center shrink-0 overflow-hidden border-4 border-white">
+            <img src="{{ asset('storage/'.$vendorProfile->shop_logo ) }}" alt="{{ $vendorProfile->shop_name }}" class="w-full h-full object-cover">
+        </div>
+
+        <!-- Info -->
+        <div class="text-center sm:text-left flex-1 min-w-0">
+            <h1 class="text-2xl sm:text-3xl font-bold text-white leading-tight break-words">
+                {{ $vendorProfile->shop_name }}
+            </h1>
+            
+            @if($vendorProfile->status == 'approved')
+                <span class="bg-green-500 text-white px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold inline-block mt-1 sm:mt-0 whitespace-nowrap">
+                    ✓ Verified Seller
+                </span>
+            @endif
+
+            <p class="text-violet-100 max-w-md mt-2 text-sm sm:text-base leading-relaxed line-clamp-2 sm:line-clamp-none">
+                {{ $vendorProfile->description }}
+            </p>
+
+            <div class="flex items-center justify-center sm:justify-start gap-1.5 text-[10px] sm:text-xs text-violet-100 mt-1">
+                <i class="fas fa-map-marker-alt text-violet-200"></i>
+                <span class="truncate max-w-[200px] sm:max-w-none">{{ $vendorProfile->address }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Side: Stats Grid -->
+    <div class="w-full md:w-auto mt-2 md:mt-0">
+        <!-- 
+           Mobile: 2 columns grid (2x2 layout)
+           Desktop (md+): 1 row flex layout (4 cards side-by-side)
+        -->
+        <div class="grid grid-cols-2 gap-3 md:flex md:gap-4 md:justify-end">
+            
+            <!-- Product Count -->
+            <div class="bg-white/20 backdrop-blur-md rounded-xl p-3 flex flex-col justify-center items-center shadow-md border border-white/20 min-h-[60px] md:min-h-0">
+                <span class="text-xl sm:text-2xl font-bold text-white">{{ $productCount }}</span>
+                <span class="text-[10px] sm:text-xs text-violet-100 uppercase">Products</span>
             </div>
 
-            <!-- Product Count Badge -->
-            <div class="flex flex-col items-center md:items-end">
-                <div class="flex flex-wrap gap-4 mt-4">
-                    <div class="bg-white/20 backdrop-blur-md rounded-xl w-28 h-24 flex flex-col justify-center items-center shadow-md border border-white/20">
-                        <span class="text-2xl font-bold text-white">{{ $productCount }}</span>
-                        <span class="text-xs text-violet-100 uppercase">Products</span>
-                    </div>
-                    <div class="bg-white/20 backdrop-blur-md rounded-xl w-28 h-24 flex flex-col justify-center items-center shadow-md border border-white/20">
-                        <span class="text-2xl font-bold text-white">{{ $brandCount }}</span>
-                        <span class="text-xs text-violet-100 uppercase">Brands</span>
-                    </div>
-                    <div class="bg-white/20 backdrop-blur-md rounded-xl w-28 h-24 flex flex-col justify-center items-center shadow-md border border-white/20">
-                        <span class="text-2xl font-bold text-white">{{ $featuredCount }}</span>
-                        <span class="text-xs text-violet-100 uppercase">Featured</span>
-                    </div>
-                    <div class="bg-white/20 backdrop-blur-md rounded-xl w-28 h-24 flex flex-col justify-center items-center shadow-md border border-white/20">
-                        <span class="text-2xl font-bold text-white">{{ $flashCount }}</span>
-                        <span class="text-xs text-violet-100 uppercase">Flash Sale</span>
-                    </div>
-                </div>
+            <!-- Brand Count -->
+            <div class="bg-white/20 backdrop-blur-md rounded-xl p-3 flex flex-col justify-center items-center shadow-md border border-white/20 min-h-[60px] md:min-h-0">
+                <span class="text-xl sm:text-2xl font-bold text-white">{{ $brandCount }}</span>
+                <span class="text-[10px] sm:text-xs text-violet-100 uppercase">Brands</span>
             </div>
-        </header>
+
+            <!-- Featured Count -->
+            <div class="bg-white/20 backdrop-blur-md rounded-xl p-3 flex flex-col justify-center items-center shadow-md border border-white/20 min-h-[60px] md:min-h-0">
+                <span class="text-xl sm:text-2xl font-bold text-white">{{ $featuredCount }}</span>
+                <span class="text-[10px] sm:text-xs text-violet-100 uppercase">Featured</span>
+            </div>
+
+            <!-- Flash Sale Count -->
+            <div class="bg-white/20 backdrop-blur-md rounded-xl p-3 flex flex-col justify-center items-center shadow-md border border-white/20 min-h-[60px] md:min-h-0">
+                <span class="text-xl sm:text-2xl font-bold text-white">{{ $flashCount }}</span>
+                <span class="text-[10px] sm:text-xs text-violet-100 uppercase">Flash Sale</span>
+            </div>
+        </div>
+    </div>
+</header>
 
         <!-- Mobile Header with Filter Toggle -->
         <div class="lg:hidden flex justify-between items-center mb-6 sticky top-0 bg-gray-50 z-20 py-2">

@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\Auth\CustomerAuthController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CheckoutController;
@@ -25,7 +27,7 @@ Route::prefix('shop')->group(function () {
         ->name('shop-on-sale');
     Route::get('/{product}', [FrontendController::class, 'productShow'])
         ->name('product.show');
-});                     
+});
 
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/products/{product}', [ProductController::class, 'show'])
@@ -49,12 +51,12 @@ Route::prefix('stores')->group(function () {
 // Khalti callback – must be public (no auth middleware)
 Route::get('/khalti/verify', [CheckoutController::class, 'verifyKhalti'])->name('khalti.verify');
 
-Route::middleware('guest')->group(function () {
+Route::middleware('guest:customer')->group(function () {
 
     Route::get('/login', [CustomerAuthController::class, 'showLogin'])
         ->name('login');
 
-    Route::post('/login', [CustomerAuthController::class, 'login']);
+    Route::post('/login', [CustomerAuthController::class, 'login'])->name('login.store');
 
     Route::get('/register', [CustomerAuthController::class, 'showRegister'])
         ->name('register');
@@ -69,6 +71,18 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/auth/google/callback', [CustomerAuthController::class, 'handleGoogleCallback'])
         ->name('google.callback');
+
+    Route::get('/forgot-password', [ForgotPasswordController::class, 'create'])
+        ->name('password.request');
+
+    Route::post('/forgot-password', [ForgotPasswordController::class, 'store'])
+        ->name('password.email');
+
+    Route::get('/reset-password/{token}', [ResetPasswordController::class, 'create'])
+        ->name('password.reset');
+
+    Route::post('/reset-password', [ResetPasswordController::class, 'store'])
+        ->name('password.update');
 });
 
 Route::prefix('vendor')->name('vendor.')->group(function () {
@@ -84,7 +98,7 @@ Route::prefix('vendor')->name('vendor.')->group(function () {
 });
 
 Route::middleware('customer')->group(function () {
-    
+
     Route::prefix('checkout')->group(function () {
         Route::get('/', [CheckoutController::class, 'index'])->name('checkout');
         Route::post('/place-order', [CheckoutController::class, 'placeOrder'])->name('place.order');
@@ -99,24 +113,24 @@ Route::middleware('customer')->group(function () {
 
         // अर्डरहरू तान्ने
         $orders = \App\Models\Order::where('user_id', $customerId)
-                       ->latest()
-                       ->get();
+            ->latest()
+            ->get();
 
         // सेसनबाट 'wishlist' तान्ने
         $wishlistItems = session()->get('wishlist', []);
 
         // यो customer ले पहिल्यै लेखेका reviews
         $reviews = \App\Models\Review::where('user_id', $customerId)
-                       ->with('product')
-                       ->latest()
-                       ->get();
+            ->with('product')
+            ->latest()
+            ->get();
 
         $reviewedOrderItemIds = $reviews->pluck('order_item_id')->filter()->all();
 
         // Delivered भएका तर अझै review नलेखिएका order items (Review लेख्न मिल्ने)
         $reviewableItems = \App\Models\OrderItem::whereHas('order', function ($q) use ($customerId) {
-                $q->where('user_id', $customerId)->where('status', 'delivered');
-            })
+            $q->where('user_id', $customerId)->where('status', 'delivered');
+        })
             ->whereNotIn('id', $reviewedOrderItemIds)
             ->with('product', 'order')
             ->latest()

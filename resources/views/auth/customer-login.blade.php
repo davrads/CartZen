@@ -46,7 +46,25 @@
                             <a href="/register" class="font-medium text-primary hover:text-purple-700 transition">Create an account</a>
                         </p>
                     </div>
+                    @if ($errors->any())
+                    <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
+                        <div class="flex items-start">
+                            <i class="fas fa-exclamation-triangle text-red-500 mt-1 mr-3"></i>
 
+                            <div>
+                                <h3 class="text-sm font-semibold text-red-800">
+                                    Login Failed
+                                </h3>
+
+                                <ul class="mt-1 text-sm text-red-700 list-disc list-inside">
+                                    @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
                     <form action="/login" method="POST" class="mt-8 space-y-6">
                         @csrf
                         <div class="space-y-5">
@@ -66,7 +84,7 @@
                                 <div class="flex items-center justify-between">
                                     <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
                                     <div class="text-sm">
-                                        <a href="#" class="font-medium text-primary hover:text-purple-700">Forgot password?</a>
+                                        <a href="{{ route('password.request') }}" class="font-medium text-primary hover:text-purple-700">Forgot password?</a>
                                     </div>
                                 </div>
                                 <div class="mt-1 relative rounded-md shadow-sm">
