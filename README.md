@@ -1,130 +1,269 @@
-# CartZen Project Overview
-## Project Title
-CartZen - Multi-Vendor E-Commerce Platform
+# 🛒 CartZen - Multi-Vendor E-Commerce Platform
+
+CartZen is a modern **multi-vendor e-commerce platform** built with **Laravel 12** that enables multiple vendors to sell products through a centralized online marketplace. The platform provides dedicated dashboards and role-based functionalities for **Customers**, **Vendors**, and **Administrators**, ensuring secure and efficient marketplace management.
 
 
-## Project Description
-CartZen is a web-based multi-vendor e-commerce platform   that enables multiple vendors to sell products through a centralized marketplace. The platform provides separate dashboards and functionalities for administrators, vendors, and customers.
+## 📖 Project Overview
 
-Administrators can manage vendors, customers, categories, and products. Vendors can manage their own products, product variants, and product images. Customers can browse products, add items to their cart, place orders, and track purchases.
+CartZen was developed as a team-based internship project following the **Laravel MVC Architecture**. It offers a complete shopping ecosystem where customers can browse products, vendors can manage their online stores, and administrators can oversee the entire marketplace from a centralized dashboard.
 
-The project is being developed as a team-based Laravel application following the MVC architecture and RESTful API principles.
 
-## Project Objectives
-- Build a scalable multi-vendor marketplace.
-- Provide a centralized platform for vendors and customers.
-- Implement role-based access control for Admin, Vendor, and Customer users.
-- Develop a responsive and user-friendly shopping experience.
-- Create an efficient product and inventory management system.
-- Enable secure order and checkout processes.
-- Provide an administrative dashboard for platform management.
+## 🎯 Project Objectives
 
-## Core Features
-### Authentication & User Management
-- User Registration & Login using Google  
-- Role-Based Access Control
-- Admin Dashboard
-- Vendor Profiles
-- Customer Profiles
+- Develop a scalable multi-vendor marketplace.
+- Provide separate dashboards for Customers, Vendors, and Administrators.
+- Implement secure role-based authentication and authorization.
+- Deliver a responsive and user-friendly shopping experience.
+- Enable efficient product, inventory, and order management.
+- Integrate secure online payment using Khalti.
+- Build a maintainable application using Laravel MVC architecture.
 
-### Vendor Management
-- Vendor Registration
-- Vendor Approval
+
+# ✨ Core Features
+
+## 👤 Authentication & User Management
+
+- Google Authentication
+- Secure Login & Registration
+- Role-Based Access Control (Admin, Vendor, Customer)
+- Customer Profile Management
 - Vendor Profile Management
+- Address Management
 
-### Platform for-
-- Product Browsing
-- Product Search
-- Category Filtering
-- Product Details Page
 
-### Product Management
-- Category Management
+## 🏪 Vendor Management
+
+- Vendor Registration
+- Vendor Verification & Approval
+- Store Profile Management
+- Vendor Dashboard
 - Product Management
-- Product Image Management
 - Product Variant Management
-- Inventory Stock Tracking
+- Product Image Management
+- Inventory Management
+- Order Management
 
-### Shopping Experience
-- Shopping Cart
-- Checkout Process
-- Order Placement
-- Make Payment
-- Order Tracking
-- Create Wishlist
-- Give Reviews & Ratings
 
-### Administration
-- Vendor Management
-- Customer Management
-- Product Monitoring
-- Dashboard Analytics
+## 🛍️ Shopping Experience
 
-## User Roles
-### Administrator
-- Manage Vendors
-- Manage Customers
-- Manage Categories
-- Monitor Products
-- View Platform Analytics
-
-### Vendor
-- Manage Products
-- Manage Product Images
-- Manage Product Variants
-- Manage Inventory
-- View Orders
-
-### Customer
 - Browse Products
-- Manage Cart
-- Manage Wishlists
-- Product Reviews 
-- Place Orders
-- Track Orders
-- Make Payments
+- Search Products
+- Category Browsing
+- Vendor Store Pages
+- Product Detail Page
+- Shopping Cart
+- Wishlist
+- Checkout Process
+- Khalti Payment Integration
+- Cash on Delivery (COD)
+- Order Tracking
+- Product Reviews & Ratings
 
-## Technology Stacks
-### Backend
-- PHP
-- Laravel Framework
+
+## 📦 Product Management
+
+- Category Management
+- Product CRUD Operations
+- Product Images
+- Product Variants
+- Inventory Stock Tracking
+- Flash Sale Management
+
+
+## ⚙️ Administration
+
+- Dashboard Overview
+- User Management
+- Vendor Approval & Management
+- Category Management
+- Product Monitoring
+- Flash Sale Management
+- Order Management
+- Review Management
+
+
+# 👥 User Roles
+
+## Administrator
+
+- Verify Vendors
+- Manage Vendors
+- Manage Categories
+- Manage Products
+- Manage Flash Sales
+- Manage Orders
+- Manage Reviews
+- Monitor Platform Activities
+
+
+## Vendor
+
+- Manage Store Profile
+- Manage Products
+- Manage Product Variants
+- Manage Product Images
+- Manage Inventory
+- Process Customer Orders
+- View Dashboard
+
+
+## Customer
+
+- Register/Login
+- Browse Products
+- Search Products
+- Manage Wishlist
+- Manage Shopping Cart
+- Checkout Products 
+- Make Payments
+- Track Orders
+- Submit Reviews & Ratings
+
+
+# 🛠️ Technology Stack
+
+## Backend
+
+- PHP 8.2
+- Laravel 12
 - Laravel Eloquent ORM
 
-### Frontend
-- Laravel Blade Templates
+## Frontend
+
+- Laravel Blade
+- Tailwind CSS
 - HTML
-- CSS
 - JavaScript
 
-### Database
-- MYSQL
+## Admin & Vendor Panel
 
-### Backend Dashboard
 - Filament
 
-### Development Tools
-- Version Control: Git & Github
-- Backend Package Manager: Composer
-- Frontend Package Manager & Build Tool: npm
-- IDE: Visual Studio Code 
+## Database
 
-## System Architecture
-Client Browser
-↓
-Laravel Blade Frontend
-↓
+- MySQL
+
+## Payment Gateway
+
+- Khalti Payment Gateway
+
+## Development Tools
+
+- Git & GitHub
+- Composer
+- npm
+- Visual Studio Code
+
+
+# 🏗️ System Architecture
+
+The application follows the **Laravel MVC (Model–View–Controller)** architecture.
+
+```
+Customer / Vendor / Admin
+            │
+            ▼
+Laravel Blade (Presentation Layer)
+            │
+            ▼
+Laravel Routes
+            │
+            ▼
 Controllers
-↓
-Services/Logics
-↓
-Models (Eloquent ORM)
-↓
+            │
+            ▼
+Business Logic & Middleware
+            │
+            ▼
+Eloquent Models
+            │
+            ▼
 MySQL Database
+            │
+            ▼
+External Services
+(Khalti Payment Gateway)
 
-## Expected Outcome 
-CartZen will provide a complete multi-vendor e-commerce solution where vendors can efficiently manage products and customers can seamlessly browse, purchase and track products through a modern web interface.
 
-## Future Additions
-- Advanced analytics and reporting
-- Email and SMS notifications
-- Mobile application support
+# 🗄️ Database Modules
+
+The system consists of the following major modules:
+
+- Users
+- Customer Profiles
+- Vendor Profiles
+- Categories
+- Products
+- Product Images
+- Product Variants
+- Flash Sales
+- Shopping Cart
+- Cart Items
+- Orders
+- Order Items
+- Reviews
+- Addresses
+
+
+# 🔒 Security Features
+
+- Role-Based Access Control
+- Secure Authentication
+- Password Hashing
+- CSRF Protection
+- Route Middleware Protection
+- Vendor Verification Workflow
+- Input Validation
+- Session Management
+- Database Integrity using Foreign Keys
+- Secure Khalti Payment Integration
+
+
+# 📱 Responsive Design
+
+The application is fully responsive and optimized for:
+
+- Desktop
+- Tablet
+- Mobile Devices
+
+
+# 🚀 Future Enhancements
+
+The following features are planned for future releases:
+
+- Sales Analytics Dashboard
+- Inventory Analytics
+- Vendor Performance Reports
+- Enhanced Reviews & Ratings
+- Email Notifications
+- SMS Notifications
+- Mobile Application
+- Advanced Reporting
+- Additional Payment Gateways
+
+
+# 📚 Development Methodology
+
+The project was developed using the **Agile Software Development Methodology**, allowing iterative development, continuous testing, and regular feature enhancements throughout the internship period.
+
+
+# 📌 Expected Outcome
+
+CartZen provides a complete and scalable multi-vendor marketplace where:
+
+- Customers can conveniently discover and purchase products.
+- Vendors can efficiently manage their online stores.
+- Administrators can effectively monitor and control marketplace operations.
+
+The platform demonstrates modern web development practices using Laravel and serves as a strong foundation for future expansion.
+
+
+## 👨‍💻 Development Team
+
+Developed as an internship project by a collaborative development team using Git for version control and Agile development practices.
+
+
+## 📄 License
+
+This project was developed for educational and internship purposes.
