@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\Review;
 use App\Models\VendorProfile;
 use Illuminate\Http\Request;
 
@@ -10,15 +13,45 @@ class StoreController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        $stores = VendorProfile::where('status', 'approved')
-            ->withCount('products')
-            ->latest()
-            ->paginate(12);
+  public function index(Request $request)
+{
+    $stores = VendorProfile::where('status', 'approved')
+        ->with('user')
+        ->withCount([
+            'products' => fn ($query) => $query->approved(),
+        ])
 
-        return view('stores.index', compact('stores'));
-    }
+        ->when($request->filled('search'), function ($query) use ($request) {
+
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+
+                $q->where('shop_name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($user) use ($search) {
+
+                        $user->where('name', 'like', "%{$search}%");
+
+                    });
+            });
+        })
+
+        ->latest()
+        ->paginate(12)
+        ->withQueryString();
+
+    $totalProducts = Product::approved()->count();
+    $categories = Category::count();
+    $totalReviews = Review::count();
+
+    return view('stores.index', compact(
+        'stores',
+        'totalProducts',
+        'categories',
+        'totalReviews'
+    ));
+}
 
     /**
      * Show the form for creating a new resource.
@@ -117,10 +150,10 @@ class StoreController extends Controller
             ->withQueryString();
 
         $productCount = $vendorProfile
-        ->user
-        ->products()
-        ->approved()
-        ->count();
+            ->user
+            ->products()
+            ->approved()
+            ->count();
 
         $brandCount = $vendorProfile->user
             ->products()
