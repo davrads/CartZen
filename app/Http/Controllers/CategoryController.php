@@ -47,7 +47,7 @@ class CategoryController extends Controller
 
         return view('categories.index', compact(
             'categories',
-            'products'
+            'products',
         ));
     }
 

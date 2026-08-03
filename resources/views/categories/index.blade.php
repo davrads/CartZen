@@ -66,23 +66,35 @@
     <div class="max-w-7xl mx-auto px-4 py-6">
         <form id="filter-form" action="{{ isset($category) ? route('categories.show', $category) : route('categories.index') }}" method="GET">
             <div class="flex flex-col lg:flex-row gap-6">
-                <div class="lg:w-64 lg:sticky lg:top-24 self-start flex-shrink-0 space-y-4">
+
+                {{-- Mobile Filter Toggle Button (Visible only on mobile) --}}
+                <div class="lg:hidden mb-2">
+                    <button type="button" id="mobile-filter-btn" class="w-full flex items-center justify-center gap-2 bg-violet-600 text-white px-4 py-3 rounded-xl font-semibold shadow-sm hover:bg-violet-700 transition">
+                        <i class="fas fa-sliders-h"></i>
+                        Filters & Categories
+                    </button>
+                </div>
+
+                {{-- Sidebar (Sticky on Desktop, Hidden/Modal on Mobile) --}}
+                <div id="mobile-sidebar" class="hidden lg:block lg:w-64 lg:sticky lg:top-24 self-start flex-shrink-0 space-y-4 transition-all duration-300">
+
+                    <!-- Categories -->
                     <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm p-5">
                         <h2 class="text-lg font-bold text-gray-800 mb-4">All Categories</h2>
-                        <div class="space-y-0.5">
+                        <div class="space-y-0.5 max-h-64 overflow-y-auto custom-scrollbar">
                             @foreach($categories as $cat)
                             <a href="{{ route('categories.show', $cat) }}"
                                 class="block px-3 py-2 text-sm font-medium rounded-lg transition
-                                          {{ isset($category) && $cat->id === $category->id
-                                              ? 'bg-violet-50 text-violet-700'
-                                              : 'text-gray-600 hover:bg-gray-50 hover:text-violet-600' }}">
+                                      {{ isset($category) && $cat->id === $category->id
+                                          ? 'bg-violet-50 text-violet-700'
+                                          : 'text-gray-600 hover:bg-gray-50 hover:text-violet-600' }}">
                                 {{ $cat->name }}
                             </a>
                             @endforeach
                         </div>
                     </div>
 
-                    {{-- Price Filter --}}
+                    <!-- Price Filter -->
                     <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm p-5">
                         <h2 class="text-lg font-bold text-gray-800 mb-4">Price</h2>
                         <div class="space-y-3">
@@ -116,19 +128,24 @@
                 <div class="flex-1 min-w-0">
                     <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm overflow-hidden">
                         {{-- Header --}}
-                        <div class="px-6 py-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-100">
+                        <div class="px-4 sm:px-6 py-4 sm:py-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-100">
                             <div>
-                                <h1 class="text-2xl font-extrabold text-gray-800"> {{ isset($category) ? $category->name : 'All Products' }}
+                                <!-- Category Name: Falls back to 'All Products' if not set -->
+                                <h1 class="text-xl sm:text-2xl font-extrabold text-gray-800 truncate">
+                                    {{ isset($category) ? $category->name : 'All Products' }}
                                 </h1>
-                                <p class="text-sm text-gray-500 mt-1">
+
+                                <!-- Product Count: Smaller text on mobile -->
+                                <p class="text-xs sm:text-sm text-gray-500 mt-1">
                                     Showing {{ $products->firstItem() ?? 0 }} – {{ $products->lastItem() ?? 0 }} of {{ $products->total() }} products
                                 </p>
                             </div>
-                            <div class="flex items-center gap-2">
-                                <span class="text-sm text-gray-500">Sort by:</span>
+
+                            <div class="flex items-center gap-2 w-full sm:w-auto">
+                                <span class="text-xs sm:text-sm text-gray-500 whitespace-nowrap">Sort by:</span>
                                 <select name="sort"
                                     onchange="document.getElementById('filter-form').submit()"
-                                    class="border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500">
+                                    class="w-full sm:w-auto border border-gray-300 rounded-xl px-3 sm:px-4 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500 bg-white">
                                     <option value="popular" {{ request('sort') == 'popular' ? 'selected' : '' }}>Popular</option>
                                     <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price: Low to High</option>
                                     <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price: High to Low</option>
@@ -137,8 +154,8 @@
                         </div>
 
                         {{-- Product Grid --}}
-                        <div class="p-6">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="p-4 sm:p-6">
+                            <div class="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
                                 @forelse($products as $product)
                                 <x-product-card :product="$product" />
                                 @empty
@@ -159,6 +176,35 @@
                 </div>
             </div>
         </form>
+
+        {{-- Mobile Toggle Script --}}
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const btn = document.getElementById('mobile-filter-btn');
+                const sidebar = document.getElementById('mobile-sidebar');
+
+                if (btn && sidebar) {
+                    btn.addEventListener('click', function() {
+                        // Toggle the hidden class
+                        sidebar.classList.toggle('hidden');
+
+                        // Change button icon/text to indicate state
+                        const icon = btn.querySelector('i');
+                        const text = btn;
+
+                        if (sidebar.classList.contains('hidden')) {
+                            icon.classList.remove('fa-times');
+                            icon.classList.add('fa-sliders-h');
+                            text.innerHTML = '<i class="fas fa-sliders-h"></i> Filters & Categories';
+                        } else {
+                            icon.classList.remove('fa-sliders-h');
+                            icon.classList.add('fa-times');
+                            text.innerHTML = '<i class="fas fa-times"></i> Close Filters';
+                        }
+                    });
+                }
+            });
+        </script>
     </div>
 </div>
 @endsection
