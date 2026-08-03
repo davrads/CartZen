@@ -26,7 +26,6 @@ class CustomerAuthController extends Controller
     if (Auth::guard('customer')->attempt($credentials)) {
         $request->session()->regenerate();
 
-        // Remove the dd() and add the role check + redirect
         if (Auth::guard('customer')->user()->role !== 'customer') {
             Auth::guard('customer')->logout();
             return back()->withErrors([
@@ -50,10 +49,7 @@ class CustomerAuthController extends Controller
 
     //     if (Auth::guard('customer')->attempt($credentials)) {
     //         $request->session()->regenerate();
-    //         dd(
-    //     Auth::guard('customer')->check(),
-    //     Auth::guard('customer')->user()
-    // );
+        
 
     //         if (Auth::guard('customer')->user()->role !== 'customer') {
     //             Auth::guard('customer')->logout();

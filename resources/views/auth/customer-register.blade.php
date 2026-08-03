@@ -42,8 +42,16 @@
                             <a href="/login" class="font-medium text-primary hover:text-purple-700 transition">Sign in</a>
                         </p>
                     </div>
-
-                    <form action="/register" method="POST" class="mt-8 space-y-6">
+                    @if ($errors->any())
+                    <div class="bg-red-100 text-red-700 p-4 rounded mb-4">
+                        <ul>
+                            @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    @endif
+                    <form action="{{ route('register') }}" method="POST" class="mt-8 space-y-6">
                         @csrf
                         <div class="space-y-5">
                             <div>
