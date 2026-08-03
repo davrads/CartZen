@@ -1,124 +1,94 @@
 @props(['product'])
 
+@php
+    // Safe product URL
+    $productUrl = ($product instanceof \App\Models\Product)
+        ? route('products.show', $product)
+        : '#';
 
-<div class="group bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
-    <a href="{{ route('products.show', $product) }}" class="block flex flex-col">
+    // Calculate discount percentage if original price/discount exists
+    $discountPercent = 0;
+    if (isset($product->original_price) && $product->original_price > $product->price) {
+        $discountPercent = round((($product->original_price - $product->price) / $product->original_price) * 100);
+    }
+@endphp
 
-        <div class="relative">
-
-            @php
-            // Check for Active Flash Sale
-            $hasActiveFlash = false;
-            $flashPrice = 0;
-            $flashSaleId = null;
-
-            if ($product->relationLoaded('flashSale') && $product->flashSale) {
-            $now = now();
-            if ($now->between($product->flashSale->start_date, $product->flashSale->end_date) && $product->flashSale->is_active) {
-            $hasActiveFlash = true;
-            $flashPrice = $product->flashSale->flash_price;
-            $flashSaleId = $product->flashSale->id;
-            }
-            }
-            @endphp
-
-            {{-- Badges: Flash Sale takes priority over Featured --}}
-            @if($hasActiveFlash)
-            <div class="absolute top-3 right-3 bg-red-600 text-white text-xs font-bold px-2.5 py-1 rounded-md z-20 shadow-sm animate-pulse">
-                Flash Sale
+<div class="product-card group relative bg-white rounded-lg sm:rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full">
+    
+    {{-- Discount Badge (If Available) --}}
+    @if($discountPercent > 0)
+        <div class="absolute top-1 left-1 sm:top-3 sm:left-3 z-20">
+            <div class="bg-red-100 text-red-600 text-[7px] sm:text-xs font-bold px-1 py-0.2 rounded-full shadow-sm leading-none">
+                -{{ $discountPercent }}%
             </div>
-            @elseif($product->featured)
-            <div class="absolute top-3 right-3 bg-violet-600 text-white text-xs font-bold px-2.5 py-1 rounded-md z-20 shadow-sm trasnsition-transform duration-300 group-hover:scale-105">
-                Featured
-            </div>
-            @endif
+        </div>
+    @endif
 
+    <div class="flex flex-col h-full justify-between">
+        <a href="{{ $productUrl }}" class="block flex flex-col">
+            
+            {{-- Image Container (Square Aspect Ratio) --}}
             <div class="relative w-full aspect-square overflow-hidden bg-gray-50">
                 <img
-                    src="{{ $product->thumbnail ? asset('storage/' . $product->thumbnail) : asset('images/no-image.png') }}"
-                    alt="{{ $product->name }}"
-                    class="w-full h-full object-contain p-4 transition-transform duration-500 ease-out group-hover:scale-110"
+                    src="{{ ($product->thumbnail ?? null) ? asset('storage/' . $product->thumbnail) : asset('images/no-image.png') }}"
+                    alt="{{ $product->name ?? 'Product' }}"
+                    class="w-full h-full object-contain p-1 sm:p-4 group-hover:scale-105 transition-transform duration-500"
                     loading="lazy"
-                    onerror="this.src='{{ asset('images/no-image.png') }}';">
-                    <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                >
             </div>
-        </div>
 
-        <div class="p-4 md:p-5 flex flex-col flex-1">
-            <h3 class="font-medium text-base md:text-lg text-gray-800 line-clamp-2 h-14 mb-2 transition-colors duration-300 group-hover:text-violet-600">
-                {{ $product->name ?? 'Unnamed Product' }}
-            </h3>
+            {{-- Content Section (Flash Card जस्तै exact font sizes र leading) --}}
+            <div class="p-1.5 sm:p-4 pb-0 flex flex-col flex-grow">
+                {{-- Title --}}
+                <h3 class="font-medium text-[10px] sm:text-base text-gray-800 line-clamp-2 leading-tight min-h-[1.75rem] sm:min-h-[2.8rem]">
+                    {{ $product->name ?? 'Product Name' }}
+                </h3>
 
-            <div class="h-16 flex items-center gap-2 flex-wrap">
-                @php
-                $displayPrice = $product->price ?? 0;
-                $originalPrice = $product->price ?? 0;
-                $hasDiscount = false;
-
-                // Priority 1: Active Flash Sale
-                if ($hasActiveFlash) {
-                $displayPrice = $flashPrice;
-                $hasDiscount = true;
-                }
-                // Priority 2: sale_price attribute
-                elseif (isset($product->sale_price) && $product->sale_price > 0 && $product->sale_price < $originalPrice) {
-                    $displayPrice=$product->sale_price;
-                    $hasDiscount = true;
-                    }
-                    // Priority 3: discounted_price attribute (legacy)
-                    elseif (isset($product->discounted_price) && $product->discounted_price > 0 && $product->discounted_price < $originalPrice) {
-                        $displayPrice=$product->discounted_price;
-                        $hasDiscount = true;
-                        }
-                        @endphp
-
-                        @if($hasDiscount)
-                        <span class="text-xl md:text-2xl font-bold text-gray-900 transition-colors duration-300 group-hover:text-violet-600">
-                            Rs. {{ number_format($displayPrice, 2) }}
+                {{-- Price Section --}}
+                <div class="mt-1 sm:mt-3 flex flex-col sm:flex-row sm:items-baseline sm:gap-2">
+                    {{-- Main Price --}}
+                    <span class="text-[11px] sm:text-xl font-bold text-gray-900 leading-none">
+                        Rs. {{ number_format($product->price ?? 0, 2) }}
+                    </span>
+                    
+                    {{-- Original/Cross Price (If Available) --}}
+                    @if(isset($product->original_price) && $product->original_price > $product->price)
+                        <span class="text-[8px] sm:text-sm text-gray-400 line-through leading-none mt-0.5 sm:mt-0">
+                            Rs. {{ number_format($product->original_price, 2) }}
                         </span>
-                        <span class="text-sm md:text-base text-gray-400 line-through transition-colors duration-300 group-hover:text-violet-600">
-                            Rs. {{ number_format($originalPrice, 2) }}
-                        </span>
-                        @else
-                        <span class="text-xl md:text-2xl font-bold text-gray-900 transition-colors duration-300 group-hover:text-violet-600">
-                            Rs. {{ number_format($displayPrice, 2) }}
-                        </span>
-                        @endif
+                    @endif
+                </div>
+
+                {{-- Rating or Stock Info (Optional) --}}
+                <div class="mt-1 flex items-center gap-0.5">
+                    <i class="fas fa-star text-amber-400 text-[7px] sm:text-xs"></i>
+                    <span class="text-[7px] sm:text-xs font-semibold text-gray-600 leading-none">
+                        {{ number_format($product->rating ?? 4.5, 1) }}
+                    </span>
+                </div>
             </div>
-            <div class="h-6 mt-2">
-                @if(isset($product->brand) && $product->brand)
-                <p class="text-xs md:text-sm text-gray-500 mt-2">
-                    {{ $product->brand }}
-                </p>
-                @endif
-            </div>
-        </div>
-    </a>
+        </a>
 
-    {{-- Add to Cart Form Section --}}
-    <div class="p-4 md:p-5 pt-0 mt-auto">
-        @if(($product->stock ?? 1) > 0)
-        <form action="{{ route('cart.add') }}" method="POST">
-            @csrf
-            <input type="hidden" name="product_id" value="{{ $product->id }}">
-            <input type="hidden" name="quantity" value="1">
+        {{-- Add to Cart Form Section --}}
+        <div class="p-1.5 sm:p-4 pt-1 z-20 relative">
+            @if(($product->stock ?? 1) > 0)
+                <form action="{{ route('cart.add') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="product_id" value="{{ $product->id ?? '' }}">
+                    <input type="hidden" name="quantity" value="1">
 
-            {{-- Flash Sale Active छ भने Flash Sale ID पनि जान्छ --}}
-            @if($hasActiveFlash && $flashSaleId)
-            <input type="hidden" name="flash_sale_id" value="{{ $flashSaleId }}">
+                    <button type="submit" class="w-full bg-violet-600 hover:bg-violet-700 text-white text-[8px] sm:text-xs font-bold py-1 sm:py-2.5 px-1 sm:px-4 rounded sm:rounded-xl shadow-xs sm:shadow-md transition-colors duration-200 flex items-center justify-center gap-0.5 sm:gap-2 leading-none">
+                        <svg class="w-2.5 h-2.5 sm:w-4 sm:h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"></path>
+                        </svg>
+                        <span class="truncate">Add To Cart</span>
+                    </button>
+                </form>
+            @else
+                <button disabled class="w-full bg-gray-300 text-gray-500 text-[8px] sm:text-xs font-bold py-1 sm:py-2.5 px-1 sm:px-4 rounded sm:rounded-xl cursor-not-allowed leading-none">
+                    Out of Stock
+                </button>
             @endif
-
-            <button type="submit" class="w-full bg-violet-600 hover:bg-violet-700 hover:shadow-lg hover:scale-[1.02] active:scale-95 transition-all duration-300 text-white text-xs md:text-sm font-bold py-2.5 px-4 rounded-xl shadow-sm flex items-center justify-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"></path>
-                </svg>
-                Add To Cart
-            </button>
-        </form>
-        @else
-        <button disabled class="w-full bg-gray-200 text-gray-400 text-xs md:text-sm font-bold py-2.5 px-4 rounded-xl cursor-not-allowed">
-            Out of Stock
-        </button>
-        @endif
+        </div>
     </div>
 </div>

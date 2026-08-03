@@ -17,20 +17,17 @@ class OrderController extends Controller
 {
     public function placeOrder(Request $request)
     {
-        
         $request->validate([
             'address_id' => 'required',
             'payment_method' => 'required',
         ]);
 
-       
         $userId = Auth::guard('customer')->id();
 
         if (!$userId) {
             return redirect()->route('login')->with('error', 'कृपया पहिले लगइन गर्नुहोस्।');
         }
 
-       
         $cart = Cart::where('user_id', $userId)->first();
 
         if (!$cart) {
@@ -45,18 +42,15 @@ class OrderController extends Controller
             return redirect()->back()->with('error', 'तपाईंको कार्ट खाली फेला पर्यो!');
         }
 
-       
         DB::beginTransaction();
 
         try {
-           
             $subTotal = 0;
             foreach ($cartItems as $item) {
                 $price = $item->price ?? optional($item->product)->price ?? 0;
                 $subTotal += $price * $item->quantity;
             }
 
-            
             $order = new Order();
             $order->user_id = $userId;
             $order->address_id = $request->address_id;
@@ -70,7 +64,6 @@ class OrderController extends Controller
             $order->status = 'pending';
             $order->save();
 
-            
             foreach ($cartItems as $item) {
                 $orderItem = new OrderItem();
                 $orderItem->order_id = $order->id;
@@ -82,36 +75,40 @@ class OrderController extends Controller
                 $orderItem->save();
             }
 
-           
-            CartItem::where('cart_id', $cart->id)->delete();
-
-            // Khalti API 
+            // Khalti Payment
             if ($request->payment_method === 'khalti') {
                 $url = env('KHALTI_BASE_URL') . '/epayment/initiate/';
                 
-                
                 $response = Http::withHeaders([
-    'Authorization' => 'Key ' . env('KHALTI_SECRET')
-])
-->timeout(30)
-->withoutVerifying() 
-->post($url, [
-    "return_url" => route('khalti.callback'),
-    "website_url" => url('/'), 
-    "amount" => $order->total_amount * 100,
-    "purchase_order_id" => $order->order_number,
-    "purchase_order_name" => "Order #" . $order->order_number,
-]);
+                    'Authorization' => 'Key ' . env('KHALTI_SECRET')
+                ])
+                ->timeout(30)
+                ->withoutVerifying() 
+                ->post($url, [
+                    "return_url" => route('khalti.callback'),
+                    "website_url" => url('/'), 
+                    "amount" => (int) round($order->total_amount * 100),
+                    "purchase_order_id" => (string) $order->id, // Order ID नै पठाउने
+                    "purchase_order_name" => "Order #" . $order->order_number,
+                ]);
 
                 if ($response->successful() && isset($response['payment_url'])) {
+                    if (isset($response['pidx'])) {
+                        $order->khalti_pidx = $response['pidx'];
+                        $order->save();
+                    }
+                    
                     DB::commit(); 
+                    // Note: कार्ट खाली गरिएको छैन, Khalti success भएपछि मात्र खाली हुन्छ।
                     return redirect($response['payment_url']); 
                 } else {
                     throw new \Exception('खल्ती गेटवेमा समस्या आयो: ' . $response->body());
                 }
             }
 
-            // यदि Cash on Delivery (COD) हो भने सिधै होमपेजमा पठाउने
+            // COD को लागि मात्र कार्ट खाली गर्ने
+            CartItem::where('cart_id', $cart->id)->delete();
+
             DB::commit();
             return redirect()->route('home')->with('success', 'तपाईंको अर्डर सफलतापूर्वक सुरक्षित भयो!');
 
@@ -127,16 +124,55 @@ class OrderController extends Controller
 
     public function callback(Request $request)
     {
-        // नोट: यदि ब्याकइन्डमा सिधै डेटा अपडेट गराउने हो भने तलको return हटाउन सक्नुहुन्छ
-       // return $request->all();
-        
-        $order = Order::find($request['purchase_order_id']);
+        // Khalti v2 Response Parameter Check
+        $pidx = $request->query('pidx');
+        $status = $request->query('status');
+        $purchaseOrderId = $request->query('purchase_order_id');
+
+        // Order खोज्ने (ID, Order Number वा pidx बाट)
+        $order = Order::where('id', $purchaseOrderId)
+            ->orWhere('order_number', $purchaseOrderId)
+            ->orWhere('khalti_pidx', $pidx)
+            ->first();
+
         if ($order) {
-            $order->status = $request['status'];
-            $order->khalti_pidx = $request['transaction_id'];
-            $order->save();
+            // यदि Khalti ले status नपठाएमा API call गरेर Verify गर्ने
+            if ($pidx && strtolower($status) !== 'completed') {
+                $verifyUrl = env('KHALTI_BASE_URL') . '/epayment/lookup/';
+                $verifyResponse = Http::withHeaders([
+                    'Authorization' => 'Key ' . env('KHALTI_SECRET')
+                ])
+                ->withoutVerifying()
+                ->post($verifyUrl, ['pidx' => $pidx]);
+
+                if ($verifyResponse->successful()) {
+                    $status = $verifyResponse->json('status');
+                }
+            }
+
+            if (strtolower($status) === 'completed') {
+                $order->status = 'completed';
+                $order->khalti_pidx = $pidx;
+                $order->save();
+
+                // ✅ पेमेन्ट सफल भएपछि मात्र कार्ट खाली गर्ने
+                $userId = $order->user_id;
+                $cart = Cart::where('user_id', $userId)->first();
+                if ($cart) {
+                    CartItem::where('cart_id', $cart->id)->delete();
+                }
+
+                return redirect()->route('order.history')->with('success', 'भुक्तानी सफल भयो! तपाईंको अर्डर स्वीकृत भयो।');
+            } else {
+                // पेमेन्ट क्यान्सिल भएमा वा असफल भएमा
+                $order->status = 'canceled';
+                $order->save();
+
+                return redirect()->route('checkout')->with('error', 'भुक्तानी पूरा भएन वा रद्द गरियो। तपाईंको कार्टका सामानहरू सुरक्षित छन्।');
+            }
         }
-        return redirect()->route('order.history');
+
+        return redirect()->route('checkout')->with('error', 'अर्डर फेला पर्न सकेन।');
     }
 
     public function history()

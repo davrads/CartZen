@@ -183,9 +183,10 @@ class CheckoutController extends Controller
                 $product->save();
             }
 
-            // ✅ FIX: Khalti भएमा cart delete/commit गर्नु अघि पहिले payment initiate गर्ने।
-            // पहिले जस्तो cart delete + commit गरेपछि Khalti fail भए, order/stock/commit
-            // भइसकेको हुन्थ्यो तर cart फर्किंदैनथ्यो — permanent data loss हुन्थ्यो।
+            // ✅ FIX: पहिले यहाँ cart delete हुन्थ्यो payment initiate हुनासाथै (Khalti तिर
+            // redirect हुनु अघि नै) — मतलब payment नगरी/cancel गरी back आए पनि cart
+            // पहिल्यै खाली भइसकेको हुन्थ्यो। अब cart यहाँ delete हुँदैन; verifyKhalti()
+            // मा payment साँच्चै "Completed" भएपछि मात्र delete हुन्छ।
             if ($request->payment_method === 'khalti') {
                 $khaltiResponse = $this->getKhaltiPaymentUrl($order);
 
@@ -194,7 +195,6 @@ class CheckoutController extends Controller
                     return redirect()->route('checkout')->with('error', 'Khalti initiation failed. Please try again or choose COD.');
                 }
 
-                $cart->items()->delete();
                 DB::commit();
 
                 return redirect()->away($khaltiResponse);
@@ -277,6 +277,13 @@ class CheckoutController extends Controller
                 if ($order) {
                     $order->status = 'processing';
                     $order->save();
+
+                    // ✅ FIX: payment साँच्चै "Completed" पुष्टि भएपछि मात्र यहाँ cart खाली गर्ने
+                    $cart = Cart::where('user_id', $order->user_id)->first();
+                    if ($cart) {
+                        $cart->items()->delete();
+                    }
+
                     return redirect()->route('home')->with('success', 'Payment successful! Your order is confirmed.');
                 }
             }

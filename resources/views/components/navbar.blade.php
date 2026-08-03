@@ -1,21 +1,19 @@
 <nav class="bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-20 py-3">
-            <div class="flex items-center gap-4">
-                <button id="mobile-menu-btn" class="md:hidden text-gray-700 hover:text-purple-600 focus:outline-none">
+            <div class="flex items-center gap-2 sm:gap-4">
+                <button id="mobile-menu-btn" class="md:hidden text-gray-700 hover:text-purple-600 focus:outline-none p-1">
                     <i class="fas fa-bars text-2xl"></i>
                 </button>
                 <a href="{{ route('home') }}">
-                    <img class="h-12 md:h-14 w-auto" src="{{ asset('images/cartzen_logo.PNG') }}" alt="CartZen Logo">
+                    <img class="h-10 sm:h-12 md:h-14 w-auto" src="{{ asset('images/cartzen_logo.PNG') }}" alt="CartZen Logo">
                 </a>
             </div>
 
             {{-- Categories Dropdown + Desktop Search Form --}}
             <div class="flex-1 max-w-4xl mx-4 hidden sm:flex items-center gap-3">
                 
-               
                 @php
-                   
                     $navCategories = \App\Models\Category::whereNull('parent_id')
                                         ->with('children')
                                         ->take(8)
@@ -40,7 +38,6 @@
                                     @endif
                                 </a>
 
-                               
                                 @if($cat->children && $cat->children->count() > 0)
                                     <div class="absolute left-full top-0 ml-1 w-56 bg-white border border-gray-100 rounded-xl shadow-xl opacity-0 invisible group-hover/sub:opacity-100 group-hover/sub:visible transition-all duration-200 py-2">
                                         @foreach($cat->children as $subCat)
@@ -52,7 +49,6 @@
                                 @endif
                             </div>
                         @empty
-                            
                             <a href="{{ route('categories.index') }}" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-violet-50 hover:text-violet-600">Electronics</a>
                             <a href="{{ route('categories.index') }}" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-violet-50 hover:text-violet-600">Fashion & Clothing</a>
                             <a href="{{ route('categories.index') }}" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-violet-50 hover:text-violet-600">Home & Kitchen</a>
@@ -82,15 +78,15 @@
                 </form>
             </div>
 
-            <div class="flex items-center gap-5 px-3 py-2 rounded-xl hover:bg-violet-50 transition md:gap-7">
+            <div class="flex items-center gap-2 sm:gap-5 px-1 sm:px-3 py-2 rounded-xl hover:bg-violet-50 transition md:gap-7">
                 <a href="/user_profile"
-                    class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-gray-700 hover:bg-violet-50 hover:text-violet-600 transition-all duration-200">
+                    class="flex items-center gap-2 rounded-xl px-2 sm:px-3 py-2 text-sm font-medium text-gray-700 hover:bg-violet-50 hover:text-violet-600 transition-all duration-200">
                     <i class="fas fa-user-circle text-2xl text-violet-600"></i>
                     <span class="hidden sm:inline">Account</span>
                 </a>
 
                 <a href="{{ route('cart.index') }}"
-                    class="relative flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-gray-700 hover:bg-violet-50 hover:text-violet-600 transition-all duration-200">
+                    class="relative flex items-center gap-2 rounded-xl px-2 sm:px-3 py-2 text-sm font-medium text-gray-700 hover:bg-violet-50 hover:text-violet-600 transition-all duration-200">
                     <i class="fas fa-shopping-cart text-2xl text-violet-600"></i>
                     @php
                     $cartCount = 0;
@@ -109,7 +105,7 @@
             </div>
         </div>
 
-       
+        {{-- Mobile Search Form --}}
         <div class="block sm:hidden pb-3">
             <form action="{{ route('search') }}" method="GET" class="relative w-full">
                 <div class="flex border border-gray-300 rounded-lg overflow-hidden bg-white">
@@ -155,20 +151,72 @@
         <div id="mobile-menu" class="hidden md:hidden pb-4 pt-2 border-t border-gray-100">
             <a href="{{ route('home') }}" class="block text-gray-700 hover:text-purple-600 font-medium px-3 py-2 rounded hover:bg-purple-50">Home</a>
             <a href="{{ route('shop-on-sale', ['slug' => 'mobiles-tablets']) }}" class="block text-gray-700 hover:text-purple-600 font-medium px-3 py-2 rounded hover:bg-purple-50">Shop</a>
-            <a href="{{ route('categories.index') }}" class="block text-gray-700 hover:text-purple-600 font-medium px-3 py-2 rounded hover:bg-purple-50">Categories</a>
+            
+            {{-- Mobile Categories Accordion --}}
+            <div class="border-y border-gray-100 my-1 py-1">
+                <button id="mobile-categories-btn" class="w-full flex items-center justify-between text-gray-700 hover:text-purple-600 font-medium px-3 py-2 rounded hover:bg-purple-50">
+                    <span class="flex items-center gap-2">
+                        <i class="fas fa-th-large text-violet-600"></i> Categories
+                    </span>
+                    <i id="mobile-cat-arrow" class="fas fa-chevron-down text-xs transition-transform duration-200"></i>
+                </button>
+                
+                <div id="mobile-categories-list" class="hidden pl-6 pr-2 py-1 space-y-1 bg-gray-50/50 rounded-lg my-1">
+                    @forelse($navCategories as $cat)
+                        <div class="py-0.5">
+                            <a href="{{ route('categories.show', $cat->slug ?? $cat->id) }}" class="block text-xs font-semibold text-gray-800 hover:text-violet-600 py-1">
+                                {{ $cat->name }}
+                            </a>
+                            @if($cat->children && $cat->children->count() > 0)
+                                <div class="pl-3 space-y-1 border-l-2 border-violet-200 my-1">
+                                    @foreach($cat->children as $subCat)
+                                        <a href="{{ route('categories.show', $subCat->slug ?? $subCat->id) }}" class="block text-[11px] text-gray-600 hover:text-violet-600 py-0.5">
+                                            {{ $subCat->name }}
+                                        </a>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
+                    @empty
+                        <a href="{{ route('categories.index') }}" class="block text-xs text-gray-600 py-1">Electronics</a>
+                        <a href="{{ route('categories.index') }}" class="block text-xs text-gray-600 py-1">Fashion & Clothing</a>
+                        <a href="{{ route('categories.index') }}" class="block text-xs text-gray-600 py-1">Home & Kitchen</a>
+                    @endforelse
+                    
+                    <a href="{{ route('categories.index') }}" class="block text-xs font-bold text-violet-600 pt-2 pb-1">
+                        View All Categories &rarr;
+                    </a>
+                </div>
+            </div>
+
+            <a href="{{ route('categories.index') }}" class="block text-gray-700 hover:text-purple-600 font-medium px-3 py-2 rounded hover:bg-purple-50">All Categories Page</a>
+            <a href="{{ route('stores.index') }}" class="block text-gray-700 hover:text-purple-600 font-medium px-3 py-2 rounded hover:bg-purple-50">Stores</a>
             <a href="{{ route('cart.index') }}" class="block text-gray-700 hover:text-purple-600 font-medium px-3 py-2 rounded hover:bg-purple-50">Cart</a>
         </div>
     </div>
 </nav>
 
 <script>
-   
     const mobileMenuBtn = document.getElementById('mobile-menu-btn');
     const mobileMenu = document.getElementById('mobile-menu');
 
     if (mobileMenuBtn && mobileMenu) {
         mobileMenuBtn.addEventListener('click', () => {
             mobileMenu.classList.toggle('hidden');
+        });
+    }
+
+    // Mobile Categories Toggle Logic
+    const mobileCatBtn = document.getElementById('mobile-categories-btn');
+    const mobileCatList = document.getElementById('mobile-categories-list');
+    const mobileCatArrow = document.getElementById('mobile-cat-arrow');
+
+    if (mobileCatBtn && mobileCatList) {
+        mobileCatBtn.addEventListener('click', () => {
+            mobileCatList.classList.toggle('hidden');
+            if (mobileCatArrow) {
+                mobileCatArrow.classList.toggle('rotate-180');
+            }
         });
     }
 </script>

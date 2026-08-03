@@ -47,7 +47,16 @@ Route::prefix('stores')->group(function () {
 
 
 // Khalti callback – must be public (no auth middleware)
+// NOTE: previously this route name ('khalti.callback') was duplicated inside the
+// 'customer' middleware group below, which made route('khalti.callback') resolve to
+// the auth-protected route. If the customer's session/cookie wasn't present on Khalti's
+// return redirect, that protected route bounced the user to /login before any order
+// logic ran — which is why the cart looked "empty" after backing out of payment
+// (it wasn't deleted, the user was just logged out). Both callback routes are now
+// public and have distinct names so route('khalti.callback') is unambiguous.
 Route::get('/khalti/verify', [CheckoutController::class, 'verifyKhalti'])->name('khalti.verify');
+Route::get('/khalti/callback', [OrderController::class, 'callback'])->name('khalti.callback');
+Route::get('/checkout/khalti/callback', [CheckoutController::class, 'callback'])->name('checkout.khalti.callback');
 
 Route::middleware('guest')->group(function () {
 
@@ -88,7 +97,6 @@ Route::middleware('customer')->group(function () {
     Route::prefix('checkout')->group(function () {
         Route::get('/', [CheckoutController::class, 'index'])->name('checkout');
         Route::post('/place-order', [CheckoutController::class, 'placeOrder'])->name('place.order');
-        Route::get('/khalti/callback', [CheckoutController::class, 'callback'])->name('khalti.callback');
     });
 
     Route::get('/order/history', [OrderController::class, 'history'])->name('order.history');

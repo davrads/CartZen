@@ -200,7 +200,7 @@
 
 <div class="bg-gray-50 min-h-screen text-gray-800">
     <header
-        class="lg:hidden fixed top-0 left-0 right-0 z-30 bg-white shadow-sm flex items-center justify-between px-4 py-3">
+        class="lg:hidden fixed top-0 left-0 right-0 bg-white shadow-sm flex items-center justify-between px-4 py-3">
         <div class="flex items-center gap-2">
             <button id="menu-btn" onclick="openSidebar()"
                 class="p-2 rounded-lg text-violet-600 hover:bg-violet-50 transition">
@@ -228,7 +228,7 @@
 
     <div class="bg-white grid lg:grid-cols-[auto,1fr]">
         <aside id="sidebar"
-            class="fixed lg:static top-0 left-0 h-screen lg:h-[calc(100vh-5rem)] overflow-y-auto w-64 bg-white shadow-xl z-50 flex flex-col transition-transform duration-300 -translate-x-full lg:translate-x-0 lg:shadow-none lg:border-r lg:border-gray-100">
+            class="fixed lg:static top-0 left-0 h-screen lg:h-[calc(100vh-5rem)] overflow-y-auto w-64 bg-white shadow-xl z-0 flex flex-col transition-transform duration-300 -translate-x-full lg:translate-x-0 lg:shadow-none lg:border-r lg:border-gray-100">
 
             <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-100 shrink-0">
                 <div

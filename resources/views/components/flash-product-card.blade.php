@@ -29,38 +29,38 @@
 @endphp
 
 @if($isActive)
-<div class="flash-card group relative bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full">
+<div class="flash-card group relative bg-white rounded-lg sm:rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full">
     
     {{-- Flash Sale Badge & Discount --}}
-    <div class="absolute top-3 left-3 z-20 flex flex-col gap-2">
-        <div class="bg-red-600 text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-md animate-pulse">
+    <div class="absolute top-1 left-1 sm:top-10 sm:left-3 z-20 flex flex-col gap-0.5 sm:gap-2">
+        <div class="bg-red-600 text-white text-[7px] sm:text-xs font-bold px-1 py-0.2  sm:px-2.5 sm:py-1 rounded sm:rounded-md shadow animate-pulse leading-none">
             Flash Sale
         </div>
         @if($discountPercent > 0)
-            <div class="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
+            <div class="bg-red-100 text-red-600 text-[7px] sm:text-xs font-bold px-1 py-0.2 rounded-full shadow-sm w-max leading-none">
                 -{{ $discountPercent }}%
             </div>
         @endif
     </div>
 
     {{-- Countdown Timer Overlay (Shows on Hover) --}}
-    <div class="absolute inset-0 bg-black/40 z-10 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-[2px]">
-        <p class="text-white text-sm font-semibold mb-2 uppercase tracking-wider">Ends In</p>
-        <div class="flex gap-2 text-center">
-            <div class="bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1 min-w-[40px]">
-                <span class="block text-white font-bold text-lg">{{ str_pad($hours, 2, '0', STR_PAD_LEFT) }}</span>
-                <span class="text-[10px] text-gray-200">Hrs</span>
+    <div class="absolute inset-0 bg-black/40 z-10 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-[2px] p-1 text-center">
+        <p class="text-white text-[9px] sm:text-sm font-semibold mb-1 uppercase tracking-wider">Ends In</p>
+        <div class="flex gap-0.5 sm:gap-2 text-center">
+            <div class="bg-white/20 backdrop-blur-sm rounded px-1 py-0.5 sm:px-2 sm:py-1 min-w-[22px] sm:min-w-[40px]">
+                <span class="block text-white font-bold text-[9px] sm:text-lg">{{ str_pad($hours, 2, '0', STR_PAD_LEFT) }}</span>
+                <span class="text-[6px] sm:text-[10px] text-gray-200">Hrs</span>
             </div>
-            <div class="bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1 min-w-[40px]">
-                <span class="block text-white font-bold text-lg">{{ str_pad($minutes, 2, '0', STR_PAD_LEFT) }}</span>
-                <span class="text-[10px] text-gray-200">Min</span>
+            <div class="bg-white/20 backdrop-blur-sm rounded px-1 py-0.5 sm:px-2 sm:py-1 min-w-[22px] sm:min-w-[40px]">
+                <span class="block text-white font-bold text-[9px] sm:text-lg">{{ str_pad($minutes, 2, '0', STR_PAD_LEFT) }}</span>
+                <span class="text-[6px] sm:text-[10px] text-gray-200">Min</span>
             </div>
-            <div class="bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1 min-w-[40px]">
-                <span class="block text-white font-bold text-lg">{{ str_pad($seconds, 2, '0', STR_PAD_LEFT) }}</span>
-                <span class="text-[10px] text-gray-200">Sec</span>
+            <div class="bg-white/20 backdrop-blur-sm rounded px-1 py-0.5 sm:px-2 sm:py-1 min-w-[22px] sm:min-w-[40px]">
+                <span class="block text-white font-bold text-[9px] sm:text-lg">{{ str_pad($seconds, 2, '0', STR_PAD_LEFT) }}</span>
+                <span class="text-[6px] sm:text-[10px] text-gray-200">Sec</span>
             </div>
         </div>
-        <a href="{{ $productUrl }}" class="mt-3 bg-white text-red-600 text-xs font-bold px-4 py-2 rounded-full hover:bg-red-50 transition-colors">
+        <a href="{{ $productUrl }}" class="mt-1 sm:mt-3 bg-white text-red-600 text-[8px] sm:text-xs font-bold px-2 py-0.5 sm:px-4 sm:py-2 rounded-full hover:bg-red-50 transition-colors">
             View Deal
         </a>
     </div>
@@ -73,25 +73,25 @@
                 <img
                     src="{{ ($product->thumbnail ?? null) ? asset('storage/' . $product->thumbnail) : asset('images/no-image.png') }}"
                     alt="{{ $product->name ?? 'Product' }}"
-                    class="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500"
+                    class="w-full h-full object-contain p-1 sm:p-4 group-hover:scale-105 transition-transform duration-500"
                     loading="lazy"
                 >
             </div>
 
             {{-- Content --}}
-            <div class="p-4 pb-0 flex flex-col flex-grow">
-                <h3 class="font-medium text-base text-gray-800 line-clamp-2 min-h-[2.8rem]">
+            <div class="p-1.5 sm:p-4 pb-0 flex flex-col flex-grow">
+                <h3 class="font-medium text-[10px] sm:text-base text-gray-800 line-clamp-2 leading-tight min-h-[1.75rem] sm:min-h-[2.8rem]">
                     {{ $product->name ?? 'Product' }}
                 </h3>
 
-                <div class="mt-3 flex items-baseline gap-2 flex-wrap">
+                <div class="mt-1 sm:mt-3 flex flex-col sm:flex-row sm:items-baseline sm:gap-2">
                     {{-- Flash Price --}}
-                    <span class="text-xl font-bold text-red-600">
+                    <span class="text-[11px] sm:text-xl font-bold text-red-600 leading-none">
                         Rs. {{ number_format($flashSale->flash_price, 2) }}
                     </span>
                     
                     {{-- Original Price (Strikethrough) --}}
-                    <span class="text-sm text-gray-400 line-through">
+                    <span class="text-[8px] sm:text-sm text-gray-400 line-through leading-none mt-0.5 sm:mt-0">
                         Rs. {{ number_format($product->price, 2) }}
                     </span>
                 </div>
@@ -99,20 +99,20 @@
                 {{-- Stock Bar (Optional Visual) --}}
                 @php $productStock = $product->stock ?? 0; @endphp
                 @if($productStock > 0)
-                    <div class="mt-3 w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
-                        <div class="bg-red-500 h-1.5 rounded-full" style="width: {{ min(100, ($productStock / 10) * 100) }}%"></div>
+                    <div class="mt-1 sm:mt-3 w-full bg-gray-200 rounded-full h-0.5 sm:h-1.5 overflow-hidden">
+                        <div class="bg-red-500 h-full rounded-full" style="width: {{ min(100, ($productStock / 10) * 100) }}%"></div>
                     </div>
-                    <p class="text-[10px] text-gray-500 mt-1 text-right">
+                    <p class="text-[7px] sm:text-[10px] text-gray-500 mt-0.5 text-right leading-none">
                         {{ $productStock }} left
                     </p>
                 @else
-                    <p class="mt-2 text-xs text-red-500 font-semibold">Sold Out</p>
+                    <p class="mt-0.5 text-[8px] sm:text-xs text-red-500 font-semibold leading-none">Sold Out</p>
                 @endif
             </div>
         </a>
 
         {{-- Add to Cart Form Section (थपिएको भाग) --}}
-        <div class="p-4 pt-3 z-20 relative">
+        <div class="p-1.5 sm:p-4 pt-1 z-20 relative">
             @if(($product->stock ?? 1) > 0)
                 <form action="{{ route('cart.add') }}" method="POST">
                     @csrf
@@ -123,15 +123,15 @@
                     <input type="hidden" name="flash_sale_id" value="{{ $flashSale->id ?? '' }}">
                     <input type="hidden" name="quantity" value="1">
 
-                    <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2.5 px-4 rounded-xl shadow-md transition-colors duration-200 flex items-center justify-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white text-[8px] sm:text-xs font-bold py-1 sm:py-2.5 px-1 sm:px-4 rounded sm:rounded-xl shadow-xs sm:shadow-md transition-colors duration-200 flex items-center justify-center gap-0.5 sm:gap-2 leading-none">
+                        <svg class="w-2.5 h-2.5 sm:w-4 sm:h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"></path>
                         </svg>
-                        Add To Cart
+                        <span class="truncate">Add To Cart</span>
                     </button>
                 </form>
             @else
-                <button disabled class="w-full bg-gray-300 text-gray-500 text-xs font-bold py-2.5 px-4 rounded-xl cursor-not-allowed">
+                <button disabled class="w-full bg-gray-300 text-gray-500 text-[8px] sm:text-xs font-bold py-1 sm:py-2.5 px-1 sm:px-4 rounded sm:rounded-xl cursor-not-allowed leading-none">
                     Out of Stock
                 </button>
             @endif
